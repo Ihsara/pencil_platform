@@ -2,17 +2,27 @@
 format: namelist
 data:
   run_pars:
+    # THIS IS THE CRITICAL FIX for the 'lperi' warning
     bcx: ['a', 's', 's', 's', 's', 's']
     cdt: 0.1
-    # ... (all other run_pars)
+    cdtv: 0.1
+    cvsid: "9a97ecc83"
+    dsnap: 1.0e-5
+    dtmin: 1.0e-12
+    dvid: 0.02
+    isave: 1000
+    tmax: 1.0e-4
+    it1: 100
+    itorder: 3
+    lpencil_check: false
     nt: 6000
 
   density_run_pars:
     diffrho_shock: 1.0
     idiff: 'shock'
     lmassdiff_fix: true
-    lgamma_is_1: false
 
+  # Include the hyper params in the base, as they exist in the working reference
   entropy_run_pars:
     chi_hyper3: 9.0e-14
     chi_shock: 1.0
@@ -23,6 +33,5 @@ data:
     nu_hyper3: 3.0e-12
     nu_shock: 1.0
   
-  # Empty namelists
   eos_run_pars: {}
   hydro_run_pars: {}

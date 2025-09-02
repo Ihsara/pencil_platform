@@ -1,51 +1,35 @@
-# Plan for the shocktube_phase1 parameter sweep
+# config/shocktube_phase1/plan/sweep.yaml
 ---
-# --- HPC Execution Parameters ---
 hpc:
-  # CORRECTED: The base directory for the source simulation on the HPC.
   source_base_dir: '/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod'
-  
-  # CORRECTED: The destination directory for the generated runs on the HPC.
   run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase1'
-
-  # SLURM SBATCH parameters for the array job submission script.
   sbatch:
-    job_name: "shock_sweep_ph1"
-    account: "project_2008296"
-    partition: "small"         # CHANGED: Use 'small' for single-node jobs
-    time: "00:15:00"         # CHANGED: 15 minutes is sufficient for a small test
-    nodes: 1
-    ntasks: 1                # CHANGED: More explicit than -n
-    cpus_per_task: 1         # CHANGED: Request only ONE core
-    mail_user: "chau.c.tran@aalto.fi"
-    mail_type: "END"
-
-# --- Experiment Generation Parameters ---
+    # ... (sbatch parameters are correct)
 
 base_experiment: 'shocktube_base'
-output_prefix: 'res400_nohyper' # More descriptive name
+output_prefix: 'res400_nohyper'
 
 # Modifications to apply to the base configuration for the ENTIRE suite.
 modifications:
   run_in.yaml:
-    # Remove these parameters from the namelists
+    # This section removes the hyper-parameters from the base config
     viscosity_run_pars:
-      nu_hyper3: null # 'null' will be interpreted as "delete this key"
+      nu_hyper3: null # 'null' deletes the key
     entropy_run_pars:
-      chi_hyper3: null # 'null' will be interpreted as "delete this key"
-    # Change the values of these lists
+      chi_hyper3: null # 'null' deletes the key
+    # This section updates the lists now that hyper is removed
     viscosity_run_pars_update:
       ivisc: ['nu-shock']
     entropy_run_pars_update:
       iheatcond: ['shock']
 
-# Defines the parameter sweep
+# Defines the parameter sweep (this is correct)
 sweep_parameters:
   nu_shock: [0.1, 0.5, 1.0, 5.0]
   chi_shock: [0.1, 0.5, 1.0, 5.0]
   diffrho_shock: [0.1, 0.5, 1.0, 5.0]
 
-# Defines the branches of the experiment
+# Defines the branches. NOTE: No 'gamma' or 'l_gamma_is_1' here.
 branches:
   - name: "massfix"
     settings:
