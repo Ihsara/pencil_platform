@@ -1,43 +1,76 @@
-# config/shocktube_phase1/plan/sweep.yaml
+# ===================================================================
+# Plan for the Shocktube Phase 1 Parameter Sweep
+# ===================================================================
+# This file defines the entire experimental campaign. It is read by
+# the main Python script to generate all necessary run configurations
+# and submission scripts.
 ---
-hpc:
-  source_base_dir: '/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod'
-  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase1'
-  sbatch:
-    # ... (sbatch parameters are correct)
 
+# --- HPC Execution Parameters ---
+# Defines paths and settings for the High-Performance Computing environment (Mahti).
+hpc:
+  # The absolute path to the verified, working base simulation directory.
+  # pc_newrun will use this as the source to create new runs.
+  source_base_dir: '/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod'
+  
+  # The absolute path where all new experiment run directories will be created.
+  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase1'
+
+  # SLURM SBATCH parameters for the array job submission script.
+  sbatch:
+    job_name: "shock_sweep_ph1"
+    account: "project_2008296"
+    partition: "small"         # Use 'small' for single-core, short jobs.
+    time: "00:15:00"         # Format: HH:MM:SS. 15 minutes is ample for a test.
+    nodes: 1
+    ntasks: 1                # Request exactly one task.
+    cpus_per_task: 1         # Request one CPU core for that task.
+    mail_user: "chau.c.tran@aalto.fi"
+    mail_type: "END"         # Options: BEGIN, END, FAIL, ALL
+
+# --- Experiment Generation Parameters ---
+# The name of the local configuration directory that serves as the template.
 base_experiment: 'shocktube_base'
+
+# A descriptive prefix for all generated run directories.
 output_prefix: 'res400_nohyper'
 
-# Modifications to apply to the base configuration for the ENTIRE suite.
+# Modifications to apply to the 'base_experiment' configuration for this entire suite.
+# This allows us to start from a verified base and programmatically alter it.
 modifications:
   run_in.yaml:
-    # This section removes the hyper-parameters from the base config
+    # Remove these parameters by setting their value to null.
     viscosity_run_pars:
-      nu_hyper3: null # 'null' deletes the key
+      nu_hyper3: null
     entropy_run_pars:
-      chi_hyper3: null # 'null' deletes the key
-    # This section updates the lists now that hyper is removed
+      chi_hyper3: null
+    # Update these list parameters now that hyper-terms are removed.
     viscosity_run_pars_update:
       ivisc: ['nu-shock']
     entropy_run_pars_update:
       iheatcond: ['shock']
 
-# Defines the parameter sweep (this is correct)
+# --- Combinatorial Sweep Definition ---
+# The script will generate a run for every possible combination of these parameters.
+# Total combinations = 4 * 4 * 4 = 64.
 sweep_parameters:
   nu_shock: [0.1, 0.5, 1.0, 5.0]
   chi_shock: [0.1, 0.5, 1.0, 5.0]
   diffrho_shock: [0.1, 0.5, 1.0, 5.0]
 
-# Defines the branches. NOTE: No 'gamma' or 'l_gamma_is_1' here.
+# --- Experiment Branches ---
+# The entire parameter sweep will be executed for each branch defined below.
+# Total runs = (number of sweep combinations) * (number of branches).
 branches:
   - name: "massfix"
+    description: "Runs with the mass diffusion fix enabled."
     settings:
       run_in.yaml:
         density_run_pars:
           lmassdiff_fix: true
 
   - name: "nomassfix"
+    description: "Runs with the mass diffusion fix disabled."
     settings:
       run_in.yaml:
         density_run_pars:
