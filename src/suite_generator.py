@@ -113,14 +113,14 @@ def run_suite(plan_file: Path, limit: int = None):
     # --- Generate the main submission script ---
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(DIRS.templates), trim_blocks=True, lstrip_blocks=True)
     submit_template = env.get_template("sbatch_array.j2")
-    
-    # **BUG FIX:** Pass the entire 'hpc' dictionary to the render context.
+        
     submit_script_content = submit_template.render(
         hpc=plan.get('hpc', {}),
         sbatch=plan.get('hpc', {}).get('sbatch', {}),
-        run_base_dir=plan.get('hpc', {}).get('run_base_dir', 'runs'), # Provide a default
+        run_base_dir=plan.get('hpc', {}).get('run_base_dir', 'runs'), 
         manifest_file=FILES.manifest,
-        num_jobs=len(all_runs)
+        num_jobs=len(all_runs),
+        experiment_name=experiment_name  # <-- NEW: Pass the experiment name
     )
     
     submit_script_path = local_exp_dir / FILES.submit_script

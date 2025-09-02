@@ -26,7 +26,8 @@ echo "Current Directory: $(pwd)"
 echo "-------------------------"
 
 # --- Path Definitions using the robust SLURM_SUBMIT_DIR variable ---
-MANIFEST_FILE="${SLURM_SUBMIT_DIR}/{{ manifest_file }}"
+MANIFEST_FILE="${SLURM_SUBMIT_DIR}/runs/{{ experiment_name }}/{{ manifest_file }}"
+
 
 if [ ! -f "$MANIFEST_FILE" ]; then
     echo "FATAL ERROR: Manifest file not found at ${MANIFEST_FILE}" >&2
@@ -44,7 +45,7 @@ fi
 SOURCE_BASE_DIR="{{ hpc.source_base_dir }}"
 RUN_BASE_DIR="{{ hpc.run_base_dir }}"
 RUN_DIR="${RUN_BASE_DIR}/${RUN_NAME}"
-LOCAL_GENERATED_CONFIG_DIR="${SLURM_SUBMIT_DIR}/generated_configs/${RUN_NAME}"
+LOCAL_GENERATED_CONFIG_DIR="${SLURM_SUBMIT_DIR}/runs/{{ experiment_name }}/generated_configs/${RUN_NAME}" # Also fix this path!
 LOGFILE="${RUN_DIR}/simulation.log"
 
 echo "INFO: Starting SLURM task ${SLURM_ARRAY_TASK_ID} for run: ${RUN_NAME}"
