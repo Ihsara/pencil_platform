@@ -7,7 +7,7 @@ from copy import deepcopy
 from .constants import DIRS, FILES
 
 def run_suite(plan_file: Path, limit: int = None):
-    """Reads an experiment plan and generates all specified run directories and scripts."""
+    """Reads an experiment plan and generates all specified run directories and scripts locally."""
     logger.info(f"Loading experiment plan from: {plan_file}")
     with open(plan_file, 'r') as f:
         plan = yaml.safe_load(f)
@@ -22,6 +22,7 @@ def run_suite(plan_file: Path, limit: int = None):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(DIRS.templates), trim_blocks=True, lstrip_blocks=True)
     
     all_runs = []
+    # (The logic to generate all_runs is the same as before)
     sweep_params = plan['sweep_parameters']
     sweep_values = list(itertools.product(*sweep_params.values()))
     
@@ -46,27 +47,41 @@ def run_suite(plan_file: Path, limit: int = None):
 
             all_runs.append({'name': run_name, 'configs': run_configs})
 
-    # --- Apply Test Mode Limit ---
     if limit is not None and limit > 0:
         logger.warning(f"TEST MODE: Generating only the first {limit} run(s) of the suite.")
         all_runs = all_runs[:limit]
 
-    # --- Write all files locally ---
+    # --- Write all generated files locally ---
     experiment_name = plan_file.parent.parent.name
     local_exp_dir = DIRS.runs / experiment_name
     os.makedirs(local_exp_dir / "slurm_logs", exist_ok=True)
     
+    # **NEW LOGIC**: Generate the config files for each run into a subdirectory
+    for run in all_runs:
+        run_config_dir = local_exp_dir / "generated_configs" / run['name']
+        os.makedirs(run_config_dir, exist_ok=True)
+        for config_filename, config_content in run['configs'].items():
+            output_filename = Path(config_filename).stem.replace('_', '.')
+            template_format = config_content.get('format')
+            template_data = config_content.get('data', {})
+            if template_format:
+                template = env.get_template(f"{template_format}.j2")
+                rendered_content = template.render(data=template_data)
+                with open(run_config_dir / output_filename, 'w') as f:
+                    f.write(rendered_content)
+
+    # Generate the manifest of run names
     manifest_path = local_exp_dir / FILES.manifest
     with open(manifest_path, 'w') as f:
         for run in all_runs:
             f.write(f"{run['name']}\n")
     logger.success(f"Generated run manifest for {len(all_runs)} run(s) at '{manifest_path}'")
 
+    # Generate the single submission script
     submit_template = env.get_template("sbatch_array.j2")
     submit_script_content = submit_template.render(
         sbatch=plan['hpc']['sbatch'],
         run_base_dir=plan['hpc']['run_base_dir'],
-        output_dir=plan['hpc']['run_base_dir'],
         manifest_file=FILES.manifest,
         num_jobs=len(all_runs)
     )
