@@ -56,6 +56,22 @@ def run_suite(plan_file: Path, limit: int = None):
 
     base_configs = {p.name: yaml.safe_load(p.read_text()) for p in base_config_path.glob("*.yaml")}
     
+    modifications = plan.get('modifications', {})
+    for file, settings in modifications.items():
+        for namelist, params in settings.items():
+            for key, value in params.items():
+                # Handle updates for list values (e.g., ivisc)
+                if namelist.endswith('_update'):
+                    clean_namelist = namelist.replace('_update', '')
+                    base_configs[file]['data'][clean_namelist][key] = value
+                # Handle key deletion
+                elif value is None:
+                    if key in base_configs[file]['data'][namelist]:
+                        del base_configs[file]['data'][namelist][key]
+                # Handle normal value changes
+                else:
+                    base_configs[file]['data'][namelist][key] = value
+    
     # --- Generate all run configurations and names in memory ---
     all_runs = []
     sweep_params = plan.get('sweep_parameters', {})

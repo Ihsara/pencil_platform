@@ -1,20 +1,13 @@
-
-# These top-level keys will correspond to the Fortran namelist blocks.
+# config/shocktube_base/in/start_in.yaml
 format: namelist
 data:
   init_pars:
-    cvsid: "10263904b"
-    lfix_unit_std: true
+    cvsid: "9a97ecc83"
     lperi: [false, true, true]
     lwrite_ic: true
-    unit_density: 1.6737236E-24
-    unit_length: 3.08567758E+21
-    unit_velocity: 97781.22994895071
+    # Using Lxyz as the standard parameter
     xyz0: [-0.5, -0.5, -0.5]
-    # Note: The standard parameter is Lxyz, not xyz1.
-    # This defines the size of the box starting from xyz0.
-    Lxyz: [1.0, 1.0, 1.0]    
-
+    Lxyz: [1.0, 1.0, 1.0]
 
   density_init_pars:
     initlnrho: 'xjump'
@@ -31,6 +24,6 @@ data:
     widthss: 0.01
     xjump_mid: 0.0
 
-  # Empty namelists are included to show they will be created correctly.
+  # These must be present but empty
   eos_init_pars: {}
   hydro_init_pars: {}

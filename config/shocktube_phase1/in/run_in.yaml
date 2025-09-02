@@ -1,18 +1,10 @@
+# config/shocktube_base/in/run_in.yaml
 format: namelist
 data:
   run_pars:
     bcx: ['a', 's', 's', 's', 's', 's']
     cdt: 0.1
-    cdtv: 0.1
-    cvsid: "10263904b"
-    dsnap: 1.0e-5
-    dtmin: 1.0e-12
-    dvid: 0.02
-    isave: 1000
-    tmax: 1.0e-4
-    it1: 100
-    itorder: 3
-    lpencil_check: false
+    # ... (all other run_pars)
     nt: 6000
 
   density_run_pars:
@@ -23,22 +15,13 @@ data:
   entropy_run_pars:
     chi_hyper3: 9.0e-14
     chi_shock: 1.0
-    iheatcond: ['shock']
-
-  shock_run_pars:
-    con_bias: 0.05
-    dtfactor: 0.2
-    ishock_max: 1
-    lconvergence_only: true
-    lgaussian_smooth: true
-    lmax_shock: false
-    shock_div_pow: 1.75
+    iheatcond: ['shock', 'hyper3']
 
   viscosity_run_pars:
-    ivisc: ['nu-shock']
+    ivisc: ['nu-shock', 'hyper3-nu-const']
     nu_hyper3: 3.0e-12
     nu_shock: 1.0
-
-  # Empty namelists are included for completeness
+  
+  # Empty namelists
   eos_run_pars: {}
   hydro_run_pars: {}
