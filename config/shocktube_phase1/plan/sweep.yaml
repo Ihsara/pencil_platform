@@ -1,28 +1,29 @@
-# Plan for the shocktube parameter sweep
+# Plan for the shocktube_phase1 parameter sweep
 ---
 # --- HPC Execution Parameters ---
 hpc:
-  # Base directory on the HPC for the source/base simulation files.
-  source_base_dir: '/scratch/project_2008296/chau/simbase/shocktube-1d'
+  # CORRECTED: The base directory for the source simulation on the HPC.
+  source_base_dir: '/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod'
   
-  # Base directory on the HPC where the new run directories will be created.
-  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube'
+  # CORRECTED: The destination directory for the generated runs on the HPC.
+  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase1'
 
   # SLURM SBATCH parameters for the array job submission script.
   sbatch:
-    job_name: "shock_sweep"
+    job_name: "shock_sweep_ph1"
     account: "project_2008296"
     partition: "medium"
     time: "01:00:00"
     nodes: 1
     ntasks_per_node: 1
     mail_user: "chau.c.tran@aalto.fi"
-    mail_type: "END" # Can be BEGIN, END, FAIL, ALL
+    mail_type: "END"
 
 # --- Experiment Generation Parameters ---
 base_experiment: 'shocktube_base'
 output_prefix: 'res400'
 
+# ... (sweep_parameters and branches remain the same as the corrected version) ...
 sweep_parameters:
   nu_shock: [0.1, 0.5, 1.0, 5.0]
   chi_shock: [0.1, 0.5, 1.0, 5.0]

@@ -36,14 +36,25 @@ def main():
 
     parser = argparse.ArgumentParser(
         description="Pencil Code Experiment Suite Generator. "
-                    "Run without arguments for an interactive selection menu."
+                    "Run without arguments for an interactive selection menu.",
+        formatter_class=argparse.RawTextHelpFormatter
     )
     parser.add_argument(
         "experiment_name",
         nargs='?',  # The '?' makes the argument optional
         default=None,
         type=str,
-        help="The name of the experiment to generate (e.g., 'shocktube')."
+        help="The name of the experiment to generate (e.g., 'shocktube_phase1')."
+    )
+    parser.add_argument(
+        "--test",
+        nargs='?',
+        const=2,  # Default value if --test is provided with no number
+        type=int,
+        default=None,
+        help="Enable test mode. Generates a limited number of runs.\n"
+             "  --test    (generates 2 runs)\n"
+             "  --test 5  (generates 5 runs)"
     )
     args = parser.parse_args()
 
@@ -71,7 +82,10 @@ def main():
         except (ValueError, IndexError):
             logger.error("Invalid input. Please enter a valid number.")
             sys.exit(1)
-    
+        except KeyboardInterrupt:
+            logger.info("\nOperation cancelled by user.")
+            sys.exit(0)
+
     # --- Execution Logic ---
     if experiment_name not in available_experiments:
         logger.error(f"Experiment '{experiment_name}' not found.")
@@ -79,12 +93,16 @@ def main():
         sys.exit(1)
     
     plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
+    if not plan_file.exists():
+        logger.error(f"Plan file not found for experiment '{experiment_name}' at '{plan_file}'")
+        sys.exit(1)
+
     logger.info(f"Selected experiment: '{experiment_name}'")
     
     try:
-        # Call the core logic, passing the plan file and project root
-        run_suite(plan_file, DIRS.root)
-        logger.success(f"Suite generation for '{experiment_name}' finished successfully.")
+        # Call the core logic, passing the plan file and the test limit
+        run_suite(plan_file=plan_file, limit=args.test)
+        
     except Exception as e:
         # Catch any unexpected errors from the generator for a clean exit
         logger.exception(f"An unexpected error occurred during suite generation: {e}")
