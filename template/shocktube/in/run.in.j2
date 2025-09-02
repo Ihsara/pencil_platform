@@ -1,0 +1,21 @@
+!
+! This file was automatically generated for {{ output_filename }}.
+!
+{% for namelist, params in data.items() %}
+&{{ namelist }}
+{% for key, value in params.items() %}
+  {%- if value is sameas true %}
+  {{ key }} = .true.
+  {%- elif value is sameas false %}
+  {{ key }} = .false.
+  {%- elif value is string %}
+  {{ key }} = '{{ value }}'
+  {# The correct Jinja2 test for list-like objects is 'sequence' #}
+  {%- elif value is sequence %}
+  {{ key }} = {{ value | join(', ') }}
+  {%- else %}
+  {{ key }} = {{ value }}
+  {%- endif %}
+{% endfor %}
+/
+{% endfor %}

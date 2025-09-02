@@ -1,0 +1,36 @@
+
+# These top-level keys will correspond to the Fortran namelist blocks.
+format: namelist
+data:
+  init_pars:
+    cvsid: "10263904b"
+    lfix_unit_std: true
+    lperi: [false, true, true]
+    lwrite_ic: true
+    unit_density: 1.6737236E-24
+    unit_length: 3.08567758E+21
+    unit_velocity: 97781.22994895071
+    xyz0: [-0.5, -0.5, -0.5]
+    # Note: The standard parameter is Lxyz, not xyz1.
+    # This defines the size of the box starting from xyz0.
+    Lxyz: [1.0, 1.0, 1.0]    
+
+
+  density_init_pars:
+    initlnrho: 'xjump'
+    ldensity_nolog: true
+    rho_left: 1.0
+    rho_right: 0.125
+    widthlnrho: 0.01
+    xjump_mid: 0.0
+
+  entropy_init_pars:
+    initss: 'xjump'
+    ss_left: 10.0
+    ss_right: 2.7
+    widthss: 0.01
+    xjump_mid: 0.0
+
+  # Empty namelists are included to show they will be created correctly.
+  eos_init_pars: {}
+  hydro_init_pars: {}

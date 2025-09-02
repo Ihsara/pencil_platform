@@ -1,0 +1,51 @@
+# Plan for the shocktube parameter sweep
+---
+# --- HPC Execution Parameters ---
+hpc:
+  # Base directory on the HPC for the source/base simulation files.
+  source_base_dir: '/scratch/project_2008296/chau/simbase/shocktube-1d'
+  
+  # Base directory on the HPC where the new run directories will be created.
+  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube'
+
+  # SLURM SBATCH parameters for the array job submission script.
+  sbatch:
+    job_name: "shock_sweep"
+    account: "project_2008296"
+    partition: "medium"
+    time: "01:00:00"
+    nodes: 1
+    ntasks_per_node: 1
+    mail_user: "chau.c.tran@aalto.fi"
+    mail_type: "END" # Can be BEGIN, END, FAIL, ALL
+
+# --- Experiment Generation Parameters ---
+base_experiment: 'shocktube_base'
+output_prefix: 'res400'
+
+sweep_parameters:
+  nu_shock: [0.1, 0.5, 1.0, 5.0]
+  chi_shock: [0.1, 0.5, 1.0, 5.0]
+  diffrho_shock: [0.1, 0.5, 1.0, 5.0]
+
+branches:
+  - name: "massfix_isothermal"
+    settings:
+      run_in.yaml:
+        density_run_pars: { lmassdiff_fix: true }
+      start_in.yaml:
+        density_init_pars: { gamma: 1.0 }
+
+  - name: "massfix_adiabatic"
+    settings:
+      run_in.yaml:
+        density_run_pars: { lmassdiff_fix: true }
+      start_in.yaml:
+        density_init_pars: { gamma: 1.666667 }
+
+  - name: "nomassfix_adiabatic"
+    settings:
+      run_in.yaml:
+        density_run_pars: { lmassdiff_fix: false }
+      start_in.yaml:
+        density_init_pars: { gamma: 1.666667 }

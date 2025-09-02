@@ -1,0 +1,10 @@
+# Parameters for cparam.local (not a namelist)
+# These are typically used for pre-processing.
+format: cparam
+data:
+  nxgrid: 128
+  nygrid: 32
+  nzgrid: 32
+  ncpus: 8
+  nprocy: 2
+  nprocz: 4

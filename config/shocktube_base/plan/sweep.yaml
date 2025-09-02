@@ -1,0 +1,40 @@
+# Plan for the shocktube parameter sweep
+---
+base_experiment: 'shocktube_base'
+output_prefix: 'shock_res400'
+
+sweep_parameters:
+  nu_shock: [0.1, 0.5, 1.0, 5.0]
+  chi_shock: [0.1, 0.5, 1.0, 5.0]
+  diffrho_shock: [0.1, 0.5, 1.0, 5.0]
+
+branches:
+  - name: "massfix_isothermal"
+    description: "Mass diffusion fix enabled, with gamma=1.0"
+    settings:
+      run_in.yaml:
+        density_run_pars:
+          lmassdiff_fix: true
+      start_in.yaml:
+        density_init_pars:
+          gamma: 1.0
+
+  - name: "massfix_adiabatic"
+    description: "Mass diffusion fix enabled, with default gamma"
+    settings:
+      run_in.yaml:
+        density_run_pars:
+          lmassdiff_fix: true
+      start_in.yaml:
+        density_init_pars:
+          gamma: 1.666667
+
+  - name: "nomassfix_adiabatic"
+    description: "Mass diffusion fix disabled, with default gamma"
+    settings:
+      run_in.yaml:
+        density_run_pars:
+          lmassdiff_fix: false
+      start_in.yaml:
+        density_init_pars:
+          gamma: 1.666667

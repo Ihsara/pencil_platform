@@ -1,0 +1,40 @@
+# Base parameters for run.in (Hyper-viscosity/diffusion removed)
+format: namelist
+data:
+  run_pars:
+    cdt: 0.1
+    cdtv: 0.1
+    dsnap: 1.0e-5
+    dtmin: 1.0e-12
+    isave: 1000
+    tmax: 1.0e-4
+    it1: 100
+    itorder: 3
+    lpencil_check: false
+    nt: 6000
+
+  density_run_pars:
+    diffrho_shock: 1.0 # Placeholder, will be overwritten
+    idiff: 'shock'
+    lmassdiff_fix: true # Placeholder, will be overwritten
+
+  entropy_run_pars:
+    chi_shock: 1.0 # Placeholder, will be overwritten
+    iheatcond: 'shock'
+
+  shock_run_pars:
+    lconvergence_only: true
+    # Other shock parameters that are constant for the whole suite
+    con_bias: 0.05
+    dtfactor: 0.2
+    ishock_max: 1
+    lgaussian_smooth: true
+    lmax_shock: false
+    shock_div_pow: 1.75
+
+  viscosity_run_pars:
+    ivisc: 'nu-shock'
+    nu_shock: 1.0 # Placeholder, will be overwritten
+
+  eos_run_pars: {}
+  hydro_run_pars: {}

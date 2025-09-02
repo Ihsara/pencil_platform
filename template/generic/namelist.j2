@@ -1,0 +1,29 @@
+!
+! This file was automatically generated for {{ output_filename }}.
+! Formatted for improved readability.
+!
+{% for namelist, params in data.items() %}
+&{{ namelist }}
+{% for key, value in params.items() %}
+    {% if value is sameas true -%}
+    {{ key }} = .true.
+    {% elif value is sameas false -%}
+    {{ key }} = .false.
+    {% elif value is string -%}
+    {{ key }} = '{{ value }}'
+    {# Check if it is a list of strings #}
+    {% elif value is sequence and value and value[0] is string -%}
+    {{ key }} = {{ value | map('tojson') | join(', ') | replace('"', "'") }}
+    {# Check for any other list (numbers, booleans) #}
+    {% elif value is sequence -%}
+    {{ key }} = {{ value | join(', ') }}
+    {% else -%}
+    {{ key }} = {{ value }}
+    {% endif %}
+{% endfor %}
+/
+{# Add a blank line between namelist blocks, but not after the last one. #}
+{% if not loop.last %}
+
+{% endif %}
+{% endfor %}
