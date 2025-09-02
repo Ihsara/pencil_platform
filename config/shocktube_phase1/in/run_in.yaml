@@ -2,7 +2,6 @@
 format: namelist
 data:
   run_pars:
-    # THIS IS THE CRITICAL FIX for the 'lperi' warning
     bcx: ['a', 's', 's', 's', 's', 's']
     cdt: 0.1
     cdtv: 0.1
