@@ -12,10 +12,11 @@ hpc:
   sbatch:
     job_name: "shock_sweep_ph1"
     account: "project_2008296"
-    partition: "medium"
-    time: "01:00:00"
+    partition: "small"         # CHANGED: Use 'small' for single-node jobs
+    time: "00:15:00"         # CHANGED: 15 minutes is sufficient for a small test
     nodes: 1
-    ntasks_per_node: 1
+    ntasks: 1                # CHANGED: More explicit than -n
+    cpus_per_task: 1         # CHANGED: Request only ONE core
     mail_user: "chau.c.tran@aalto.fi"
     mail_type: "END"
 
