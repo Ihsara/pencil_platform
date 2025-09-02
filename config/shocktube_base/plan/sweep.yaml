@@ -15,9 +15,6 @@ branches:
       run_in.yaml:
         density_run_pars:
           lmassdiff_fix: true
-      start_in.yaml:
-        density_init_pars:
-          gamma: 1.0
 
   - name: "massfix_adiabatic"
     description: "Mass diffusion fix enabled, with default gamma"
@@ -25,9 +22,6 @@ branches:
       run_in.yaml:
         density_run_pars:
           lmassdiff_fix: true
-      start_in.yaml:
-        density_init_pars:
-          gamma: 1.666667
 
   - name: "nomassfix_adiabatic"
     description: "Mass diffusion fix disabled, with default gamma"
@@ -35,6 +29,3 @@ branches:
       run_in.yaml:
         density_run_pars:
           lmassdiff_fix: false
-      start_in.yaml:
-        density_init_pars:
-          gamma: 1.666667
