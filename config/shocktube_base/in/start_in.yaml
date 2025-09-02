@@ -15,7 +15,7 @@ data:
     rho_right: 0.125
     widthlnrho: 0.01
     xjump_mid: 0.0
-    gamma: 1.666667 # Placeholder, will be overwritten by the plan
+
 
   entropy_init_pars:
     initss: 'xjump'
@@ -24,7 +24,5 @@ data:
     widthss: 0.01
     xjump_mid: 0.0
 
-  eos_init_pars:
-    l_gamma_is_1: false # Placeholder, will be overwritten by the plan
-  
+  eos_init_pars: {}  
   hydro_init_pars: {}

@@ -14,52 +14,71 @@
 
 set -e
 
-# --- START OF FIX ---
-# Determine the absolute path of the directory where this script is located.
-# This makes the script portable and independent of where SLURM runs it.
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
-MANIFEST_FILE="${SCRIPT_DIR}/run_manifest.txt"
-# --- END OF FIX ---
+# --- Debug Information ---
+echo "--- SLURM ENVIRONMENT ---"
+echo "Job ID: ${SLURM_JOB_ID}"
+echo "Array Task ID: ${SLURM_ARRAY_TASK_ID}"
+echo "Submission Directory: ${SLURM_SUBMIT_DIR}"
+echo "Hostname: $(hostname)"
+echo "Current Directory: $(pwd)"
+echo "-------------------------"
 
-# Get the name of the specific run directory for this task from the manifest using its absolute path
-RUN_NAME=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$MANIFEST_FILE")
+# --- Path Definitions using the robust SLURM_SUBMIT_DIR variable ---
+MANIFEST_FILE="${SLURM_SUBMIT_DIR}/runs/shocktube_phase1/run_manifest.txt"
 
-# Define the absolute path for the run on the HPC
-RUN_DIR="/scratch/project_2008296/chau/runs/shocktube_phase1/${RUN_NAME}"
 
-# Create a log file inside the specific run directory for simulation output
-LOGFILE="${RUN_DIR}/simulation.log"
-
-# --- Create the run directory first before trying to cd into it ---
-# This part of the logic will now be handled by the submission script itself,
-# making it more explicit and easier to debug.
-echo "INFO: Creating run directory: $RUN_DIR"
-mkdir -p "$RUN_DIR"
-
-echo "INFO: Starting SLURM task ${SLURM_ARRAY_TASK_ID} for run: ${RUN_NAME}" > $LOGFILE
-echo "INFO: Working directory: ${RUN_DIR}" >> $LOGFILE
-
-# Navigate into the run directory. Exit if it fails.
-cd "$RUN_DIR" || exit 1
-
-# --- Run the simulation ---
-# (The rest of the script is the same)
-if [ -e ERROR -o -e LOCK -o -e RELOAD -o -e STOP -o -e FULLSTOP -o -e ENDTIME -o -e data/proc0/crash.dat -o -e data/allprocs/crash.h5 ]; then
-    echo "WARNING: Lock file or previous error detected. Skipping run." >>$LOGFILE 2>&1
-else
-    if [ ! -e data/param.nml ]; then
-       echo "INFO: Running START..." >>$LOGFILE 2>&1
-       srun ./start.csh >>$LOGFILE 2>&1
-       if [ $? -ne 0 ]; then echo "ERROR: start.csh failed" | tee -a $LOGFILE >&2; exit 1; fi
-       echo "INFO: START finished." >>$LOGFILE 2>&1
-    else
-        echo "INFO: Skipping START (data/param.nml exists)." >>$LOGFILE 2>&1
-    fi
-
-    echo "INFO: Running RUN..." >>$LOGFILE 2>&1
-    srun ./run.csh >>$LOGFILE 2>&1
-    if [ $? -ne 0 ]; then echo "ERROR: run.csh failed" | tee -a $LOGFILE >&2; exit 1; fi
-    echo "INFO: RUN finished successfully." >>$LOGFILE 2>&1
+if [ ! -f "$MANIFEST_FILE" ]; then
+    echo "FATAL ERROR: Manifest file not found at ${MANIFEST_FILE}" >&2
+    exit 1
 fi
 
-echo "INFO: SLURM task finished." >>$LOGFILE 2>&1
+# Get the unique name for this specific job task from the manifest
+RUN_NAME=$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$MANIFEST_FILE")
+if [ -z "$RUN_NAME" ]; then
+    echo "FATAL ERROR: Could not read RUN_NAME from manifest for task ID ${SLURM_ARRAY_TASK_ID}" >&2
+    exit 1
+fi
+
+# Define all paths as absolute paths
+SOURCE_BASE_DIR="/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod"
+RUN_BASE_DIR="/scratch/project_2008296/chau/runs/shocktube_phase1"
+RUN_DIR="${RUN_BASE_DIR}/${RUN_NAME}"
+LOCAL_GENERATED_CONFIG_DIR="${SLURM_SUBMIT_DIR}/runs/shocktube_phase1/generated_configs/${RUN_NAME}" # Also fix this path!
+LOGFILE="${RUN_DIR}/simulation.log"
+
+echo "INFO: Starting SLURM task ${SLURM_ARRAY_TASK_ID} for run: ${RUN_NAME}"
+
+# --- Setup the Run Directory ---
+echo "INFO: Setting up run directory from ${SOURCE_BASE_DIR} to ${RUN_DIR}"
+pc_newrun -s "${SOURCE_BASE_DIR}" "${RUN_DIR}"
+
+# --- CRUCIAL STEP: Copy the unique generated config files into the new run directory ---
+if [ -d "$LOCAL_GENERATED_CONFIG_DIR" ]; then
+    echo "INFO: Copying generated config files from ${LOCAL_GENERATED_CONFIG_DIR} into ${RUN_DIR}"
+    cp -v "${LOCAL_GENERATED_CONFIG_DIR}"/* "${RUN_DIR}/"
+else
+    echo "WARNING: No specific generated config directory found at ${LOCAL_GENERATED_CONFIG_DIR}. Using base configs."
+fi
+
+# --- Navigate and Execute ---
+echo "INFO: Changing to working directory: ${RUN_DIR}"
+cd "$RUN_DIR" || { echo "FATAL ERROR: Could not cd to ${RUN_DIR}"; exit 1; }
+
+echo "INFO: Starting simulation run..." > $LOGFILE
+
+# --- Run the simulation ---
+if [ ! -e data/param.nml ]; then
+    echo "INFO: Running START..." >>$LOGFILE 2>&1
+    srun ./start.csh >>$LOGFILE 2>&1
+    if [ $? -ne 0 ]; then echo "ERROR: start.csh failed" | tee -a $LOGFILE >&2; exit 1; fi
+    echo "INFO: START finished." >>$LOGFILE 2>&1
+else
+    echo "INFO: Skipping START (data/param.nml exists)." >>$LOGFILE 2>&1
+fi
+
+echo "INFO: Running RUN..." >>$LOGFILE 2>&1
+srun ./run.csh >>$LOGFILE 2>&1
+if [ $? -ne 0 ]; then echo "ERROR: run.csh failed" | tee -a $LOGFILE >&2; exit 1; fi
+echo "INFO: RUN finished successfully." >>$LOGFILE 2>&1
+
+echo "INFO: SLURM task finished successfully." >>$LOGFILE 2>&1

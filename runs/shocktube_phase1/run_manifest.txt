@@ -1,2 +1,2 @@
-res400_massfix_isothermal_nu0.1_chi0.1_diffrho0.1
-res400_massfix_isothermal_nu0.1_chi0.1_diffrho0.5
+res400_nohyper_massfix_nu0.1_chi0.1_diffrho0.1
+res400_nohyper_massfix_nu0.1_chi0.1_diffrho0.5

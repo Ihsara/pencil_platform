@@ -17,6 +17,7 @@ data:
     diffrho_shock: 1.0 # Placeholder, will be overwritten
     idiff: 'shock'
     lmassdiff_fix: true # Placeholder, will be overwritten
+    lgamma_is_1: false
 
   entropy_run_pars:
     chi_shock: 1.0 # Placeholder, will be overwritten
