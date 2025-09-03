@@ -25,10 +25,10 @@ data:
   entropy_run_pars:
     chi_hyper3: 9.0e-14
     chi_shock: 1.0
-    iheatcond: ['shock', 'hyper3']
+    iheatcond: ['shock']
 
   viscosity_run_pars:
-    ivisc: ['nu-shock', 'hyper3-nu-const']
+    ivisc: ['nu-shock']
     nu_hyper3: 3.0e-12
     nu_shock: 1.0
   

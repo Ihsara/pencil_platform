@@ -52,11 +52,12 @@ modifications:
 
 # --- Combinatorial Sweep Definition ---
 # The script will generate a run for every possible combination of these parameters.
-# Total combinations = 4 * 4 * 4 = 64.
-sweep_parameters:
-  nu_shock: [0.1, 0.5, 1.0, 5.0]
-  chi_shock: [0.1, 0.5, 1.0, 5.0]
-  diffrho_shock: [0.1, 0.5, 1.0, 5.0]
+parameter_sweeps:
+  # This is a "linked" sweep. It creates 4 parameter sets.
+  # In each set, all specified variables have the same value from the list.
+  - type: linked
+    variables: [nu_shock, chi_shock, diffrho_shock]
+    values: [0.1, 0.5, 1.0, 5.0]
 
 # --- Experiment Branches ---
 # The entire parameter sweep will be executed for each branch defined below.

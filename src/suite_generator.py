@@ -11,10 +11,53 @@ import jinja2
 # Import the centralized constants
 from .constants import DIRS, FILES
 
+def _generate_sweep_combinations(plan: dict) -> list:
+    """
+    Parses the 'parameter_sweeps' section of a plan and returns a list of
+    all unique parameter combination dictionaries.
+    """
+    if 'parameter_sweeps' not in plan:
+        return [{}]
+
+    all_param_groups = []
+    for sweep in plan.get('parameter_sweeps', []):
+        # ROBUSTNESS FIX: Skip any empty or malformed entries in the list
+        if not sweep:
+            continue
+            
+        sweep_type = sweep.get('type')
+        group = []
+
+        if sweep_type == 'linked':
+            variables = sweep.get('variables', [])
+            for value in sweep.get('values', []):
+                group.append({var: value for var in variables})
+            
+        elif sweep_type == 'product':
+            variable = sweep.get('variable')
+            if variable:
+                group = [{variable: value} for value in sweep.get('values', [])]
+        
+        else:
+            logger.warning(f"Unknown sweep type '{sweep_type}' found in plan. Skipping.")
+            continue
+        
+        if group:
+            all_param_groups.append(group)
+
+    final_combinations = []
+    for combo_tuple in itertools.product(*all_param_groups):
+        merged_dict = {}
+        for d in combo_tuple:
+            merged_dict.update(d)
+        final_combinations.append(merged_dict)
+        
+    return final_combinations if final_combinations else [{}]
+
+# NAMEERROR FIX: The missing helper function is now defined here.
 def generate_experiment_from_dict(experiment_name: str, config_data_map: dict, template_dir: Path, output_dir: Path):
     """
-    Generates all .in, .local, etc., files for a single experiment run
-    from a dictionary of configurations and saves them to a subdirectory.
+    Generates all config files for a single experiment run into its own subdirectory.
     """
     run_config_dir = output_dir / experiment_name
     os.makedirs(run_config_dir, exist_ok=True)
@@ -40,10 +83,6 @@ def run_suite(plan_file: Path, limit: int = None):
     """
     Reads an experiment plan YAML and generates all specified run directories,
     configuration files, and a master submission script.
-
-    Args:
-        plan_file: Path to the experiment plan YAML file.
-        limit: If provided, generates only the first 'limit' number of runs for testing.
     """
     logger.info(f"Loading experiment plan from: {plan_file}")
     with open(plan_file, 'r') as f:
@@ -56,48 +95,37 @@ def run_suite(plan_file: Path, limit: int = None):
 
     base_configs = {p.name: yaml.safe_load(p.read_text()) for p in base_config_path.glob("*.yaml")}
     
-    modifications = plan.get('modifications', {})
-    for file, settings in modifications.items():
-        for namelist, params in settings.items():
-            for key, value in params.items():
-                # Handle updates for list values (e.g., ivisc)
-                if namelist.endswith('_update'):
-                    clean_namelist = namelist.replace('_update', '')
-                    base_configs[file]['data'][clean_namelist][key] = value
-                # Handle key deletion
-                elif value is None:
-                    if key in base_configs[file]['data'][namelist]:
-                        del base_configs[file]['data'][namelist][key]
-                # Handle normal value changes
-                else:
-                    base_configs[file]['data'][namelist][key] = value
-    
-    # --- Generate all run configurations and names in memory ---
     all_runs = []
-    sweep_params = plan.get('sweep_parameters', {})
-    sweep_values = list(itertools.product(*sweep_params.values())) if sweep_params else [()]
+    all_param_combinations = _generate_sweep_combinations(plan)
     
-    for branch in plan.get('branches', []):
-        for values in sweep_values:
-            current_params = dict(zip(sweep_params.keys(), values))
+    for branch in plan.get('branches', [{'name': 'default', 'settings': {}}]):
+        for current_params in all_param_combinations:
             params_str = '_'.join([f"{k.split('_')[0]}{v}" for k, v in current_params.items()])
             run_name = f"{plan['output_prefix']}_{branch['name']}_{params_str}" if params_str else f"{plan['output_prefix']}_{branch['name']}"
             
             run_configs = deepcopy(base_configs)
+            # Apply global modifications
+            for file, settings in plan.get('modifications', {}).items():
+                for namelist, params in settings.items():
+                    for key, value in params.items():
+                        if namelist.endswith('_update'):
+                            clean_namelist = namelist.replace('_update', '')
+                            if key in run_configs.get(file,{}).get('data',{}).get(clean_namelist,{}):
+                                run_configs[file]['data'][clean_namelist][key] = value
+                        elif value is None:
+                            if key in run_configs.get(file,{}).get('data',{}).get(namelist,{}):
+                                del run_configs[file]['data'][namelist][key]
+
             # Apply branch-specific settings
             for file, settings in branch.get('settings', {}).items():
                 for key, params in settings.items():
-                    if key in run_configs.get(file, {}).get('data', {}):
-                        run_configs[file]['data'][key].update(params)
+                    run_configs[file]['data'][key].update(params)
             
             # Apply sweep-specific settings
             for key, value in current_params.items():
-                if key in run_configs.get('run_in.yaml', {}).get('data', {}).get('viscosity_run_pars', {}):
-                    run_configs['run_in.yaml']['data']['viscosity_run_pars'][key] = value
-                if key in run_configs.get('run_in.yaml', {}).get('data', {}).get('entropy_run_pars', {}):
-                    run_configs['run_in.yaml']['data']['entropy_run_pars'][key] = value
-                if key in run_configs.get('run_in.yaml', {}).get('data', {}).get('density_run_pars', {}):
-                    run_configs['run_in.yaml']['data']['density_run_pars'][key] = value
+                for namelist in ['viscosity_run_pars', 'entropy_run_pars', 'density_run_pars']:
+                    if key in run_configs.get('run_in.yaml', {}).get('data', {}).get(namelist, {}):
+                        run_configs['run_in.yaml']['data'][namelist][key] = value
 
             all_runs.append({'name': run_name, 'configs': run_configs})
 
@@ -112,6 +140,7 @@ def run_suite(plan_file: Path, limit: int = None):
     os.makedirs(local_exp_dir / "slurm_logs", exist_ok=True)
     
     for run in all_runs:
+        # NAMEERROR FIX: The call to this function now works correctly.
         generate_experiment_from_dict(
             experiment_name=run['name'],
             config_data_map=run['configs'],
@@ -129,14 +158,14 @@ def run_suite(plan_file: Path, limit: int = None):
     # --- Generate the main submission script ---
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(DIRS.templates), trim_blocks=True, lstrip_blocks=True)
     submit_template = env.get_template("sbatch_array.j2")
-        
+    
     submit_script_content = submit_template.render(
         hpc=plan.get('hpc', {}),
         sbatch=plan.get('hpc', {}).get('sbatch', {}),
-        run_base_dir=plan.get('hpc', {}).get('run_base_dir', 'runs'), 
+        run_base_dir=plan.get('hpc', {}).get('run_base_dir', 'runs'),
         manifest_file=FILES.manifest,
         num_jobs=len(all_runs),
-        experiment_name=experiment_name  # <-- NEW: Pass the experiment name
+        experiment_name=experiment_name
     )
     
     submit_script_path = local_exp_dir / FILES.submit_script
