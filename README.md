@@ -91,28 +91,6 @@ python main.py shocktube_phase1 --test
 python main.py shocktube_phase1 --test 1
 ```
 
-### Step 5: Transfer and Submit on the HPC
-
-The script will generate a new directory inside `runs/`. For example: `runs/shocktube_phase1/`. This directory is a self-contained package.
-
-1.  **Copy the directory to the HPC** (e.g., Mahti):
-    ```bash
-    # Run this from your local machine
-    rsync -avz --progress runs/shocktube_phase1/ your_user@mahti.csc.fi:/scratch/project_XXXX/chau/runs/
-    ```
-
-2.  **Submit the job on the HPC:**
-    ```bash
-    # Log in to Mahti
-    ssh your_user@mahti.csc.fi
-
-    # Navigate to the directory you just copied
-    cd /scratch/project_XXXX/chau/runs/shocktube_phase1
-
-    # Submit the master script to the SLURM scheduler
-    sbatch submit_suite.sh
-    ```
-This single command will launch the entire array of simulations.
 
 ---
 
@@ -201,3 +179,135 @@ The `Snakefile` is now the main entry point. It reads your experiment plan just 
     ```
 
 This is the modern, reproducible, and scalable way to manage computational campaigns.
+
+
+
+
+
+# Planning Experiments with `plan.yaml`
+
+The `plan.yaml` file is the heart of the automation system. It provides a powerful and flexible way to define large, complex suites of simulations from a single, human-readable file. This guide explains the key concepts of **Parameter Sweeps** and **Branches**.
+
+## The Core Idea
+
+The generator works by starting with a **`base_experiment`** configuration and programmatically applying a series of modifications to it to generate each unique run. This process is defined by two main sections in the `plan.yaml`:
+1.  `parameter_sweeps`: Defines the combinations of numerical parameter values to test.
+2.  `branches`: Defines a set of distinct, fundamental configurations under which the entire parameter sweep will be run.
+
+The total number of simulations generated is **(number of sweep combinations) x (number of branches)**.
+
+---
+
+## 1. Defining Parameter Sweeps
+
+The `parameter_sweeps` section is a list of "sweep operations". The results of all operations are combined to create the final set of unique parameter combinations.
+
+### Sweep Type 1: Product Sweep
+
+This is the most common type of sweep, used for exploring a grid of independent parameters. The system will generate a run for every possible combination of the values.
+
+**Concept:** For each value of `param_A`, run it against every value of `param_B`.
+
+**Example:**
+To test two different `nu_shock` values and two `chi_shock` values, you would define two `product` sweeps.
+
+```yaml
+parameter_sweeps:
+  - type: product
+    variable: nu_shock
+    values: [0.1, 0.5]
+  - type: product
+    variable: chi_shock
+    values: [1.0, 5.0]
+```
+
+**Result:** This will produce `2 * 2 = 4` unique parameter combinations, which will be reflected in the generated directory names:
+-   `..._nu0.1_chi1.0`
+-   `..._nu0.1_chi5.0`
+-   `..._nu0.5_chi1.0`
+-   `..._nu0.5_chi5.0`
+
+### Sweep Type 2: Linked Sweep
+
+This is a more specialized sweep used when you want multiple parameters to vary together, taking on the same value for each run.
+
+**Concept:** For each value in the list, set `param_A`, `param_B`, and `param_C` to that same value.
+
+**Example:**
+To run simulations where `nu_shock`, `chi_shock`, and `diffrho_shock` are always equal, you use a single `linked` sweep.
+
+```yaml
+parameter_sweeps:
+  - type: linked
+    variables: [nu_shock, chi_shock, diffrho_shock]
+    values: [0.1, 0.5, 1.0, 5.0]
+```
+
+**Result:** This will produce **4** unique parameter combinations:
+-   `..._nu0.1_chi0.1_diffrho0.1`
+-   `..._nu0.5_chi0.5_diffrho0.5`
+-   `..._nu1.0_chi1.0_diffrho1.0`
+-   `..._nu5.0_chi5.0_diffrho5.0`
+
+### Combining Sweep Types
+
+You can combine different sweep types. The system will first calculate the results of each sweep block independently and then create the Cartesian product of those results.
+
+**Example:** Combine the linked sweep from above with a product sweep for a different parameter.
+
+```yaml
+parameter_sweeps:
+  # This block results in 4 parameter sets for the shock values.
+  - type: linked
+    variables: [nu_shock, chi_shock, diffrho_shock]
+    values: [0.1, 0.5, 1.0, 5.0]
+
+  # This block results in 2 parameter sets for the 'nt' value.
+  - type: product
+    variable: nt
+    values: [1000, 2000]
+```
+
+**Result:** This will produce `4 * 2 = 8` unique parameter combinations. For example, the first linked set (`nu=0.1`, `chi=0.1`, `diff=0.1`) will be combined with each value of `nt`:
+-   `..._nu0.1_chi0.1_diffrho0.1_nt1000`
+-   `..._nu0.1_chi0.1_diffrho0.1_nt2000`
+-   And so on for the other linked sets.
+
+---
+
+## 2. Defining Branches
+
+The `branches` section is for defining fundamentally different simulation setups. The entire parameter sweep (as defined above) will be run for each branch. This is perfect for comparing major configuration changes, like the effect of a physical flag (`lmassdiff_fix`) or a completely different `Makefile.local` setup.
+
+**Concept:** Run the entire suite of experiments under `Condition_A`, and then run the *entire suite again* under `Condition_B`.
+
+**Example:**
+To run the full linked sweep with `lmassdiff_fix` both enabled and disabled.
+
+```yaml
+branches:
+  - name: "massfix"
+    description: "Runs with the mass diffusion fix enabled."
+    settings:
+      # This section defines which file to modify and what to change.
+      run_in.yaml:
+        density_run_pars:
+          lmassdiff_fix: true
+
+  - name: "nomassfix"
+    description: "Runs with the mass diffusion fix disabled."
+    settings:
+      run_in.yaml:
+        density_run_pars:
+          lmassdiff_fix: false
+```
+
+**Result:**
+The `name` of each branch is prepended to the run directory name. If you use this with the linked sweep example, you will get `4 (sweep) * 2 (branch) = 8` total runs:
+-   `..._massfix_nu0.1_chi0.1_diffrho0.1`
+-   `..._nomassfix_nu0.1_chi0.1_diffrho0.1`
+-   `..._massfix_nu0.5_chi0.5_diffrho0.5`
+-   `..._nomassfix_nu0.5_chi0.5_diffrho0.5`
+-   ...and so on.
+
+By combining sweeps and branches, you can define very complex and comprehensive simulation campaigns in a structured and highly readable way.
