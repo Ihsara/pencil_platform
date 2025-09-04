@@ -8,6 +8,7 @@ from loguru import logger
 # Import shared logic and constants from the 'src' directory
 from src.suite_generator import run_suite
 from src.constants import DIRS, FILES
+from src.post_processing import analyze_suite
 
 def configure_logging():
     """Configures the loguru logger for clean, formatted output."""
@@ -56,6 +57,12 @@ def main():
              "  --test    (generates 2 runs)\n"
              "  --test 5  (generates 5 runs)"
     )
+
+    parser.add_argument(
+        "--analyze", action="store_true",
+        help="Run post-processing analysis on an existing experiment suite."
+    )    
+    
     args = parser.parse_args()
 
     experiment_name = args.experiment_name
@@ -96,6 +103,15 @@ def main():
     if not plan_file.exists():
         logger.error(f"Plan file not found for experiment '{experiment_name}' at '{plan_file}'")
         sys.exit(1)
+        
+    if args.analyze:
+            logger.info(f"--- ANALYSIS MODE ---")
+            analyze_suite(experiment_name=experiment_name)
+            logger.success(f"Analysis for '{experiment_name}' finished.")
+    else:
+        logger.info(f"--- GENERATION MODE ---")
+        run_suite(plan_file=plan_file, limit=args.test)
+        logger.success(f"Suite generation for '{experiment_name}' finished successfully.")        
 
     logger.info(f"Selected experiment: '{experiment_name}'")
     
