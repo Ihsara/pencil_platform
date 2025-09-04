@@ -35,43 +35,35 @@ base_experiment: 'shocktube_base'
 # A descriptive prefix for all generated run directories.
 output_prefix: 'res400_nohyper'
 
-# Modifications to apply to the 'base_experiment' configuration for this entire suite.
-# This allows us to start from a verified base and programmatically alter it.
+# Modifications to apply to the base configuration for the ENTIRE suite.
 modifications:
   run_in.yaml:
-    # Remove these parameters by setting their value to null.
+    # This section removes the hyper-parameters from the base config
     viscosity_run_pars:
-      nu_hyper3: null
+      nu_hyper3: null # 'null' in YAML deletes the key
     entropy_run_pars:
-      chi_hyper3: null
-    # Update these list parameters now that hyper-terms are removed.
+      chi_hyper3: null # 'null' deletes the key
+    # This section updates the lists now that hyper is removed
     viscosity_run_pars_update:
       ivisc: ['nu-shock']
     entropy_run_pars_update:
       iheatcond: ['shock']
 
-# --- Combinatorial Sweep Definition ---
-# The script will generate a run for every possible combination of these parameters.
-parameter_sweeps:
-  # This is a "linked" sweep. It creates 4 parameter sets.
-  # In each set, all specified variables have the same value from the list.
-  - type: linked
-    variables: [nu_shock, chi_shock, diffrho_shock]
-    values: [0.1, 0.5, 1.0, 5.0]
+# Defines the parameter sweep (this is correct)
+sweep_parameters:
+  nu_shock: [0.1, 0.5, 1.0, 5.0]
+  chi_shock: [0.1, 0.5, 1.0, 5.0]
+  diffrho_shock: [0.1, 0.5, 1.0, 5.0]
 
-# --- Experiment Branches ---
-# The entire parameter sweep will be executed for each branch defined below.
-# Total runs = (number of sweep combinations) * (number of branches).
+# Defines the branches. No 'gamma' or 'l_gamma_is_1' here.
 branches:
   - name: "massfix"
-    description: "Runs with the mass diffusion fix enabled."
     settings:
       run_in.yaml:
         density_run_pars:
           lmassdiff_fix: true
 
   - name: "nomassfix"
-    description: "Runs with the mass diffusion fix disabled."
     settings:
       run_in.yaml:
         density_run_pars:

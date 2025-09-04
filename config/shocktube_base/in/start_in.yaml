@@ -1,12 +1,14 @@
-# Base parameters for start.in
+# This is an exact representation of the working start.in
 format: namelist
 data:
   init_pars:
-    cvsid: "shocktube_base"
-    lperi: [false, true, true] # Non-periodic in X for the shock
+    cvsid: "9a97ecc83"
+    lperi: [false, true, true]
     lwrite_ic: true
     xyz0: [-0.5, -0.5, -0.5]
-    Lxyz: [1.0, 1.0, 1.0]      # Standard parameter for a box size of 1.0
+    Lxyz: [1.0, 1.0, 1.0]
+    # Explicitly add rho0, which is needed by the post-processing script
+    rho0: 1.0
 
   density_init_pars:
     initlnrho: 'xjump'
@@ -24,5 +26,6 @@ data:
     widthss: 0.01
     xjump_mid: 0.0
 
-  eos_init_pars: {}  
+  # These namelists are present but empty in the working reference
+  eos_init_pars: {}
   hydro_init_pars: {}
