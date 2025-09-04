@@ -7,8 +7,6 @@ data:
     lwrite_ic: true
     xyz0: [-0.5, -0.5, -0.5]
     Lxyz: [1.0, 1.0, 1.0]
-    # Explicitly add rho0, which is needed by the post-processing script
-    rho0: 1.0
 
   density_init_pars:
     initlnrho: 'xjump'
@@ -17,6 +15,7 @@ data:
     rho_right: 0.125
     widthlnrho: 0.01
     xjump_mid: 0.0
+    rho0 : 1.0
 
 
   entropy_init_pars:
