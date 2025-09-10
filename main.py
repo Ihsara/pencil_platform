@@ -57,11 +57,16 @@ def main():
              "  --test    (generates 2 runs)\n"
              "  --test 5  (generates 5 runs)"
     )
-
     parser.add_argument(
         "--analyze", action="store_true",
         help="Run post-processing analysis on an existing experiment suite."
-    )    
+    )
+    parser.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="Forcefully rebuild the executables in each new run directory.\n"
+             "This creates full copies instead of symbolic links."
+    )
     
     args = parser.parse_args()
 
@@ -99,29 +104,29 @@ def main():
         logger.info(f"Available experiments are: {', '.join(available_experiments)}")
         sys.exit(1)
     
+    logger.info(f"Selected experiment: '{experiment_name}'")
+    
     plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
     if not plan_file.exists():
         logger.error(f"Plan file not found for experiment '{experiment_name}' at '{plan_file}'")
         sys.exit(1)
         
-    if args.analyze:
+    try:
+        if args.analyze:
             logger.info(f"--- ANALYSIS MODE ---")
             analyze_suite(experiment_name=experiment_name)
             logger.success(f"Analysis for '{experiment_name}' finished.")
-    else:
-        logger.info(f"--- GENERATION MODE ---")
-        run_suite(plan_file=plan_file, limit=args.test)
-        logger.success(f"Suite generation for '{experiment_name}' finished successfully.")        
-
-    logger.info(f"Selected experiment: '{experiment_name}'")
-    
-    try:
-        # Call the core logic, passing the plan file and the test limit
-        run_suite(plan_file=plan_file, limit=args.test)
-        
+        else:
+            logger.info(f"--- GENERATION MODE ---")
+            if args.rebuild:
+                logger.info("REBUILD flag is active. Submission script will perform a full build.")
+            # Call the core logic, passing all relevant arguments
+            run_suite(plan_file=plan_file, limit=args.test, rebuild=args.rebuild)
+            logger.success(f"Suite generation for '{experiment_name}' finished successfully.")
+            
     except Exception as e:
         # Catch any unexpected errors from the generator for a clean exit
-        logger.exception(f"An unexpected error occurred during suite generation: {e}")
+        logger.exception(f"An unexpected error occurred: {e}")
         sys.exit(1)
 
 if __name__ == "__main__":

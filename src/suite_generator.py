@@ -21,7 +21,6 @@ def _generate_sweep_combinations(plan: dict) -> list:
 
     all_param_groups = []
     for sweep in plan.get('parameter_sweeps', []):
-        # ROBUSTNESS FIX: Skip any empty or malformed entries in the list
         if not sweep:
             continue
             
@@ -54,7 +53,6 @@ def _generate_sweep_combinations(plan: dict) -> list:
         
     return final_combinations if final_combinations else [{}]
 
-# NAMEERROR FIX: The missing helper function is now defined here.
 def generate_experiment_from_dict(experiment_name: str, config_data_map: dict, template_dir: Path, output_dir: Path):
     """
     Generates all config files for a single experiment run into its own subdirectory.
@@ -79,10 +77,15 @@ def generate_experiment_from_dict(experiment_name: str, config_data_map: dict, t
         with open(run_config_dir / output_filename, 'w') as f:
             f.write(rendered_content)
 
-def run_suite(plan_file: Path, limit: int = None):
+def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     """
     Reads an experiment plan YAML and generates all specified run directories,
     configuration files, and a master submission script.
+
+    Args:
+        plan_file: Path to the experiment's sweep.yaml file.
+        limit: An optional integer to limit the number of generated runs for testing.
+        rebuild: If True, generates a script that performs a full copy and rebuild.
     """
     logger.info(f"Loading experiment plan from: {plan_file}")
     with open(plan_file, 'r') as f:
@@ -140,7 +143,6 @@ def run_suite(plan_file: Path, limit: int = None):
     os.makedirs(local_exp_dir / "slurm_logs", exist_ok=True)
     
     for run in all_runs:
-        # NAMEERROR FIX: The call to this function now works correctly.
         generate_experiment_from_dict(
             experiment_name=run['name'],
             config_data_map=run['configs'],
@@ -159,13 +161,22 @@ def run_suite(plan_file: Path, limit: int = None):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(DIRS.templates), trim_blocks=True, lstrip_blocks=True)
     submit_template = env.get_template("sbatch_array.j2")
     
+    hpc_config = plan.get('hpc', {})
+    module_loads_str = hpc_config.get('module_loads', '')
+
+    if rebuild and not module_loads_str.strip():
+        logger.warning("The --rebuild flag was used, but no 'module_loads' commands were found in the plan file.")
+        logger.warning("The generated build script may fail if the environment is not correctly configured on the cluster.")
+
     submit_script_content = submit_template.render(
-        hpc=plan.get('hpc', {}),
-        sbatch=plan.get('hpc', {}).get('sbatch', {}),
-        run_base_dir=plan.get('hpc', {}).get('run_base_dir', 'runs'),
+        hpc=hpc_config,
+        sbatch=hpc_config.get('sbatch', {}),
+        run_base_dir=hpc_config.get('run_base_dir', 'runs'),
         manifest_file=FILES.manifest,
         num_jobs=len(all_runs),
-        experiment_name=experiment_name
+        experiment_name=experiment_name,
+        rebuild=rebuild,
+        module_loads=module_loads_str
     )
     
     submit_script_path = local_exp_dir / FILES.submit_script
@@ -176,4 +187,4 @@ def run_suite(plan_file: Path, limit: int = None):
     if limit:
         logger.info("The following run directories will be created on the HPC:")
         for run in all_runs:
-            print(f"  - {Path(plan.get('hpc', {}).get('run_base_dir', 'runs')) / run['name']}")
+            print(f"  - {Path(hpc_config.get('run_base_dir', 'runs')) / run['name']}")

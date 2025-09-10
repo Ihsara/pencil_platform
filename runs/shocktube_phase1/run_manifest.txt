@@ -1,2 +1,2 @@
-res400_nohyper_massfix_nu0.1_chi0.1_diffrho0.1
-res400_nohyper_massfix_nu0.5_chi0.5_diffrho0.5
+res400_nohyper_massfix
+res400_nohyper_nomassfix

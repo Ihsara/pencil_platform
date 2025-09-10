@@ -16,6 +16,15 @@ hpc:
   # The absolute path where all new experiment run directories will be created.
   run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase1'
 
+  module_loads: |
+    module load gcc/11.2.0
+    module load openmpi/4.1.2
+    module load openblas/0.3.18-omp
+    module load csc-tools
+    module load StdEnv
+    module load hdf5/1.10.7-mpi
+
+
   # SLURM SBATCH parameters for the array job submission script.
   sbatch:
     job_name: "shock_sweep_ph1"
