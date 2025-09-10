@@ -1,0 +1,77 @@
+---
+title: "Analysis Report for {{ experiment_name }}"
+author: "Automated Analysis Pipeline"
+format: 
+  html:
+    toc: true
+    code-fold: true
+    self-contained: true
+execute:
+  echo: false
+  warning: false
+---
+
+## Experiment Overview
+
+This report details the analysis of the **{{ experiment_name }}** simulation suite, comparing numerical results against the analytical Sod shock tube solution.
+
+```{python}
+#| label: setup
+#| include: false
+# Setup notebook-specific tools
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+# Configure plotting style
+plt.style.use('seaborn-v0_8-whitegrid')
+```
+
+---
+
+{% for run_name in run_names %}
+## Run: `{{ run_name }}`
+
+This section provides a detailed breakdown of the simulation run named `{{ run_name }}`.
+
+### Numerical Error Analysis
+
+The table below shows the Mean Squared Error (MSE) for key physical variables when comparing the final state of the simulation to the analytical solution at the same time point.
+
+```{python}
+#| label: analysis-{{ run_name }}
+#| echo: true
+
+# Load the pre-generated analysis report for this run
+report_path = Path("{{ run_name }}") / "analysis_summary.md"
+with open(report_path, 'r') as f:
+    # We skip the title line of the markdown file
+    markdown_content = f.read().splitlines()[2:]
+    print("\n".join(markdown_content))
+
+```
+
+### Visualization Plots
+
+The following plots compare the final simulation profiles (blue lines) against the analytical solution (dashed black lines).
+
+```{python}
+#| label: plots-{{ run_name }}
+#| fig-cap: "Comparison of simulation vs. analytical solution for {{ run_name }}."
+#| layout-ncol: 2
+
+# Define paths to pre-generated plot images
+plot_dir = Path("{{ run_name }}")
+
+# Display the plots
+from IPython.display import Image, display
+
+display(Image(filename=plot_dir / 'density.png'))
+display(Image(filename=plot_dir / 'velocity.png'))
+display(Image(filename=plot_dir / 'pressure.png'))
+display(Image(filename=plot_dir / 'energy.png'))
+
+```
+---
+{% endfor %}
