@@ -14,11 +14,7 @@ from src.constants import DIRS, FILES
 def configure_logging():
     """Configures the loguru logger for clean, formatted output."""
     logger.remove()
-    logger.add(
-        sys.stderr,
-        level="INFO",
-        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>"
-    )
+    logger.add(sys.stderr, level="INFO", format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>")
 
 def find_available_experiments() -> list:
     """Scans the configuration directory to find all available experiments."""
@@ -33,29 +29,11 @@ def main():
         description="Pencil Code Experiment Suite Generator and Manager.",
         formatter_class=argparse.RawTextHelpFormatter
     )
-    parser.add_argument(
-        "experiment_name",
-        nargs='?', default=None, type=str,
-        help="The name of the experiment to generate (e.g., 'shocktube_phase1')."
-    )
-    parser.add_argument(
-        "--test", nargs='?', const=2, type=int, default=None,
-        help="Enable test mode. Generates a limited number of runs without submitting.\n"
-             "  --test    (generates 2 runs)\n"
-             "  --test 5  (generates 5 runs)"
-    )
-    parser.add_argument(
-        "--analyze", action="store_true",
-        help="Run post-processing analysis on an existing experiment suite."
-    )
-    parser.add_argument(
-        "--rebuild", action="store_true",
-        help="Forcefully rebuild the executables in each new run directory."
-    )
-    parser.add_argument(
-        "--check", action="store_true",
-        help="Check the status of the last submitted job for an experiment."
-    )
+    parser.add_argument("experiment_name", nargs='?', default=None, type=str, help="The name of the experiment to generate.")
+    parser.add_argument("--test", nargs='?', const=2, type=int, default=None, help="Enable test mode. Generates a limited number of runs without submitting.")
+    parser.add_argument("--analyze", action="store_true", help="Run post-processing analysis and generate comparison plots.")
+    parser.add_argument("--rebuild", action="store_true", help="Forcefully rebuild the executables in each new run directory.")
+    parser.add_argument("--check", action="store_true", help="Check the status of the last submitted job for an experiment.")
     
     args = parser.parse_args()
     experiment_name = args.experiment_name
@@ -70,23 +48,18 @@ def main():
         for i, name in enumerate(available_experiments):
             print(f"  {i+1}: {name}")
         try:
-            choice_str = input("Please choose an experiment number: ")
-            choice = int(choice_str) - 1
+            choice = int(input("Please choose an experiment number: ")) - 1
             if 0 <= choice < len(available_experiments):
                 experiment_name = available_experiments[choice]
             else:
-                logger.error(f"Invalid selection.")
-                sys.exit(1)
+                logger.error("Invalid selection."); sys.exit(1)
         except (ValueError, IndexError):
-            logger.error("Invalid input.")
-            sys.exit(1)
+            logger.error("Invalid input."); sys.exit(1)
         except KeyboardInterrupt:
-            logger.info("\nOperation cancelled by user.")
-            sys.exit(0)
+            logger.info("\nOperation cancelled."); sys.exit(0)
 
     if experiment_name not in available_experiments:
-        logger.error(f"Experiment '{experiment_name}' not found.")
-        sys.exit(1)
+        logger.error(f"Experiment '{experiment_name}' not found."); sys.exit(1)
         
     logger.info(f"Selected experiment: '{experiment_name}'")
     
@@ -94,25 +67,17 @@ def main():
         if args.check:
             check_suite_status(experiment_name)
         elif args.analyze:
-            logger.info("--- ANALYSIS MODE ---")
+            logger.info("--- ANALYSIS & COMPARISON MODE ---")
             analyze_suite(experiment_name)
         else:
             logger.info("--- GENERATION & SUBMISSION MODE ---")
             plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
+            submit_script_path, plan = run_suite(plan_file=plan_file, limit=args.test, rebuild=args.rebuild)
             
-            # Step 1: Generate all experiment files
-            submit_script_path, plan = run_suite(
-                plan_file=plan_file, 
-                limit=args.test, 
-                rebuild=args.rebuild
-            )
-            
-            # Step 2: Submit to HPC, unless in test mode
-            if not args.test:
+            if not args.test and submit_script_path:
                 submit_suite(experiment_name, submit_script_path, plan)
-            else:
-                logger.warning(f"TEST MODE: Generated {plan['total_sims']} run configuration(s). Automatic submission is SKIPPED.")
-                logger.info("To run the full suite, execute without the --test flag.")
+            elif args.test:
+                 logger.warning("TEST MODE: Automatic submission is SKIPPED.")
 
     except Exception as e:
         logger.exception(f"An unexpected error occurred: {e}")
