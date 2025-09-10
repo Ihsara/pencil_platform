@@ -34,6 +34,7 @@ def get_analytical_solution(params, x: np.ndarray, t: float) -> Optional[Dict]:
     """Calculates the analytical Sod shock tube solution for a given set of parameters."""
     try:
         solution = sod(x, [t], par=params, lplot=False)
+        print(solution)
         return {
             'rho': np.squeeze(solution.rho),
             'ux': np.squeeze(solution.ux),
