@@ -31,7 +31,6 @@ except ImportError as e:
 def get_analytical_solution(params, x: np.ndarray, t: float) -> Optional[Dict]:
     """Calculates the analytical Sod shock tube solution for a given set of parameters."""
     try:
-        # The analytical solver also needs these reference values.
         if not hasattr(params, 'rho0'):
             setattr(params, 'rho0', 1.0)
         if not hasattr(params, 'cs0'):
@@ -66,43 +65,44 @@ def load_simulation_data(run_path: Path) -> Optional[Dict]:
             logger.warning(f"No VAR files found in {proc_dir}")
             return None
 
-        # --- CORE FIX IS HERE ---
-        # 1. Read the parameters from the simulation directory first.
+        # Load parameters first to perform calculations
         params = read.param(datadir=str(data_dir), quiet=True)
-
-        # 2. Check for the existence of optional parameters that the Pencil Code
-        #    library expects but which may not be in the param file.
-        if not hasattr(params, 'rho0'):
-            logger.debug(f"Run '{run_path.name}': 'rho0' not in params. Patching with default value 1.0.")
-            setattr(params, 'rho0', 1.0)
-        if not hasattr(params, 'cs0'):
-            logger.debug(f"Run '{run_path.name}': 'cs0' not in params. Patching with default value 1.0.")
-            setattr(params, 'cs0', 1.0)
-
-        # 3. Now, call read.var but PASS the patched parameter object to it.
-        #    This prevents the NameError crash inside the library.
-        var = read.var(
-            var_files[-1].name,
-            datadir=str(data_dir),
-            quiet=True,
-            magic=['pp'],
-            trimall=True,
-            param=params  # Pass the corrected params
-        )
+        
+        # Load the raw variable data without using fragile 'magic' calculations
+        var = read.var(var_files[-1].name, datadir=str(data_dir), quiet=True, trimall=True)
         grid = read.grid(datadir=str(data_dir), quiet=True, trim=True)
         
+        # --- Manually Calculate Pressure (pp) ---
+        # This is the robust way to avoid the library bug.
         density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
         
+        # Set default reference values if they are not in the param file
+        rho0 = getattr(params, 'rho0', 1.0)
+        cs0 = getattr(params, 'cs0', 1.0)
+        
+        # Calculate pressure from entropy and density
+        cp = params.cp
+        gamma = params.gamma
+        cv = cp / gamma
+        lnrho0 = np.log(rho0)
+        lnTT0 = np.log(cs0**2 / (cp * (gamma - 1.0)))
+        
+        pressure = (cp - cv) * np.exp(
+            lnTT0 + (gamma / cp * var.ss) + (gamma * np.log(density)) - ((gamma - 1.0) * lnrho0)
+        )
+
+        # Calculate internal energy from the ideal gas law (p = (gamma-1)*rho*e)
         internal_energy = np.zeros_like(density)
         if hasattr(params, 'gamma') and params.gamma > 1.0:
             non_zero_density_mask = density > 1e-18
-            internal_energy[non_zero_density_mask] = var.pp[non_zero_density_mask] / (density[non_zero_density_mask] * (params.gamma - 1.0))
+            internal_energy[non_zero_density_mask] = pressure[non_zero_density_mask] / \
+                (density[non_zero_density_mask] * (params.gamma - 1.0))
 
         return {
             "x": np.squeeze(grid.x),
             "rho": np.squeeze(density),
             "ux": np.squeeze(var.ux),
-            "pp": np.squeeze(var.pp),
+            "pp": np.squeeze(pressure),
             "ee": np.squeeze(internal_energy),
             "t": var.t,
             "params": params
