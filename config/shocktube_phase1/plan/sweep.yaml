@@ -70,9 +70,7 @@ branches:
     settings:
       run_in.yaml:
         density_run_pars:
-          lmassdiff_fix: true
-      start_in.yaml:
-        density_init_pars:     
+          lmassdiff_fix: true 
           lgamma_is_1: true
 
   - name: "nomassfix"
