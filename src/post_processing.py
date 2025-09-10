@@ -16,8 +16,6 @@ from loguru import logger
 from .constants import DIRS, FILES
 
 # --- Add Pencil Code Python Library to Path ---
-# This assumes the pencil-code repository is cloned alongside this project directory.
-# Adjust the path if it is located elsewhere.
 PENCIL_CODE_PYTHON_PATH = DIRS.root.parent / "pencil-code" / "python"
 if str(PENCIL_CODE_PYTHON_PATH) not in sys.path:
     logger.info(f"Adding '{PENCIL_CODE_PYTHON_PATH}' to system path to find the 'pencil' module.")
@@ -33,14 +31,12 @@ except ImportError as e:
 def get_analytical_solution(params, x: np.ndarray, t: float) -> Optional[Dict]:
     """Calculates the analytical Sod shock tube solution for a given set of parameters."""
     try:
+        # The analytical solver also needs these reference values.
         if not hasattr(params, 'rho0'):
-            logger.debug("Parameter 'rho0' not found. Setting rho0 = 1.0 for analytical solver.")
             setattr(params, 'rho0', 1.0)
         if not hasattr(params, 'cs0'):
-            logger.debug("Parameter 'cs0' not found. Setting cs0 = 1.0 for analytical solver.")
             setattr(params, 'cs0', 1.0)
         
-        # Request internal energy ('ee') from the solver
         solution = sod(x, [t], par=params, lplot=False, magic=['ee'])
 
         return {
@@ -70,17 +66,35 @@ def load_simulation_data(run_path: Path) -> Optional[Dict]:
             logger.warning(f"No VAR files found in {proc_dir}")
             return None
 
-        # Read the final snapshot, requesting pressure ('pp')
-        var = read.var(var_files[-1].name, datadir=str(data_dir), quiet=True, magic=['pp'], trimall=True)
-        grid = read.grid(datadir=str(data_dir), quiet=True, trim=True)
+        # --- CORE FIX IS HERE ---
+        # 1. Read the parameters from the simulation directory first.
         params = read.param(datadir=str(data_dir), quiet=True)
+
+        # 2. Check for the existence of optional parameters that the Pencil Code
+        #    library expects but which may not be in the param file.
+        if not hasattr(params, 'rho0'):
+            logger.debug(f"Run '{run_path.name}': 'rho0' not in params. Patching with default value 1.0.")
+            setattr(params, 'rho0', 1.0)
+        if not hasattr(params, 'cs0'):
+            logger.debug(f"Run '{run_path.name}': 'cs0' not in params. Patching with default value 1.0.")
+            setattr(params, 'cs0', 1.0)
+
+        # 3. Now, call read.var but PASS the patched parameter object to it.
+        #    This prevents the NameError crash inside the library.
+        var = read.var(
+            var_files[-1].name,
+            datadir=str(data_dir),
+            quiet=True,
+            magic=['pp'],
+            trimall=True,
+            param=params  # Pass the corrected params
+        )
+        grid = read.grid(datadir=str(data_dir), quiet=True, trim=True)
         
         density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
         
-        # Calculate internal energy from the ideal gas law (p = (gamma-1)*rho*e)
         internal_energy = np.zeros_like(density)
         if hasattr(params, 'gamma') and params.gamma > 1.0:
-            # Avoid division by zero if density is ever zero
             non_zero_density_mask = density > 1e-18
             internal_energy[non_zero_density_mask] = var.pp[non_zero_density_mask] / (density[non_zero_density_mask] * (params.gamma - 1.0))
 
@@ -140,21 +154,17 @@ def analyze_single_run(run_path: Path, report_dir: Path, run_name: str):
     """
     logger.info(f"Processing run: {run_name}")
     
-    # 1. Load data from the final snapshot of the simulation
     sim_data = load_simulation_data(run_path)
     if not sim_data:
-        return # Error is logged within the function
+        return
 
-    # 2. Calculate the corresponding analytical solution for that moment in time
     analytical_data = get_analytical_solution(sim_data['params'], sim_data['x'], sim_data['t'])
     if not analytical_data:
-        return # Error is logged within the function
+        return
     
-    # 3. Create a specific subdirectory for this run's reports
     run_report_dir = report_dir / run_name
     os.makedirs(run_report_dir, exist_ok=True)
     
-    # 4. Generate and save the comparison plots
     plot_simulation_vs_analytical(sim_data, analytical_data, run_report_dir, run_name)
 
 def analyze_suite(experiment_name: str):
@@ -190,6 +200,5 @@ def analyze_suite(experiment_name: str):
         run_path = hpc_run_base_dir / run_name
         analyze_single_run(run_path, report_dir, run_name)
 
-    # For provenance, copy the script used for this analysis into the main report directory
     copy_script_to_report(report_dir)
     logger.info(f"Copied analysis script to {report_dir} for provenance.")
