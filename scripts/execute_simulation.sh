@@ -16,7 +16,7 @@ echo "---------------------"
 
 # --- 2. Setup the Run Directory ---
 echo "INFO: Setting up run directory from ${SNAKEMAKE_PARAMS_SOURCE_DIR} to ${SNAKEMAKE_PARAMS_RUN_DIR}"
-pc_newrun -s "${SNAKEMAKE_PARAMS_SOURCE_DIR}" "${SNAKEMAKE_PARAMS_RUN_DIR}"
+pc_newrun "${SNAKEMAKE_PARAMS_SOURCE_DIR}" "${SNAKEMAKE_PARAMS_RUN_DIR}"
 
 # --- 3. Copy Generated Configs ---
 echo "INFO: Copying generated config files from ${SNAKEMAKE_PARAMS_CONFIG_DIR}"

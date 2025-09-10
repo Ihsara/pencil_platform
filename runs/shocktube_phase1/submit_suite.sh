@@ -54,7 +54,7 @@ echo "INFO: Starting SLURM task ${SLURM_ARRAY_TASK_ID} for run: ${RUN_NAME}"
 
 # --- 1. Setup the Run Directory ---
 echo "INFO: Setting up run directory from ${SOURCE_BASE_DIR} to ${RUN_DIR}"
-pc_newrun -s "${SOURCE_BASE_DIR}" "${RUN_DIR}"
+pc_newrun "${SOURCE_BASE_DIR}" "${RUN_DIR}"
 
 # --- 2. Copy Generated Configs ---
 echo "INFO: Copying generated config files from ${LOCAL_GENERATED_CONFIG_DIR}"

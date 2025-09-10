@@ -15,7 +15,6 @@ data:
     rho_right: 0.125
     widthlnrho: 0.01
     xjump_mid: 0.0
-    rho0 : 1.0
 
 
   entropy_init_pars:
