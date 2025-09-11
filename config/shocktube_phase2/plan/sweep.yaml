@@ -6,6 +6,7 @@ hpc:
   run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase2'
   module_loads: |
     module load gcc/11.2.0 openmpi/4.1.2 openblas/0.3.18-omp csc-tools StdEnv hdf5/1.10.7-mpi
+  pencil_code_home: '/scratch/project_2008296/chau/pencil-code'
   sbatch:
     job_name: "shock_sweep_ph2"
     account: "project_2008296"

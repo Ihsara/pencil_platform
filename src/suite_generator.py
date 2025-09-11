@@ -10,6 +10,7 @@ import jinja2
 
 from .constants import DIRS, FILES
 
+
 def _generate_sweep_combinations(plan: dict) -> list:
     if 'parameter_sweeps' not in plan: return [{}]
     all_param_groups = []
@@ -17,20 +18,14 @@ def _generate_sweep_combinations(plan: dict) -> list:
         group = []
         if sweep.get('type') == 'linked':
             variables = sweep.get('variables', [])
-            for value in sweep.get('values', []):
-                group.append({var: value for var in variables})
+            for value in sweep.get('values', []): group.append({var: value for var in variables})
         elif sweep.get('type') == 'product':
             variable = sweep.get('variable')
-            if variable:
-                group = [{variable: value} for value in sweep.get('values', [])]
-        if group:
-            all_param_groups.append(group)
-
+            if variable: group = [{variable: value} for value in sweep.get('values', [])]
+        if group: all_param_groups.append(group)
     final_combinations = []
     for combo_tuple in itertools.product(*all_param_groups):
-        merged_dict = {}
-        for d in combo_tuple:
-            merged_dict.update(d)
+        merged_dict = {}; [merged_dict.update(d) for d in combo_tuple]
         final_combinations.append(merged_dict)
     return final_combinations if final_combinations else [{}]
 
@@ -44,88 +39,95 @@ def generate_experiment_from_dict(experiment_name: str, config_data_map: dict, t
         if not template_format: continue
         template = env.get_template(f"{template_format}.j2")
         rendered_content = template.render(data=template_data, output_filename=output_filename)
-        with open(run_config_dir / output_filename, 'w') as f:
-            f.write(rendered_content)
+        with open(run_config_dir / output_filename, 'w') as f: f.write(rendered_content)
 
 def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     logger.info(f"Loading experiment plan from: {plan_file}")
-    with open(plan_file, 'r') as f:
-        plan = yaml.safe_load(f)
+    with open(plan_file, 'r') as f: plan = yaml.safe_load(f)
 
     base_config_path = DIRS.config / plan['base_experiment'] / DIRS.in_subdir
     base_configs = {p.name: yaml.safe_load(p.read_text()) for p in base_config_path.glob("*.yaml")}
     
-    all_runs = []
-    all_param_combinations = _generate_sweep_combinations(plan)
+
+    auto_rebuild = False
+    rebuild_reason = ""
     
+    # Check if any parameter sweep modifies nxgrid
+    for sweep in plan.get('parameter_sweeps', []):
+        if sweep.get('variable') == 'nxgrid':
+            auto_rebuild = True
+            rebuild_reason = "Parameter sweep modifies 'nxgrid'."
+            break
+    
+    # Check for direct modifications to critical files
+    critical_files = ['cparam_local.yaml', 'Makefile_local.yaml']
+    if not auto_rebuild:
+        for file in critical_files:
+            if file in plan.get('modifications', {}):
+                auto_rebuild = True
+                rebuild_reason = f"Plan directly modifies '{file}'."
+                break
+            for branch in plan.get('branches', []):
+                if file in branch.get('settings', {}):
+                    auto_rebuild = True
+                    rebuild_reason = f"Branch '{branch['name']}' modifies '{file}'."
+                    break
+
+    final_rebuild_flag = rebuild or auto_rebuild
+    if auto_rebuild:
+        logger.warning("AUTOMATIC REBUILD ENACTED.")
+        logger.warning(f"  Reason: {rebuild_reason}")
+        if rebuild:
+            logger.info("  (Note: --rebuild flag was also provided manually.)")
+    # --- END OF NEW LOGIC ---
+
+    all_runs = []
+    # (The rest of the run generation loop is unchanged)
+    all_param_combinations = _generate_sweep_combinations(plan)
     for branch in plan.get('branches', [{'name': 'default', 'settings': {}}]):
         for current_params in all_param_combinations:
-            
-            context = {
-                'plan': plan,
-                'branch': branch,
-                'output_prefix': plan.get('output_prefix', ''),
-                **current_params
-            }
-
+            context = {'plan': plan, 'branch': branch, 'output_prefix': plan.get('output_prefix', ''), **current_params}
             if 'derived_parameters' in plan:
                 for key, formula in plan['derived_parameters'].items():
-                    if isinstance(formula, str):
-                        context[key] = eval(formula, {}, context)
-                    else:
-                        context[key] = formula
+                    if isinstance(formula, str): context[key] = eval(formula, {}, context)
+                    else: context[key] = formula
                 for key, formula in plan['derived_parameters'].items():
-                     if isinstance(formula, str) and key not in context:
-                        context[key] = eval(formula, {}, context)
-
+                     if isinstance(formula, str) and key not in context: context[key] = eval(formula, {}, context)
             if 'run_name_template' in plan:
-
-                env = jinja2.Environment()
-                env.filters['fs_safe'] = lambda v: str(v).replace('.', 'p')
+                env = jinja2.Environment(); env.filters['fs_safe'] = lambda v: str(v).replace('.', 'p')
                 name_template = env.from_string(plan['run_name_template'])
                 run_name = name_template.render(context)
             else:
                 params_str = '_'.join([f"{k}{v}" for k, v in current_params.items()])
                 run_name = '_'.join([plan.get('output_prefix', ''), branch['name'], params_str])
-            
             run_configs = deepcopy(base_configs)
-            
             for file_name, settings in branch.get('settings', {}).items():
                 if file_name in run_configs:
                     config_data = run_configs[file_name]['data']
                     for namelist, params in settings.items():
-                        if namelist in config_data:
-                            config_data[namelist].update(params)
-
+                        if namelist in config_data: config_data[namelist].update(params)
             for param_key, param_value in context.items():
                 for config_file in run_configs.values():
                     for namelist_data in config_file.get('data', {}).values():
-                        if isinstance(namelist_data, dict) and param_key in namelist_data:
-                            namelist_data[param_key] = param_value
-            
+                        if isinstance(namelist_data, dict) and param_key in namelist_data: namelist_data[param_key] = param_value
             all_runs.append({'name': run_name, 'configs': run_configs})
 
-    if limit is not None and limit > 0:
-        all_runs = all_runs[:limit]
-
-    plan['total_sims'] = len(all_runs)
+    if limit is not None: all_runs = all_runs[:limit]
+    
     experiment_name = plan_file.parent.parent.name
     local_exp_dir = DIRS.runs / experiment_name
     generated_configs_dir = local_exp_dir / "generated_configs"
     os.makedirs(local_exp_dir / "slurm_logs", exist_ok=True)
-    
     for run in all_runs:
         generate_experiment_from_dict(run['name'], run['configs'], DIRS.templates, generated_configs_dir)
     logger.success(f"Generated config files for {len(all_runs)} run(s) in '{generated_configs_dir}'")
-
-    manifest_path = local_exp_dir / FILES.manifest
-    with open(manifest_path, 'w') as f:
+    with open(local_exp_dir / FILES.manifest, 'w') as f:
         for run in all_runs: f.write(f"{run['name']}\n")
-    logger.success(f"Generated run manifest at '{manifest_path}'")
+    logger.success(f"Generated run manifest at '{local_exp_dir / FILES.manifest}'")
 
+    # Pass the FINAL rebuild flag to the template
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(DIRS.templates))
     submit_template = env.get_template("sbatch_array.j2")
-    
     hpc_config = plan.get('hpc', {})
     submit_script_path = local_exp_dir / FILES.submit_script
     with open(submit_script_path, 'w') as f:
@@ -133,11 +135,9 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
             hpc=hpc_config, sbatch=hpc_config.get('sbatch', {}),
             run_base_dir=hpc_config.get('run_base_dir', 'runs'),
             manifest_file=FILES.manifest, num_jobs=len(all_runs),
-            experiment_name=experiment_name, rebuild=rebuild,
+            experiment_name=experiment_name, rebuild=final_rebuild_flag, # USE THE FINAL FLAG
             module_loads=hpc_config.get('module_loads', '')
         ))
     logger.success(f"Generated submission script at '{submit_script_path}'")
-
-    logger.info("--- Experiment Summary ---")
-    print(f"Total Simulations to Generate: {len(all_runs)}")
+    logger.info("--- Experiment Summary ---\nTotal Simulations to Generate: " + str(len(all_runs)))
     return submit_script_path, plan
