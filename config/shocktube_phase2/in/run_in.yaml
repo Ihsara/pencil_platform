@@ -1,0 +1,45 @@
+# This is the base run configuration for the Phase 2 experiment.
+# It includes hyperdiffusion parameters by default and is set for
+# an adiabatic run (lgamma_is_1 = false).
+format: namelist
+data:
+  run_pars:
+    bcx: ['a', 's', 's', 's', 's', 's']
+    cdt: 0.1
+    cdtv: 0.1
+    dsnap: 1.0e-5
+    dtmin: 1.0e-12
+    isave: 1000
+    tmax: 1.0e-4
+    it1: 100
+    itorder: 3
+    lpencil_check: false
+    nt: 60000 # Increased nt for higher resolution runs
+
+  density_run_pars:
+    diffrho_shock: 0.5 # Default value from Phase 1 winner
+    idiff: 'shock'
+    lmassdiff_fix: true # Default to true, branch can override
+    lgamma_is_1: false  
+
+  entropy_run_pars:
+    chi_shock: 0.5      # Default value from Phase 1 winner
+    iheatcond: ['shock', 'hyper3'] # Enable hyperdiffusion
+    chi_hyper3: 1.9e-14 # Placeholder value for res=1600, C=1.0
+
+  viscosity_run_pars:
+    ivisc: ['nu-shock', 'hyper3-nu-const'] # Enable hyperdiffusion
+    nu_shock: 0.5       # Default value from Phase 1 winner
+    nu_hyper3: 1.9e-14  # Placeholder value for res=1600, C=1.0
+
+  shock_run_pars:
+    con_bias: 0.05
+    dtfactor: 0.2
+    ishock_max: 1
+    lconvergence_only: true
+    lgaussian_smooth: true
+    lmax_shock: false
+    shock_div_pow: 1.75
+  
+  eos_run_pars: {}
+  hydro_run_pars: {}

@@ -1,0 +1,84 @@
+# ===================================================================
+# Plan for the Shocktube Phase 2: Hyperdiffusion & Convergence
+# ===================================================================
+# This plan builds on the results of Phase 1 to investigate more
+# advanced numerical stabilization techniques (hyperdiffusion) and to
+# conduct a formal resolution study.
+---
+
+# --- HPC Execution Parameters ---
+hpc:
+  source_base_dir: '/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod'
+  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase2'
+  module_loads: |
+    module load gcc/11.2.0
+    module load openmpi/4.1.2
+    module load openblas/0.3.18-omp
+    module load csc-tools
+    module load StdEnv
+    module load hdf5/1.10.7-mpi
+
+  sbatch:
+    job_name: "shock_sweep_ph2"
+    account: "project_2008296"
+    partition: "small"
+    time: "01:00:00"         # Increased time for higher resolution runs.
+    nodes: 1
+    ntasks: 1
+    cpus_per_task: 1
+    mail_user: "chau.c.tran@aalto.fi"
+    mail_type: "END"
+
+# --- Experiment Generation Parameters ---
+# Use a new base configuration that is pre-configured for hyperdiffusion.
+base_experiment: 'shocktube_hyper_base'
+
+# A descriptive prefix for all generated run directories.
+output_prefix: 'shock'
+
+# This experiment uses parameter sweeps to control all variations.
+# No global modifications are needed here.
+
+# --- Parameter Sweeps ---
+# This defines the grid search for the experiment. We use a 'product'
+# sweep to test every resolution against every hyperdiffusion strength.
+parameter_sweeps:
+  - type: product
+    variable: nxgrid
+    values: [400, 800, 1600] # A practical set for a convergence test.
+
+  - type: linked
+    # This sweep controls the strength of the hyperdiffusion. The values are
+    # calculated based on the formula: nu_hyper3 = C * (dx^5 * u_max)
+    # where dx = 1/nxgrid, u_max is assumed to be ~200, and C is varied.
+    # We will manually set the values for each resolution later.
+    # For now, this is a placeholder.
+    variables: [nu_hyper3, chi_hyper3]
+    values:
+      # C=0.2 (Weak) | C=1.0 (Standard) | C=5.0 (Strong)
+      - [3.9e-12, 3.9e-12]   # For nxgrid=400
+      - [1.95e-11, 1.95e-11] # For nxgrid=400
+      - [9.75e-11, 9.75e-11] # For nxgrid=400
+      - [1.22e-13, 1.22e-13] # For nxgrid=800
+      - [6.1e-13, 6.1e-13]   # For nxgrid=800
+      - [3.05e-12, 3.05e-12] # For nxgrid=800
+      - [3.8e-15, 3.8e-15]   # For nxgrid=1600
+      - [1.9e-14, 1.9e-14]   # For nxgrid=1600
+      - [9.5e-14, 9.5e-14]   # For nxgrid=1600
+
+# --- Branches ---
+# The branches define the core comparisons of the experiment.
+branches:
+  - name: "massfix_hyper"
+    description: "Runs with mass diffusion fix AND hyperdiffusion enabled."
+    settings:
+      run_in.yaml:
+        density_run_pars:
+          lmassdiff_fix: true
+
+  - name: "nomassfix_hyper"
+    description: "Control runs: hyperdiffusion enabled, but mass fix DISABLED."
+    settings:
+      run_in.yaml:
+        density_run_pars:
+          lmassdiff_fix: false
