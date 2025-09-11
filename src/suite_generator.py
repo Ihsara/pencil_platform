@@ -11,22 +11,21 @@ import jinja2
 from .constants import DIRS, FILES
 
 def _generate_sweep_combinations(plan: dict) -> list:
-    # This helper function is unchanged
     if 'parameter_sweeps' not in plan: return [{}]
     all_param_groups = []
     for sweep in plan.get('parameter_sweeps', []):
-        if not sweep: continue
         group = []
         if sweep.get('type') == 'linked':
+            variables = sweep.get('variables', [])
             for value in sweep.get('values', []):
-                group.append({var: value for var in sweep.get('variables', [])})
+                group.append({var: value for var in variables})
         elif sweep.get('type') == 'product':
             variable = sweep.get('variable')
-            group = [{variable: value} for value in sweep.get('values', [])]
-        if group: all_param_groups.append(group)
-    final_combinations = [dict(p) for p in itertools.product(*[d.items() for d in group]) for group in all_param_groups] # Simplified this section
-    # ... Original logic for product/linked is complex, simplifying for this example, but assuming it works.
-    # Re-implementing the core logic correctly.
+            if variable:
+                group = [{variable: value} for value in sweep.get('values', [])]
+        if group:
+            all_param_groups.append(group)
+
     final_combinations = []
     for combo_tuple in itertools.product(*all_param_groups):
         merged_dict = {}
@@ -35,9 +34,7 @@ def _generate_sweep_combinations(plan: dict) -> list:
         final_combinations.append(merged_dict)
     return final_combinations if final_combinations else [{}]
 
-
 def generate_experiment_from_dict(experiment_name: str, config_data_map: dict, template_dir: Path, output_dir: Path):
-    # This helper function is unchanged
     run_config_dir = output_dir / experiment_name
     os.makedirs(run_config_dir, exist_ok=True)
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), trim_blocks=True, lstrip_blocks=True)
@@ -64,37 +61,37 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     for branch in plan.get('branches', [{'name': 'default', 'settings': {}}]):
         for current_params in all_param_combinations:
             
-            # --- NEW: Agnostic, Configuration-Driven Logic ---
-            
-            # 1. Create the full context for this run
             context = {
                 'plan': plan,
                 'branch': branch,
                 **current_params
             }
 
-            # 2. Calculate derived parameters if they are defined in the plan
             if 'derived_parameters' in plan:
                 for key, formula in plan['derived_parameters'].items():
-                    # Evaluate the formula string using the current context
-                    context[key] = eval(formula, {}, context)
+                    if isinstance(formula, str):
+                        try:
+                            context[key] = eval(formula, {}, context)
+                        except NameError:
+                             logger.warning(f"Could not evaluate '{formula}' yet, will re-evaluate later.")
+                    else:
+                        context[key] = formula
+                # Second pass to handle dependencies between derived parameters
+                for key, formula in plan['derived_parameters'].items():
+                    if isinstance(formula, str) and key not in context:
+                        context[key] = eval(formula, {}, context)
 
-            # 3. Generate the run name using the template from the plan
+
             if 'run_name_template' in plan:
                 name_template = jinja2.Template(plan['run_name_template'])
-                # Add a filter for filesystem-friendly names
                 name_template.environment.filters['fs_safe'] = lambda v: str(v).replace('.', 'p')
                 run_name = name_template.render(context)
             else:
-                # Fallback to the original, simple naming for backward compatibility
                 params_str = '_'.join([f"{k}{v}" for k, v in current_params.items()])
                 run_name = '_'.join([plan['output_prefix'], branch['name'], params_str])
             
-            # --- END OF NEW LOGIC ---
-
             run_configs = deepcopy(base_configs)
             
-            # Apply branch settings
             for file_name, settings in branch.get('settings', {}).items():
                 if file_name in run_configs:
                     config_data = run_configs[file_name]['data']
@@ -102,11 +99,10 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
                         if namelist in config_data:
                             config_data[namelist].update(params)
 
-            # Apply all parameters from the context (swept, derived) to the configs
             for param_key, param_value in context.items():
                 for config_file in run_configs.values():
                     for namelist_data in config_file.get('data', {}).values():
-                        if isinstance(namelist_data, dict) and param_key in namelist_data:
+                        if isinstance(namelist_data, dict) and param_key in param_value:
                             namelist_data[param_key] = param_value
             
             all_runs.append({'name': run_name, 'configs': run_configs})
@@ -114,7 +110,6 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     if limit is not None and limit > 0:
         all_runs = all_runs[:limit]
 
-    # The rest of the script (file writing, summary) is unchanged
     plan['total_sims'] = len(all_runs)
     experiment_name = plan_file.parent.parent.name
     local_exp_dir = DIRS.runs / experiment_name
