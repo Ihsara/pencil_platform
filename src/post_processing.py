@@ -2,8 +2,8 @@
 
 import os
 import sys
+import re
 import yaml
-import shutil
 from pathlib import Path
 import jinja2
 import numpy as np
@@ -29,7 +29,6 @@ except ImportError as e:
 def get_analytical_solution(params, x: np.ndarray, t: float) -> dict | None:
     """Calculates the analytical Sod shock tube solution."""
     try:
-        # Ensure necessary parameters exist for the `sod` function
         if not hasattr(params, 'rho0'): setattr(params, 'rho0', 1.0)
         if not hasattr(params, 'cs0'): setattr(params, 'cs0', 1.0)
         
@@ -45,16 +44,35 @@ def get_analytical_solution(params, x: np.ndarray, t: float) -> dict | None:
 def load_simulation_data(run_path: Path) -> dict | None:
     """Loads and processes the final snapshot data from a single simulation run."""
     try:
+        if not run_path.is_dir():
+            logger.warning(f"Run directory not found: {run_path}")
+            return None
+            
         data_dir = run_path / "data"
-        var_file = sorted((data_dir / "proc0").glob("VAR*") or data_dir.glob("VAR*"))[-1]
+        proc_dir = data_dir / "proc0" if (data_dir / "proc0").is_dir() else data_dir
+        var_files = sorted(proc_dir.glob("VAR*"))
+        if not var_files:
+            logger.warning(f"No VAR files found in {proc_dir}")
+            return None
         
         params = read.param(datadir=str(data_dir), quiet=True)
-        var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=True)
+        var = read.var(var_files[-1].name, datadir=str(data_dir), quiet=True, trimall=True)
         grid = read.grid(datadir=str(data_dir), quiet=True, trim=True)
         
+        # Ensure required parameters for calculating pressure and energy exist
+        if not all(hasattr(params, attr) for attr in ['cp', 'gamma']):
+            logger.error(f"Parameters 'cp' and/or 'gamma' not found in param file for {run_path}.")
+            return None
+        
+        cv = params.cp / params.gamma
+        
         density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
-        pressure = (params.cp - params.cv) * density * var.TT
-        internal_energy = pressure / (density * (params.gamma - 1.0))
+        
+        # Calculate pressure using the ideal gas law (p = rho * R * T), where R = cp - cv
+        pressure = (params.cp - cv) * density * var.TT
+        
+        # Calculate internal energy from pressure
+        internal_energy = pressure / (density * (params.gamma - 1.0)) if params.gamma > 1.0 else np.zeros_like(density)
 
         return {
             "x": np.squeeze(grid.x), "rho": np.squeeze(density), "ux": np.squeeze(var.ux),
@@ -91,7 +109,7 @@ def process_and_analyze_run(run_path: Path, report_dir: Path, run_name: str):
         f.write(f"# Analysis Report for {run_name}\n\n")
         f.write(markdown_table)
     
-    # 3. Generate visualization plots (now saved inside the run's report directory)
+    # 3. Generate visualization plots
     plot_simulation_vs_analytical(sim_data, analytical_data, run_report_dir, run_name)
 
 def generate_quarto_report(experiment_name: str, report_dir: Path, run_names: list):
@@ -127,11 +145,11 @@ def analyze_suite(experiment_name: str):
 
     with open(manifest_file, 'r') as f: run_names = [line.strip() for line in f if line.strip()]
 
-    # Step 1: Process each run individually and save its data, analysis, and plots
+    # Step 1: Process each run individually
     for run_name in run_names:
         process_and_analyze_run(hpc_run_base_dir / run_name, report_dir, run_name)
     
-    # Step 2: Generate the final Quarto report that consolidates all results
+    # Step 2: Generate the final Quarto report
     generate_quarto_report(experiment_name, report_dir, run_names)
     
     logger.success(f"Analysis for '{experiment_name}' finished successfully.")
