@@ -20,7 +20,7 @@ data:
     diffrho_shock: 0.5 # Default value from Phase 1 winner
     idiff: 'shock'
     lmassdiff_fix: true # Default to true, branch can override
-    lgamma_is_1: false  
+    lgamma_is_1: true  
 
   entropy_run_pars:
     chi_shock: 0.5      # Default value from Phase 1 winner

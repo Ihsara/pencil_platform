@@ -2,13 +2,13 @@
 # Plan for Shocktube Phase 2: Hyperdiffusion & Convergence (Agnostic)
 # ===================================================================
 hpc:
-  source_base_dir: '/scratch/project_200826/chau/chausims/sod_10_test_proj/quick_test_sod'
-  run_base_dir: '/scratch/project_200826/chau/runs/shocktube_phase2'
+  source_base_dir: '/scratch/project_2008296/chau/chausims/sod_10_test_proj/quick_test_sod'
+  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase2'
   module_loads: |
     module load gcc/11.2.0 openmpi/4.1.2 openblas/0.3.18-omp csc-tools StdEnv hdf5/1.10.7-mpi
   sbatch:
     job_name: "shock_sweep_ph2"
-    account: "project_200826"
+    account: "project_2008296"
     partition: "small"
     time: "01:00:00"
     nodes: 1
@@ -41,11 +41,16 @@ parameter_sweeps:
 
 # --- Branches ---
 branches:
-  - name: "massfix_hyper"
+  - name: "with_best_fit"
     settings:
       run_in.yaml:
-        density_run_pars: { lmassdiff_fix: true }
-  - name: "nomassfix_hyper"
+        density_run_pars: { diffrho_shock: 0.5 }
+        entropy_run_pars: { chi_shock: 0.5 }
+        viscosity_run_pars: { nu_shock: 0.5 }
+
+  - name: "with_second_best_fit"
     settings:
       run_in.yaml:
-        density_run_pars: { lmassdiff_fix: false }
+        density_run_pars: { diffrho_shock: 1.0 }
+        entropy_run_pars: { chi_shock: 1.0 }
+        viscosity_run_pars: { nu_shock: 1.0 }
