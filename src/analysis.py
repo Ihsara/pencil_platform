@@ -27,27 +27,30 @@ def compare_simulation_to_analytical(sim_data: dict, analytical_data: dict) -> d
     for var in comparable_vars:
         if var in sim_data and var in analytical_data:
             try:
-                metrics[f'mse_{var}'] = calculate_mse(analytical_data[var], sim_data[var])
+                # Format the MSE to a reasonable number of significant figures
+                metrics[f'MSE_{var}'] = f"{calculate_mse(analytical_data[var], sim_data[var]):.4e}"
             except ValueError as e:
                 logger.warning(f"Could not compute MSE for '{var}': {e}")
     
     return metrics
 
-def format_report_tables(metrics: dict) -> tuple[str, str]:
+def format_comparison_table(all_metrics: dict) -> tuple[str, str]:
     """
-    Formats the analysis metrics into both a log-friendly string and a Markdown table.
+    Formats metrics from all runs into a single side-by-side comparison table.
 
     Args:
-        metrics (dict): A dictionary of calculated metrics (e.g., from compare_simulation_to_analytical).
+        all_metrics (dict): A dictionary where keys are run names and values are metric dictionaries.
 
     Returns:
         tuple[str, str]: A tuple containing the log summary string and the Markdown table string.
     """
-    df = pd.DataFrame.from_dict(metrics, orient='index', columns=['Value'])
-    df.index.name = "Metric"
+    # Create a DataFrame where columns are run names and rows are metrics
+    df = pd.DataFrame(all_metrics).T  # Transpose to get runs as rows initially
+    df.index.name = "Run Name"
+    df = df.T # Transpose back to have runs as columns
     
     # Format for logging
-    log_summary = "Analysis Metrics:\n" + df.to_string()
+    log_summary = "Side-by-Side Analysis Metrics:\n" + df.to_string()
     
     # Format for Markdown report
     markdown_table = df.to_markdown()
