@@ -12,8 +12,6 @@ init
 
 data
 runs
-#runs 
-#runs
 
 export
 export_script.py
