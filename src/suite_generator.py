@@ -64,31 +64,29 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
             context = {
                 'plan': plan,
                 'branch': branch,
+                'output_prefix': plan.get('output_prefix', ''),
                 **current_params
             }
 
             if 'derived_parameters' in plan:
                 for key, formula in plan['derived_parameters'].items():
                     if isinstance(formula, str):
-                        try:
-                            context[key] = eval(formula, {}, context)
-                        except NameError:
-                             logger.warning(f"Could not evaluate '{formula}' yet, will re-evaluate later.")
+                        context[key] = eval(formula, {}, context)
                     else:
                         context[key] = formula
-                # Second pass to handle dependencies between derived parameters
                 for key, formula in plan['derived_parameters'].items():
-                    if isinstance(formula, str) and key not in context:
+                     if isinstance(formula, str) and key not in context:
                         context[key] = eval(formula, {}, context)
 
-
             if 'run_name_template' in plan:
-                name_template = jinja2.Template(plan['run_name_template'])
-                name_template.environment.filters['fs_safe'] = lambda v: str(v).replace('.', 'p')
+
+                env = jinja2.Environment()
+                env.filters['fs_safe'] = lambda v: str(v).replace('.', 'p')
+                name_template = env.from_string(plan['run_name_template'])
                 run_name = name_template.render(context)
             else:
                 params_str = '_'.join([f"{k}{v}" for k, v in current_params.items()])
-                run_name = '_'.join([plan['output_prefix'], branch['name'], params_str])
+                run_name = '_'.join([plan.get('output_prefix', ''), branch['name'], params_str])
             
             run_configs = deepcopy(base_configs)
             
@@ -102,7 +100,7 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
             for param_key, param_value in context.items():
                 for config_file in run_configs.values():
                     for namelist_data in config_file.get('data', {}).values():
-                        if isinstance(namelist_data, dict) and param_key in param_value:
+                        if isinstance(namelist_data, dict) and param_key in namelist_data:
                             namelist_data[param_key] = param_value
             
             all_runs.append({'name': run_name, 'configs': run_configs})
