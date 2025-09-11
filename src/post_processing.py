@@ -2,7 +2,6 @@
 
 import os
 import sys
-import re
 import yaml
 from pathlib import Path
 import jinja2
@@ -59,21 +58,30 @@ def load_simulation_data(run_path: Path) -> dict | None:
         var = read.var(var_files[-1].name, datadir=str(data_dir), quiet=True, trimall=True)
         grid = read.grid(datadir=str(data_dir), quiet=True, trim=True)
         
-        # Ensure required parameters for calculating pressure and energy exist
-        if not all(hasattr(params, attr) for attr in ['cp', 'gamma']):
-            logger.error(f"Parameters 'cp' and/or 'gamma' not found in param file for {run_path}.")
-            return None
-        
-        cv = params.cp / params.gamma
+        # --- CORRECTED PRESSURE AND ENERGY CALCULATION ---
         
         density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
         
-        # Calculate pressure using the ideal gas law (p = rho * R * T), where R = cp - cv
-        pressure = (params.cp - cv) * density * var.TT
+        # Get necessary parameters from the param file
+        cp, gamma = params.cp, params.gamma
+        cv = cp / gamma
         
-        # Calculate internal energy from pressure
-        internal_energy = pressure / (density * (params.gamma - 1.0)) if params.gamma > 1.0 else np.zeros_like(density)
+        # Check if entropy 'ss' is available, as temperature 'TT' is not.
+        if not hasattr(var, 'ss'):
+            logger.error(f"Variable 'ss' (entropy) not found in VAR file for {run_path}. Cannot calculate pressure.")
+            return None
 
+        # Reconstruct pressure from entropy using the Pencil Code's equation of state.
+        # This requires reference values, which we get from the params object.
+        rho0 = getattr(params, 'rho0', 1.0)
+        cs0 = getattr(params, 'cs0', 1.0)
+        lnrho0 = np.log(rho0)
+        lnTT0 = np.log(cs0**2 / (cp * (gamma - 1.0)))
+        
+        # This formula reconstructs temperature from entropy and density, then pressure is derived from it.
+        pressure = (cp - cv) * np.exp(lnTT0 + (gamma / cp * var.ss) + (gamma * np.log(density)) - ((gamma - 1.0) * lnrho0))
+        internal_energy = pressure / (density * (gamma - 1.0)) if gamma > 1.0 else np.zeros_like(density)
+        
         return {
             "x": np.squeeze(grid.x), "rho": np.squeeze(density), "ux": np.squeeze(var.ux),
             "pp": np.squeeze(pressure), "ee": np.squeeze(internal_energy), 
@@ -96,11 +104,9 @@ def process_and_analyze_run(run_path: Path, report_dir: Path, run_name: str):
     run_report_dir = report_dir / run_name
     run_report_dir.mkdir(parents=True, exist_ok=True)
 
-    # 1. Save processed data for external use (e.g., by Quarto)
     np.savez_compressed(run_report_dir / "simulation_data.npz", **{k: v for k, v in sim_data.items() if k != 'params'})
     np.savez_compressed(run_report_dir / "analytical_data.npz", **analytical_data)
 
-    # 2. Perform numerical analysis and generate reports
     metrics = compare_simulation_to_analytical(sim_data, analytical_data)
     log_summary, markdown_table = format_report_tables(metrics)
     
@@ -109,7 +115,6 @@ def process_and_analyze_run(run_path: Path, report_dir: Path, run_name: str):
         f.write(f"# Analysis Report for {run_name}\n\n")
         f.write(markdown_table)
     
-    # 3. Generate visualization plots
     plot_simulation_vs_analytical(sim_data, analytical_data, run_report_dir, run_name)
 
 def generate_quarto_report(experiment_name: str, report_dir: Path, run_names: list):
@@ -145,11 +150,9 @@ def analyze_suite(experiment_name: str):
 
     with open(manifest_file, 'r') as f: run_names = [line.strip() for line in f if line.strip()]
 
-    # Step 1: Process each run individually
     for run_name in run_names:
         process_and_analyze_run(hpc_run_base_dir / run_name, report_dir, run_name)
     
-    # Step 2: Generate the final Quarto report
     generate_quarto_report(experiment_name, report_dir, run_names)
     
     logger.success(f"Analysis for '{experiment_name}' finished successfully.")
