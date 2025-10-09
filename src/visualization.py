@@ -19,13 +19,14 @@ def plot_simulation_vs_analytical(sim_data: dict, analytical_data: dict, output_
     output_path.mkdir(parents=True, exist_ok=True)
     
     plot_definitions = {
-        'density': ('rho', r'Density ($\rho$)'),
-        'velocity': ('ux', r'Velocity ($u_x$)'),
-        'pressure': ('pp', r'Pressure ($p$)'),
-        'energy': ('ee', r'Internal Energy ($e$)')
+        'density': ('rho', r'$\rho$ [g cm$^{-3}$]', sim_data['params'].unit_density),
+        'velocity': ('ux', r'$u_x$ [km s$^{-1}$] ', sim_data['params'].unit_velocity*1e-5),
+        'pressure': ('pp', r'$p$ [dyn cm$^{-2}$]',   sim_data['params'].unit_energy_density),
+        'energy': ('ee', r'$e$ [km$^2$ s$^{-2}$] ', sim_data['params'].unit_velocity**2), 
+        
     }
 
-    for plot_key, (data_key, ylabel) in plot_definitions.items():
+    for plot_key, (data_key, ylabel, unit) in plot_definitions.items():
         plt.style.use('seaborn-v0_8-whitegrid')
         fig, ax = plt.subplots(figsize=(10, 7))
         
@@ -33,11 +34,11 @@ def plot_simulation_vs_analytical(sim_data: dict, analytical_data: dict, output_
         ax.plot(analytical_data['x'], analytical_data[data_key], 'k--', linewidth=2.5, label='Analytical Solution')
         
         # Plot simulation data with markers
-        ax.plot(sim_data['x'], sim_data[data_key], 'o-', color='#1f77b4', markersize=4, label=f'Simulation (t={sim_data["t"]:.2e})')
+        ax.plot(sim_data['x'], sim_data[data_key]*unit, 'o-', color='#1f77b4', markersize=4, label=f'Simulation (t={sim_data["t"]:.2e})')
         
         ax.set_title(f"{ylabel} Profile for\n{run_name}", fontsize=16, pad=15)
-        ax.set_xlabel('Position (x) [code units]', fontsize=12)
-        ax.set_ylabel(f'{ylabel} [code units]', fontsize=12)
+        ax.set_xlabel('Position (x) [kpc]', fontsize=12)
+        ax.set_ylabel(f'{ylabel}', fontsize=12)
         ax.legend(fontsize=11)
         ax.grid(True, which='major', linestyle='--', linewidth=0.5)
         

@@ -17,7 +17,7 @@ data:
     initlnrho: 'xjump'
     ldensity_nolog: true
     rho_left: 1.0
-    rho_right: 0.125
+    rho_right: 1.0
     widthlnrho: 0.01
     xjump_mid: 0.0
 
