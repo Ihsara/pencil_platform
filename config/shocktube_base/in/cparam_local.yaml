@@ -8,3 +8,4 @@ data:
   ncpus: 1
   nprocy: 1
   nprocz: 1
+  nprocx: 1

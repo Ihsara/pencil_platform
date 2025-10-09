@@ -19,14 +19,14 @@ def plot_simulation_vs_analytical(sim_data: dict, analytical_data: dict, output_
     output_path.mkdir(parents=True, exist_ok=True)
     
     plot_definitions = {
-        'density': ('rho', r'$\rho$ [g cm$^{-3}$]', sim_data['params'].unit_density),
-        'velocity': ('ux', r'$u_x$ [km s$^{-1}$] ', sim_data['params'].unit_velocity*1e-5),
-        'pressure': ('pp', r'$p$ [dyn cm$^{-2}$]',   sim_data['params'].unit_energy_density),
-        'energy': ('ee', r'$e$ [km$^2$ s$^{-2}$] ', sim_data['params'].unit_velocity**2), 
+        'density': ('rho', r'$\rho$ [g cm$^{-3}$]', sim_data['params'].unit_density, 'log'),
+        'velocity': ('ux', r'$u_x$ [km s$^{-1}$] ', sim_data['params'].unit_velocity*1e-5, 'linear'),
+        'pressure': ('pp', r'$p$ [dyn cm$^{-2}$]',   sim_data['params'].unit_energy_density, 'log'),
+        'energy': ('ee', r'$e$ [km$^2$ s$^{-2}$] ', sim_data['params'].unit_velocity**2, 'log'), 
         
     }
 
-    for plot_key, (data_key, ylabel, unit) in plot_definitions.items():
+    for plot_key, (data_key, ylabel, unit, yscale) in plot_definitions.items():
         plt.style.use('seaborn-v0_8-whitegrid')
         fig, ax = plt.subplots(figsize=(10, 7))
         
@@ -39,6 +39,7 @@ def plot_simulation_vs_analytical(sim_data: dict, analytical_data: dict, output_
         ax.set_title(f"{ylabel} Profile for\n{run_name}", fontsize=16, pad=15)
         ax.set_xlabel('Position (x) [kpc]', fontsize=12)
         ax.set_ylabel(f'{ylabel}', fontsize=12)
+        ax.set_yscale(yscale)
         ax.legend(fontsize=11)
         ax.grid(True, which='major', linestyle='--', linewidth=0.5)
         

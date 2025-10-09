@@ -51,12 +51,13 @@ def load_simulation_data(run_path: Path) -> dict | None:
         data_dir = run_path / "data"
         proc_dir = data_dir / "proc0" if (data_dir / "proc0").is_dir() else data_dir
         var_files = sorted(proc_dir.glob("VAR*"))
+        logger.info(f"Loading data from {run_path}, found {len(var_files)} VAR files.")
         if not var_files:
             logger.warning(f"No VAR files found in {proc_dir}")
             return None
         
         params = read.param(datadir=str(data_dir), quiet=True)
-        var = read.var(var_files[-1].name, datadir=str(data_dir), quiet=True, trimall=True)
+        var = read.var(var_files[-4].name, datadir=str(data_dir), quiet=True, trimall=True)
         grid = read.grid(datadir=str(data_dir), quiet=True, trim=True)
         
         density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho

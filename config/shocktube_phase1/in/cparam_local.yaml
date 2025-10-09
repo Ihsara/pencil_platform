@@ -2,9 +2,10 @@
 # These are typically used for pre-processing.
 format: cparam
 data:
-  nxgrid: 400
+  nxgrid: 4000
   nygrid: 1
   nzgrid: 1
   ncpus: 1
   nprocy: 1
   nprocz: 1
+  nprocx: 1
