@@ -8,6 +8,10 @@ data:
     # Using Lxyz as the standard parameter
     xyz0: [-0.5, -0.5, -0.5]
     Lxyz: [1.0, 1.0, 1.0]
+    unit_length: 3.08567758e21
+    unit_velocity: 9.778122994895071e4
+    unit_density: 1.6737236e-24
+    lfix_unit_std: T
 
   density_init_pars:
     initlnrho: 'xjump'
