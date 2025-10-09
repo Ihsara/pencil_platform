@@ -79,8 +79,19 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     logger.info(f"Loading experiment plan from: {plan_file}")
     with open(plan_file, 'r') as f: plan = yaml.safe_load(f)
 
+    # Load base experiment configs first
     base_config_path = DIRS.config / plan['base_experiment'] / DIRS.in_subdir
     base_configs = {p.name: yaml.safe_load(p.read_text()) for p in base_config_path.glob("*.yaml")}
+    logger.info(f"Loaded {len(base_configs)} config file(s) from base experiment '{plan['base_experiment']}'")
+    
+    # Load specific experiment configs and override base configs (specific experiment has higher precedence)
+    experiment_name = plan_file.parent.parent.name
+    specific_config_path = DIRS.config / experiment_name / DIRS.in_subdir
+    if specific_config_path.exists() and specific_config_path != base_config_path:
+        specific_configs = {p.name: yaml.safe_load(p.read_text()) for p in specific_config_path.glob("*.yaml")}
+        if specific_configs:
+            logger.info(f"Loaded {len(specific_configs)} config file(s) from specific experiment '{experiment_name}' (overriding base)")
+            base_configs.update(specific_configs)  # Override base configs with specific experiment configs
     
     auto_rebuild = False
     rebuild_reason = ""
@@ -147,9 +158,15 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     
     experiment_name = plan_file.parent.parent.name
     local_exp_dir = DIRS.runs / experiment_name
+    
+    # Clean up old experiment directory to ensure fresh run
+    if os.path.exists(local_exp_dir):
+        import shutil
+        logger.info(f"Removing existing experiment directory: {local_exp_dir}")
+        shutil.rmtree(local_exp_dir)
+    
+    # Create fresh directory structure
     generated_configs_dir = local_exp_dir / "generated_configs"
-    if os.path.exists(generated_configs_dir):
-        import shutil; shutil.rmtree(generated_configs_dir)
     os.makedirs(local_exp_dir / "slurm_logs", exist_ok=True)
     
     for run in all_runs:

@@ -10,11 +10,11 @@ data:
     dtmin: 1.0e-12
     dvid: 0.02
     isave: 1000
-    tmax: 1.0e-4
+    tmax: 0.002
     it1: 100
     itorder: 3
     lpencil_check: false
-    nt: 6000
+    nt: 120000
 
   density_run_pars:
     diffrho_shock: 1.0
@@ -23,13 +23,11 @@ data:
 
   # Include the hyper params in the base, as they exist in the working reference
   entropy_run_pars:
-    chi_hyper3: 9.0e-14
     chi_shock: 1.0
     iheatcond: ['shock']
 
   viscosity_run_pars:
     ivisc: ['nu-shock']
-    nu_hyper3: 3.0e-12
     nu_shock: 1.0
   
   eos_run_pars: {}
