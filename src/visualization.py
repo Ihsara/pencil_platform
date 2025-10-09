@@ -31,7 +31,7 @@ def plot_simulation_vs_analytical(sim_data: dict, analytical_data: dict, output_
         fig, ax = plt.subplots(figsize=(10, 7))
         
         # Plot analytical solution as a dashed black line for reference
-        ax.plot(analytical_data['x'], analytical_data[data_key], 'k--', linewidth=2.5, label='Analytical Solution')
+        ax.plot(analytical_data['x'], analytical_data[data_key]*unit, 'k--', linewidth=2.5, label='Analytical Solution')
         
         # Plot simulation data with markers
         ax.plot(sim_data['x'], sim_data[data_key]*unit, 'o-', color='#1f77b4', markersize=4, label=f'Simulation (t={sim_data["t"]:.2e})')
