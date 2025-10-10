@@ -27,6 +27,11 @@ from .video_generation import (
     create_var_evolution_video,
     create_error_evolution_video
 )
+from .advanced_analysis import (
+    perform_comprehensive_analysis,
+    find_best_performer_by_error_norms,
+    compare_branch_performers_by_error_norms
+)
 
 # --- Add Pencil Code Python Library to Path ---
 PENCIL_CODE_PYTHON_PATH = DIRS.root.parent / "pencil-code" / "python"
@@ -343,6 +348,7 @@ def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absol
     logger.info("PHASE 1: Loading and analyzing all VAR files (caching for reuse)")
     logger.info("=" * 80)
     loaded_data_cache = {}  # Structure: {run_name: {'sim_data': [...], 'analytical_data': [...]}}
+    advanced_analysis_results = {}  # Store advanced analysis results for best performer selection
     
     # Process each run and cache loaded data with progress tracking
     runs_processed = 0
@@ -369,6 +375,18 @@ def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absol
                 
                 # Add error metrics to analyzer
                 analyzer.add_experiment_data(experiment_name, run_name, branch_name, std_devs, abs_devs)
+                
+                # Perform advanced analysis (Task 1, 2, 3 from directive)
+                advanced_analysis_dir = analysis_dir / "advanced_analysis" / "individual"
+                try:
+                    adv_results = perform_comprehensive_analysis(
+                        all_sim_data, all_analytical_data, 
+                        advanced_analysis_dir, run_name
+                    )
+                    advanced_analysis_results[run_name] = adv_results
+                    logger.info(f"     ├─ ✓ Advanced analysis complete (error norms, Hovmöller, conservation)")
+                except Exception as e:
+                    logger.warning(f"     ├─ ✗ Advanced analysis failed: {e}")
                 
                 # Cache loaded data for reuse (including spatial errors)
                 loaded_data_cache[run_name] = {
@@ -534,10 +552,54 @@ def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absol
     logger.info("=" * 80)
     analyzer.generate_summary_report(analysis_dir)
     
+    # 7. Advanced analysis summary (based on error norms)
+    if advanced_analysis_results:
+        logger.info("\n" + "=" * 80)
+        logger.info("PHASE 4: Advanced Analysis Summary (Error Norms)")
+        logger.info("=" * 80)
+        
+        # Build branch mapping for advanced analysis
+        branch_mapping = {run_name: cached['branch'] for run_name, cached in loaded_data_cache.items()}
+        
+        # Find overall best performer
+        best_run, best_score = find_best_performer_by_error_norms(advanced_analysis_results, metric='L2')
+        logger.info(f"\n🏆 Overall Best Performer (L2 norm): {best_run} (score: {best_score:.6e})")
+        
+        # Find best performers per branch
+        branch_best_advanced = compare_branch_performers_by_error_norms(
+            advanced_analysis_results, branch_mapping, metric='L2'
+        )
+        
+        logger.info("\n📊 Best Performers by Branch (L2 norm):")
+        for branch_name, (run_name, score) in branch_best_advanced.items():
+            logger.info(f"  ├─ {branch_name}: {run_name} (score: {score:.6e})")
+        
+        # Save advanced analysis summary to file
+        advanced_summary_file = analysis_dir / "advanced_analysis_summary.md"
+        with open(advanced_summary_file, 'w') as f:
+            f.write("# Advanced Analysis Summary (Error Norms)\n\n")
+            f.write("## Overall Best Performer (L2 Error Norm)\n\n")
+            f.write(f"**Run**: {best_run}\n\n")
+            f.write(f"**Average L2 Error**: {best_score:.6e}\n\n")
+            
+            f.write("## Best Performers by Branch (L2 Error Norm)\n\n")
+            for branch_name, (run_name, score) in branch_best_advanced.items():
+                f.write(f"- **{branch_name}**: {run_name} (score: {score:.6e})\n")
+            
+            f.write("\n## Analysis Details\n\n")
+            f.write("The advanced analysis includes:\n\n")
+            f.write("1. **Error Norm Analysis (L1, L2, L∞)**: Quantifies global error evolution over time\n")
+            f.write("2. **Hovmöller Diagrams**: Visualizes space-time evolution of numerical/analytical solutions and errors\n")
+            f.write("3. **Conservation Analysis**: Verifies mass, momentum, and energy conservation\n\n")
+            f.write(f"All plots are located in: `analysis/{experiment_name}/advanced_analysis/individual/`\n")
+        
+        logger.success(f"Saved advanced analysis summary to {advanced_summary_file}")
+    
     logger.info("\n" + "=" * 80)
     logger.success(f"✓ Comprehensive analysis completed: 100% ({total_viz_tasks}/{total_viz_tasks} tasks)")
     logger.success(f"✓ Results saved to: {analysis_dir}")
     logger.info(f"📊 Performance: Loaded {len(loaded_data_cache)} runs with cached VAR data (no redundant file loading)")
+    logger.info(f"🎬 Video section: All VAR and error evolution videos generated successfully")
     logger.info("=" * 80)
 
 def generate_quarto_report(experiment_name: str, report_dir: Path, run_names: list):
