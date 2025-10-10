@@ -37,6 +37,12 @@ hpc:
     mail_user: "chau.c.tran@aalto.fi"
     mail_type: "END"         # Options: BEGIN, END, FAIL, ALL
 
+# --- Post-Processing Automation (Optional) ---
+# Set to true to automatically run post-processing after job submission
+# Note: These flags only provide reminders. Actual post-processing must be run manually after jobs complete.
+auto_check: false              # If true, automatically check job status after submission
+auto_postprocessing: false     # If true, display reminder to run --analyze and --viz after jobs complete
+
 # --- Experiment Generation Parameters ---
 base_experiment: 'shocktube_base'
 output_prefix: 'res400_nohyper'

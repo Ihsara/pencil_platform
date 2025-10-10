@@ -1,0 +1,27 @@
+# 3D Base Start Configuration
+format: namelist
+data:
+  init_pars:
+    cvsid: "9a97ecc83"
+    lperi: [false, false, false]  # 3D: all directions non-periodic
+    lwrite_ic: true
+    xyz0: [-0.5, -0.5, -0.5]
+    Lxyz: [1.0, 1.0, 1.0]
+
+  density_init_pars:
+    initlnrho: 'xjump'
+    ldensity_nolog: true
+    rho_left: 1.0
+    rho_right: 0.125
+    widthlnrho: 0.01
+    xjump_mid: 0.0
+
+  entropy_init_pars:
+    initss: 'xjump'
+    ss_left: 10.0
+    ss_right: 2.7
+    widthss: 0.01
+    xjump_mid: 0.0
+
+  eos_init_pars: {}
+  hydro_init_pars: {}

@@ -1,0 +1,22 @@
+# 3D Base Configuration for Shocktube Experiments
+# This demonstrates how to create an alternative base
+format: makefile
+data:
+  MPICOMM: MPICOMM_WORLD
+  
+  # 3D Grid Configuration
+  nxgrid: 128
+  nygrid: 128
+  nzgrid: 128
+  
+  # MPI Configuration for 3D
+  ncpus: 512
+  nprocx: 8
+  nprocy: 8
+  nprocz: 8
+  
+  # Modules (same as 1D base)
+  HYDRO: HYDRO
+  DENSITY: DENSITY
+  ENTROPY: ENTROPY
+  SHOCK: SHOCK

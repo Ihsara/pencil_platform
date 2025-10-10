@@ -1,2 +1,2 @@
-res400_nohyper_massfix
-res400_nohyper_nomassfix
+res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5

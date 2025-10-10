@@ -7,7 +7,7 @@ from loguru import logger
 
 # Import logic from the src directory
 from src.suite_generator import run_suite
-from src.post_processing import analyze_suite
+from src.post_processing import visualize_suite, analyze_suite_comprehensive
 from src.job_manager import submit_suite, check_suite_status
 from src.constants import DIRS, FILES
 
@@ -29,11 +29,20 @@ def main():
         description="Pencil Code Experiment Suite Generator and Manager.",
         formatter_class=argparse.RawTextHelpFormatter
     )
-    parser.add_argument("experiment_name", nargs='?', default=None, type=str, help="The name of the experiment to generate.")
-    parser.add_argument("--test", nargs='?', const=2, type=int, default=None, help="Enable test mode. Generates a limited number of runs without submitting.")
-    parser.add_argument("--analyze", action="store_true", help="Run post-processing analysis and generate comparison plots.")
-    parser.add_argument("--rebuild", action="store_true", help="Forcefully rebuild the executables in each new run directory.")
-    parser.add_argument("--check", action="store_true", help="Check the status of the last submitted job for an experiment.")
+    parser.add_argument("experiment_name", nargs='?', default=None, type=str, 
+                       help="The name of the experiment to generate.")
+    parser.add_argument("--test", nargs='?', const=2, type=int, default=None, 
+                       help="Enable test mode. Generates a limited number of runs without submitting.")
+    parser.add_argument("--analyze", action="store_true", 
+                       help="Run comprehensive error analysis across all VAR files. Generates statistical comparisons and evolution collages.")
+    parser.add_argument("--viz", nargs='*', default=None,
+                       help="Visualize experiment results. Usage: --viz (all runs), --viz run1 run2 (specific runs), --viz ? (interactive)")
+    parser.add_argument("--var", type=str, default=None,
+                       help="Select specific VAR file for visualization. Options: 'middle' (default), 'random', 'last', 'first', or specific like 'VAR5'")
+    parser.add_argument("--rebuild", action="store_true", 
+                       help="Forcefully rebuild the executables in each new run directory.")
+    parser.add_argument("--check", action="store_true", 
+                       help="Check the status of the last submitted job for an experiment.")
     
     args = parser.parse_args()
     experiment_name = args.experiment_name
@@ -67,17 +76,86 @@ def main():
         if args.check:
             check_suite_status(experiment_name)
         elif args.analyze:
-            logger.info("--- ANALYSIS & COMPARISON MODE ---")
-            analyze_suite(experiment_name)
+            logger.info("--- COMPREHENSIVE ERROR ANALYSIS MODE ---")
+            analyze_suite_comprehensive(experiment_name)
+        elif args.viz is not None:
+            logger.info("--- VISUALIZATION MODE ---")
+            
+            # Handle interactive mode
+            if args.viz and args.viz[0] == '?':
+                # Load manifest to show available runs
+                manifest_file = DIRS.runs / experiment_name / FILES.manifest
+                if manifest_file.exists():
+                    with open(manifest_file, 'r') as f:
+                        available_runs = [line.strip() for line in f if line.strip()]
+                    
+                    logger.info(f"Available runs ({len(available_runs)}):")
+                    for i, run in enumerate(available_runs, 1):
+                        print(f"  {i}: {run}")
+                    
+                    print("\nVisualization options:")
+                    print("  - Press Enter to visualize all runs")
+                    print("  - Enter run numbers (e.g., '1 3 5') to visualize specific runs")
+                    print("  - Enter branch name to visualize all runs in that branch")
+                    
+                    try:
+                        choice = input("Your choice: ").strip()
+                        if not choice:
+                            # Visualize all
+                            specific_runs = None
+                        elif choice.isdigit() or ' ' in choice:
+                            # Specific run numbers
+                            indices = [int(x)-1 for x in choice.split()]
+                            specific_runs = [available_runs[i] for i in indices if 0 <= i < len(available_runs)]
+                        else:
+                            # Branch name
+                            specific_runs = [r for r in available_runs if choice in r]
+                            if not specific_runs:
+                                logger.warning(f"No runs found matching '{choice}'")
+                                specific_runs = None
+                    except (ValueError, IndexError, KeyboardInterrupt) as e:
+                        logger.error(f"Invalid selection: {e}")
+                        sys.exit(1)
+                else:
+                    logger.error(f"Manifest file not found: {manifest_file}")
+                    sys.exit(1)
+            elif args.viz:
+                # Specific runs provided
+                specific_runs = args.viz
+            else:
+                # No arguments, visualize all
+                specific_runs = None
+            
+            visualize_suite(experiment_name, specific_runs=specific_runs, var_selection=args.var)
         else:
             logger.info("--- GENERATION & SUBMISSION MODE ---")
             plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
+            
+            # Check for auto-postprocessing flags
+            import yaml
+            with open(plan_file, 'r') as f:
+                plan_config = yaml.safe_load(f)
+            
             submit_script_path, plan = run_suite(plan_file=plan_file, limit=args.test, rebuild=args.rebuild)
             
             if not args.test and submit_script_path:
                 submit_suite(experiment_name, submit_script_path, plan)
+                
+                # Check for auto_check and auto_postprocessing flags
+                auto_check = plan_config.get('auto_check', False)
+                auto_postprocessing = plan_config.get('auto_postprocessing', False)
+                
+                if auto_check:
+                    logger.info("Auto-check enabled, checking job status...")
+                    check_suite_status(experiment_name)
+                
+                if auto_postprocessing:
+                    logger.info("Auto-postprocessing enabled.")
+                    logger.info("Note: Postprocessing should be run after jobs complete.")
+                    logger.info("To run analysis: python main.py {} --analyze".format(experiment_name))
+                    logger.info("To run visualization: python main.py {} --viz".format(experiment_name))
             elif args.test:
-                 logger.warning("TEST MODE: Automatic submission is SKIPPED.")
+                logger.warning("TEST MODE: Automatic submission is SKIPPED.")
 
     except Exception as e:
         logger.exception(f"An unexpected error occurred: {e}")

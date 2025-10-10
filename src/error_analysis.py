@@ -1,0 +1,390 @@
+# src/error_analysis.py
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+from loguru import logger
+import json
+from typing import Dict, List, Tuple, Optional
+import seaborn as sns
+
+def calculate_std_deviation_across_vars(sim_data_list: List[dict], analytical_data_list: List[dict], 
+                                        variables: List[str] = ['rho', 'ux', 'pp', 'ee']) -> Dict:
+    """
+    Calculate standard deviation between numerical and analytical solutions across all VAR files.
+    
+    Args:
+        sim_data_list: List of simulation data dictionaries from all VAR files
+        analytical_data_list: List of corresponding analytical solutions
+        variables: List of variable names to analyze
+        
+    Returns:
+        Dictionary containing standard deviation metrics for each variable across all timesteps
+    """
+    std_devs = {}
+    
+    for var in variables:
+        deviations = []
+        for sim_data, analytical_data in zip(sim_data_list, analytical_data_list):
+            if var in sim_data and var in analytical_data:
+                diff = sim_data[var] - analytical_data[var]
+                deviations.append(np.std(diff))
+        
+        if deviations:
+            std_devs[var] = {
+                'mean_std': np.mean(deviations),
+                'max_std': np.max(deviations),
+                'min_std': np.min(deviations),
+                'std_of_std': np.std(deviations),
+                'per_timestep': deviations
+            }
+    
+    return std_devs
+
+
+def calculate_absolute_deviation_per_var(sim_data_list: List[dict], analytical_data_list: List[dict],
+                                         variables: List[str] = ['rho', 'ux', 'pp', 'ee']) -> Dict:
+    """
+    Calculate absolute deviation for each VAR file and find the worst performing VAR.
+    
+    Returns:
+        Dictionary with absolute deviations per VAR and identification of worst performing VAR
+    """
+    results = {}
+    
+    for var in variables:
+        var_results = []
+        for idx, (sim_data, analytical_data) in enumerate(zip(sim_data_list, analytical_data_list)):
+            if var in sim_data and var in analytical_data:
+                abs_dev = np.mean(np.abs(sim_data[var] - analytical_data[var]))
+                max_abs_dev = np.max(np.abs(sim_data[var] - analytical_data[var]))
+                var_results.append({
+                    'var_idx': idx,
+                    'timestep': sim_data.get('t', idx),
+                    'mean_abs_dev': abs_dev,
+                    'max_abs_dev': max_abs_dev
+                })
+        
+        if var_results:
+            # Find worst performing VAR
+            worst_mean = max(var_results, key=lambda x: x['mean_abs_dev'])
+            worst_max = max(var_results, key=lambda x: x['max_abs_dev'])
+            
+            results[var] = {
+                'per_var': var_results,
+                'worst_mean_deviation': worst_mean,
+                'worst_max_deviation': worst_max
+            }
+    
+    return results
+
+
+class ExperimentErrorAnalyzer:
+    """
+    Analyzes and compares errors across multiple experiments and branches.
+    """
+    
+    def __init__(self, results_dir: Path):
+        self.results_dir = results_dir
+        self.results_dir.mkdir(parents=True, exist_ok=True)
+        self.experiment_data = {}
+        
+    def add_experiment_data(self, experiment_name: str, run_name: str, branch_name: str,
+                           std_devs: Dict, abs_devs: Dict):
+        """Add error data for a single experiment run."""
+        if experiment_name not in self.experiment_data:
+            self.experiment_data[experiment_name] = {}
+        
+        if branch_name not in self.experiment_data[experiment_name]:
+            self.experiment_data[experiment_name][branch_name] = {}
+        
+        self.experiment_data[experiment_name][branch_name][run_name] = {
+            'std_devs': std_devs,
+            'abs_devs': abs_devs
+        }
+    
+    def save_intermediate_data(self, experiment_name: str):
+        """Save intermediate data for an experiment."""
+        output_file = self.results_dir / f"{experiment_name}_error_analysis.json"
+        
+        # Convert numpy types to Python native types for JSON serialization
+        def convert_to_serializable(obj):
+            if isinstance(obj, np.ndarray):
+                return obj.tolist()
+            elif isinstance(obj, np.integer):
+                return int(obj)
+            elif isinstance(obj, np.floating):
+                return float(obj)
+            elif isinstance(obj, dict):
+                return {k: convert_to_serializable(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [convert_to_serializable(item) for item in obj]
+            else:
+                return obj
+        
+        serializable_data = convert_to_serializable(self.experiment_data[experiment_name])
+        
+        with open(output_file, 'w') as f:
+            json.dump(serializable_data, f, indent=2)
+        
+        logger.success(f"Saved intermediate error analysis data to {output_file}")
+    
+    def load_experiment_data(self, experiment_name: str) -> bool:
+        """Load previously saved experiment data."""
+        input_file = self.results_dir / f"{experiment_name}_error_analysis.json"
+        
+        if not input_file.exists():
+            return False
+        
+        with open(input_file, 'r') as f:
+            self.experiment_data[experiment_name] = json.load(f)
+        
+        logger.info(f"Loaded error analysis data from {input_file}")
+        return True
+    
+    def find_top_performers(self, metric: str = 'mean_std', top_n: int = 3) -> List[Tuple[str, str, float]]:
+        """
+        Find top N performing experiments based on specified metric.
+        
+        Returns:
+            List of tuples (experiment_name, run_name, score)
+        """
+        all_scores = []
+        
+        for exp_name, branches in self.experiment_data.items():
+            for branch_name, runs in branches.items():
+                for run_name, data in runs.items():
+                    # Calculate average metric across all variables
+                    avg_score = np.mean([
+                        data['std_devs'][var][metric] 
+                        for var in data['std_devs'].keys()
+                    ])
+                    all_scores.append((f"{exp_name}/{branch_name}", run_name, avg_score))
+        
+        # Sort by score (lower is better)
+        all_scores.sort(key=lambda x: x[2])
+        return all_scores[:top_n]
+    
+    def find_worst_deviations(self) -> Dict:
+        """Find runs and VARs with highest absolute deviations."""
+        worst_per_var = {}
+        
+        for exp_name, branches in self.experiment_data.items():
+            for branch_name, runs in branches.items():
+                for run_name, data in runs.items():
+                    for var, abs_dev_data in data['abs_devs'].items():
+                        if var not in worst_per_var:
+                            worst_per_var[var] = {
+                                'worst_mean': None,
+                                'worst_max': None
+                            }
+                        
+                        worst_mean = abs_dev_data['worst_mean_deviation']
+                        worst_max = abs_dev_data['worst_max_deviation']
+                        
+                        if (worst_per_var[var]['worst_mean'] is None or 
+                            worst_mean['mean_abs_dev'] > worst_per_var[var]['worst_mean']['value']):
+                            worst_per_var[var]['worst_mean'] = {
+                                'experiment': f"{exp_name}/{branch_name}/{run_name}",
+                                'var_idx': worst_mean['var_idx'],
+                                'timestep': worst_mean['timestep'],
+                                'value': worst_mean['mean_abs_dev']
+                            }
+                        
+                        if (worst_per_var[var]['worst_max'] is None or 
+                            worst_max['max_abs_dev'] > worst_per_var[var]['worst_max']['value']):
+                            worst_per_var[var]['worst_max'] = {
+                                'experiment': f"{exp_name}/{branch_name}/{run_name}",
+                                'var_idx': worst_max['var_idx'],
+                                'timestep': worst_max['timestep'],
+                                'value': worst_max['max_abs_dev']
+                            }
+        
+        return worst_per_var
+    
+    def compare_branch_best_performers(self) -> Dict:
+        """Compare best performers from each branch."""
+        branch_best = {}
+        
+        for exp_name, branches in self.experiment_data.items():
+            if exp_name not in branch_best:
+                branch_best[exp_name] = {}
+            
+            for branch_name, runs in branches.items():
+                # Find best run in this branch
+                best_run = None
+                best_score = float('inf')
+                
+                for run_name, data in runs.items():
+                    avg_score = np.mean([
+                        data['std_devs'][var]['mean_std'] 
+                        for var in data['std_devs'].keys()
+                    ])
+                    
+                    if avg_score < best_score:
+                        best_score = avg_score
+                        best_run = run_name
+                
+                branch_best[exp_name][branch_name] = {
+                    'run': best_run,
+                    'score': best_score,
+                    'data': runs[best_run]
+                }
+        
+        return branch_best
+    
+    def plot_individual_experiment_std(self, experiment_name: str, branch_name: str, 
+                                       run_name: str, output_dir: Path):
+        """Plot standard deviation evolution for individual experiment."""
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        data = self.experiment_data[experiment_name][branch_name][run_name]
+        std_devs = data['std_devs']
+        
+        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+        fig.suptitle(f'Standard Deviation Evolution\n{experiment_name}/{branch_name}/{run_name}', 
+                     fontsize=16, fontweight='bold')
+        
+        axes = axes.flatten()
+        variables = ['rho', 'ux', 'pp', 'ee']
+        var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+        
+        for idx, (var, label) in enumerate(zip(variables, var_labels)):
+            if var in std_devs:
+                timesteps = range(len(std_devs[var]['per_timestep']))
+                axes[idx].plot(timesteps, std_devs[var]['per_timestep'], 
+                              'o-', linewidth=2, markersize=6)
+                axes[idx].axhline(y=std_devs[var]['mean_std'], color='r', 
+                                 linestyle='--', label=f"Mean: {std_devs[var]['mean_std']:.4e}")
+                axes[idx].set_xlabel('VAR File Index', fontsize=11)
+                axes[idx].set_ylabel(f'Std Dev of {label}', fontsize=11)
+                axes[idx].set_title(f'{label} Standard Deviation', fontsize=12)
+                axes[idx].legend()
+                axes[idx].grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        output_file = output_dir / f"{run_name}_std_evolution.png"
+        plt.savefig(output_file, dpi=150, bbox_inches='tight')
+        plt.close()
+        logger.info(f"Saved individual experiment plot to {output_file}")
+    
+    def plot_branch_comparison(self, experiment_name: str, output_dir: Path):
+        """Plot comparison of all runs within branches."""
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        branches = self.experiment_data[experiment_name]
+        variables = ['rho', 'ux', 'pp', 'ee']
+        var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+        
+        for var, label in zip(variables, var_labels):
+            fig, axes = plt.subplots(1, len(branches), figsize=(6*len(branches), 5))
+            if len(branches) == 1:
+                axes = [axes]
+            
+            fig.suptitle(f'Branch Comparison: {label} Standard Deviation\n{experiment_name}', 
+                        fontsize=14, fontweight='bold')
+            
+            for ax, (branch_name, runs) in zip(axes, branches.items()):
+                for run_name, data in runs.items():
+                    if var in data['std_devs']:
+                        mean_std = data['std_devs'][var]['mean_std']
+                        ax.bar(run_name, mean_std, alpha=0.7, label=run_name)
+                
+                ax.set_title(f'Branch: {branch_name}', fontsize=11)
+                ax.set_ylabel(f'Mean Std Dev', fontsize=10)
+                ax.tick_params(axis='x', rotation=45, labelsize=8)
+                ax.grid(True, alpha=0.3, axis='y')
+            
+            plt.tight_layout()
+            output_file = output_dir / f"{experiment_name}_branch_comparison_{var}.png"
+            plt.savefig(output_file, dpi=150, bbox_inches='tight')
+            plt.close()
+            logger.info(f"Saved branch comparison plot to {output_file}")
+    
+    def plot_best_performers_comparison(self, output_dir: Path):
+        """Plot comparison of best performers from each branch."""
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        branch_best = self.compare_branch_best_performers()
+        variables = ['rho', 'ux', 'pp', 'ee']
+        var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+        
+        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+        fig.suptitle('Best Performers Comparison Across Branches', fontsize=16, fontweight='bold')
+        axes = axes.flatten()
+        
+        for idx, (var, label) in enumerate(zip(variables, var_labels)):
+            labels = []
+            scores = []
+            
+            for exp_name, branches in branch_best.items():
+                for branch_name, best_data in branches.items():
+                    if var in best_data['data']['std_devs']:
+                        labels.append(f"{exp_name}\n{branch_name}")
+                        scores.append(best_data['data']['std_devs'][var]['mean_std'])
+            
+            if scores:
+                bars = axes[idx].bar(range(len(labels)), scores, alpha=0.7)
+                axes[idx].set_xticks(range(len(labels)))
+                axes[idx].set_xticklabels(labels, rotation=45, ha='right', fontsize=9)
+                axes[idx].set_ylabel(f'Mean Std Dev of {label}', fontsize=11)
+                axes[idx].set_title(f'{label} - Best in Each Branch', fontsize=12)
+                axes[idx].grid(True, alpha=0.3, axis='y')
+                
+                # Color the best overall
+                if scores:
+                    best_idx = np.argmin(scores)
+                    bars[best_idx].set_color('green')
+                    bars[best_idx].set_alpha(1.0)
+        
+        plt.tight_layout()
+        output_file = output_dir / "best_performers_comparison.png"
+        plt.savefig(output_file, dpi=150, bbox_inches='tight')
+        plt.close()
+        logger.info(f"Saved best performers comparison to {output_file}")
+    
+    def generate_summary_report(self, output_dir: Path):
+        """Generate a comprehensive summary report."""
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Find top performers
+        top_3 = self.find_top_performers(top_n=3)
+        
+        # Find worst deviations
+        worst_devs = self.find_worst_deviations()
+        
+        # Compare branch best performers
+        branch_best = self.compare_branch_best_performers()
+        
+        # Generate markdown report
+        report = ["# Error Analysis Summary Report\n"]
+        report.append("## Top 3 Overall Performers\n")
+        for idx, (exp_branch, run, score) in enumerate(top_3, 1):
+            report.append(f"{idx}. **{exp_branch}/{run}** - Mean Std Dev: {score:.6e}\n")
+        
+        report.append("\n## Worst Deviations by Variable\n")
+        for var, worst_data in worst_devs.items():
+            report.append(f"\n### Variable: {var}\n")
+            report.append(f"- **Worst Mean Deviation**: {worst_data['worst_mean']['experiment']} ")
+            report.append(f"(VAR {worst_data['worst_mean']['var_idx']}, t={worst_data['worst_mean']['timestep']:.4e}, ")
+            report.append(f"value={worst_data['worst_mean']['value']:.6e})\n")
+            report.append(f"- **Worst Max Deviation**: {worst_data['worst_max']['experiment']} ")
+            report.append(f"(VAR {worst_data['worst_max']['var_idx']}, t={worst_data['worst_max']['timestep']:.4e}, ")
+            report.append(f"value={worst_data['worst_max']['value']:.6e})\n")
+        
+        report.append("\n## Best Performers by Branch\n")
+        for exp_name, branches in branch_best.items():
+            report.append(f"\n### Experiment: {exp_name}\n")
+            for branch_name, best_data in branches.items():
+                report.append(f"- **{branch_name}**: {best_data['run']} (score: {best_data['score']:.6e})\n")
+        
+        # Save report
+        report_file = output_dir / "error_analysis_summary.md"
+        with open(report_file, 'w') as f:
+            f.writelines(report)
+        
+        logger.success(f"Generated summary report at {report_file}")
+        
+        # Also print to console
+        logger.info("\n" + "".join(report))

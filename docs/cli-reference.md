@@ -79,7 +79,7 @@ python main.py shocktube_phase1 --rebuild
 
 ### `--analyze`
 
-Run post-processing analysis and generate comparison plots.
+Run comprehensive error analysis across all VAR files for all runs.
 
 **Usage:**
 ```bash
@@ -87,14 +87,74 @@ python main.py shocktube_phase1 --analyze
 ```
 
 **What it does:**
-- Reads simulation output data
-- Generates comparison plots across parameter values
-- Creates analysis reports
-- Saves results to the experiment's output directory
+- Loads **all VAR files** from all simulation runs
+- Calculates standard deviation between numerical and analytical solutions
+- Identifies top 3 performing experiments
+- Finds worst deviations per variable
+- Compares performance across branches
+- Generates evolution collages showing temporal trends
+- Creates comprehensive summary report
+
+**Output location:** `analysis/<experiment_name>/`
 
 **Requirements:**
-- Simulation data must exist in the output directories
-- Analysis modules must be configured for the experiment type
+- Simulation data must exist and be complete
+- Sufficient memory for loading all VAR files
+
+**See:** [Analysis and Visualization Guide](analysis-and-visualization.md) for detailed information
+
+### `--viz [RUNS...]`
+
+Visualize specific runs with comparison plots (quick visualization mode).
+
+**Usage:**
+```bash
+# Visualize all runs
+python main.py shocktube_phase1 --viz
+
+# Visualize specific runs
+python main.py shocktube_phase1 --viz run1 run2 run3
+
+# Interactive mode - select runs interactively
+python main.py shocktube_phase1 --viz ?
+```
+
+**What it does:**
+- Generates comparison plots for selected runs
+- Uses single VAR file per run (middle by default)
+- Creates MSE metrics comparison table
+- Generates Quarto report template
+- Much faster than `--analyze` for quick checks
+
+**Output location:** `reports/<experiment_name>/`
+
+**See:** [Analysis and Visualization Guide](analysis-and-visualization.md) for usage examples
+
+### `--var SELECTION`
+
+Select which VAR file to use for visualization (used with `--viz`).
+
+**Usage:**
+```bash
+# Use middle VAR file (default)
+python main.py shocktube_phase1 --viz --var middle
+
+# Use random VAR file
+python main.py shocktube_phase1 --viz --var random
+
+# Use last VAR file
+python main.py shocktube_phase1 --viz --var last
+
+# Use specific VAR file
+python main.py shocktube_phase1 --viz --var VAR5
+```
+
+**Options:**
+- `middle` (default): Selects VAR file in the middle of the sequence
+- `random`: Randomly selects a VAR file
+- `last`: Uses the final VAR file
+- `first`: Uses the first VAR file
+- `VAR<N>`: Specific VAR file (e.g., `VAR5`, `VAR10`)
 
 ### `--check`
 

@@ -9,8 +9,10 @@
 #SBATCH --array=1-2
 #SBATCH --output=/scratch/project_2008296/chau/runs/shocktube_phase1/slurm_logs/output_%A_%a.txt
 #SBATCH --error=/scratch/project_2008296/chau/runs/shocktube_phase1/slurm_logs/errors_%A_%a.txt
+
 #SBATCH --mail-user=chau.c.tran@aalto.fi
 #SBATCH --mail-type=END
+
 
 set -e
 
@@ -52,23 +54,32 @@ LOGFILE="${RUN_DIR}/simulation.log"
 
 echo "INFO: Starting SLURM task ${SLURM_ARRAY_TASK_ID} for run: ${RUN_NAME}"
 
-# --- 1. Setup the Run Directory ---
+# --- 1. Clean up existing run directory if it exists ---
+if [ -d "${RUN_DIR}" ]; then
+    echo "INFO: Removing existing run directory: ${RUN_DIR}"
+    rm -rf "${RUN_DIR}"
+fi
+
+# --- 2. Setup the Run Directory ---
+
 echo "INFO: Setting up symbolic-linked run directory."
 pc_newrun -s "${SOURCE_BASE_DIR}" "${RUN_DIR}"
 
 
-# --- 2. Copy Generated Configs ---
-echo "INFO: Copying generated config files from ${LOCAL_GENERATED_CONFIG_DIR}"
-cp -v "${LOCAL_GENERATED_CONFIG_DIR}"/* "${RUN_DIR}/"
 
-# --- 3. Navigate and Execute ---
+# --- 3. Copy Generated Configs ---
+echo "INFO: Copying generated config files from ${LOCAL_GENERATED_CONFIG_DIR}"
+cp -rv "${LOCAL_GENERATED_CONFIG_DIR}"/* "${RUN_DIR}/"
+
+# --- 4. Navigate and Execute ---
 echo "INFO: Changing to working directory: ${RUN_DIR}"
 cd "$RUN_DIR" || { echo "FATAL ERROR: Could not cd to ${RUN_DIR}"; exit 1; }
 echo "INFO: Starting simulation run..." > $LOGFILE
 
-# --- 4. Build Step (only if rebuilding) ---
+# --- 5. Build Step (only if rebuilding) ---
 
-# --- 5. Run the simulation ---
+
+# --- 6. Run the simulation ---
 if [ ! -e data/param.nml ]; then
     echo "INFO: Running START..." >>$LOGFILE 2>&1
     srun ./start.csh >>$LOGFILE 2>&1
