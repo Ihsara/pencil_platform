@@ -194,11 +194,16 @@ def process_run_visualization(run_path: Path, report_dir: Path, run_name: str,
     return compare_simulation_to_analytical(sim_data, analytical_data)
 
 
-def process_run_analysis(run_path: Path, run_name: str, branch_name: str) -> tuple[dict, dict] | None:
-    """Processes a single run for comprehensive error analysis across all VAR files."""
+def process_run_analysis(run_path: Path, run_name: str, branch_name: str) -> tuple[dict, dict, list, list] | None:
+    """Processes a single run for comprehensive error analysis across all VAR files.
+    
+    Returns:
+        Tuple of (std_devs, abs_devs, all_sim_data, all_analytical_data) or None if failed.
+        The loaded data is returned to enable caching and reuse for collage generation.
+    """
     logger.info(f"--- Analyzing run: {run_name} (branch: {branch_name}) ---")
     
-    # Load all VAR files
+    # Load all VAR files ONCE
     all_sim_data = load_all_var_files(run_path)
     if not all_sim_data:
         return None
@@ -218,7 +223,8 @@ def process_run_analysis(run_path: Path, run_name: str, branch_name: str) -> tup
     std_devs = calculate_std_deviation_across_vars(all_sim_data, all_analytical_data)
     abs_devs = calculate_absolute_deviation_per_var(all_sim_data, all_analytical_data)
     
-    return std_devs, abs_devs
+    # Return loaded data along with metrics for caching/reuse
+    return std_devs, abs_devs, all_sim_data, all_analytical_data
 
 def visualize_suite(experiment_name: str, specific_runs: list = None, var_selection: str = None):
     """Visualize an experiment suite (formerly analyze_suite)."""
@@ -261,7 +267,10 @@ def visualize_suite(experiment_name: str, specific_runs: list = None, var_select
 
 
 def analyze_suite_comprehensive(experiment_name: str):
-    """Comprehensive error analysis across all VAR files for an experiment suite."""
+    """Comprehensive error analysis across all VAR files for an experiment suite.
+    
+    OPTIMIZED: VAR files are loaded once and cached for reuse in all visualizations.
+    """
     logger.info(f"--- STARTING COMPREHENSIVE ERROR ANALYSIS for experiment: '{experiment_name}' ---")
     
     plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
@@ -283,7 +292,11 @@ def analyze_suite_comprehensive(experiment_name: str):
     branches = plan.get('branches', [])
     branch_names = [b['name'] for b in branches] if branches else ['default']
     
-    # Process each run
+    # OPTIMIZATION: Cache all loaded VAR data to avoid redundant file loading
+    logger.info("Loading and analyzing all VAR files (caching for reuse)...")
+    loaded_data_cache = {}  # Structure: {run_name: {'sim_data': [...], 'analytical_data': [...]}}
+    
+    # Process each run and cache loaded data
     for run_name in run_names:
         # Determine which branch this run belongs to
         branch_name = 'default'
@@ -294,8 +307,19 @@ def analyze_suite_comprehensive(experiment_name: str):
         
         result = process_run_analysis(hpc_run_base_dir / run_name, run_name, branch_name)
         if result:
-            std_devs, abs_devs = result
+            std_devs, abs_devs, all_sim_data, all_analytical_data = result
+            
+            # Add error metrics to analyzer
             analyzer.add_experiment_data(experiment_name, run_name, branch_name, std_devs, abs_devs)
+            
+            # Cache loaded data for reuse
+            loaded_data_cache[run_name] = {
+                'sim_data': all_sim_data,
+                'analytical_data': all_analytical_data,
+                'branch': branch_name
+            }
+            
+            logger.info(f"✓ Cached {len(all_sim_data)} VAR files for {run_name}")
     
     # Save intermediate data
     analyzer.save_intermediate_data(experiment_name)
@@ -320,60 +344,57 @@ def analyze_suite_comprehensive(experiment_name: str):
     logger.info("Creating best performers comparison...")
     analyzer.plot_best_performers_comparison(analysis_dir / "best_performers")
     
-    # 4. Generate VAR evolution collages
-    logger.info("Creating VAR evolution collages...")
+    # 4. Generate VAR evolution collages (USING CACHED DATA - NO RELOADING)
+    logger.info("Creating VAR evolution collages (using cached data)...")
     collage_dir = analysis_dir / "var_evolution"
     collage_dir.mkdir(parents=True, exist_ok=True)
     
-    # Load data for collages
-    for branch_name, runs in analyzer.experiment_data[experiment_name].items():
-        branch_collage_data = {}
-        for run_name in runs.keys():
-            all_sim_data = load_all_var_files(hpc_run_base_dir / run_name)
-            if all_sim_data:
-                all_analytical_data = []
-                for sim_data in all_sim_data:
-                    analytical = get_analytical_solution(sim_data['params'], sim_data['x'], sim_data['t'])
-                    if analytical:
-                        all_analytical_data.append(analytical)
-                
-                # Individual run collage
-                create_var_evolution_collage(all_sim_data, all_analytical_data, 
-                                            collage_dir / "individual", run_name)
-                
-                # Store for branch collage
-                branch_collage_data[run_name] = {
-                    'sim_data_list': all_sim_data,
-                    'analytical_data_list': all_analytical_data
-                }
+    # Organize cached data by branch for collages
+    branch_collage_data_by_branch = {}
+    for run_name, cached in loaded_data_cache.items():
+        branch_name = cached['branch']
+        if branch_name not in branch_collage_data_by_branch:
+            branch_collage_data_by_branch[branch_name] = {}
         
-        # Branch-level collages for each variable
+        # Individual run collage (using cached data)
+        create_var_evolution_collage(
+            cached['sim_data'], cached['analytical_data'], 
+            collage_dir / "individual", run_name
+        )
+        
+        # Store for branch collage
+        branch_collage_data_by_branch[branch_name][run_name] = {
+            'sim_data_list': cached['sim_data'],
+            'analytical_data_list': cached['analytical_data']
+        }
+    
+    # Branch-level collages for each variable (using cached data)
+    for branch_name, branch_collage_data in branch_collage_data_by_branch.items():
         for var in ['rho', 'ux', 'pp', 'ee']:
             create_branch_var_evolution_collage(
                 branch_collage_data, collage_dir / "branch", 
                 experiment_name, branch_name, var
             )
     
-    # 5. Best performers collages
+    # 5. Best performers collages (USING CACHED DATA - NO RELOADING)
+    logger.info("Creating best performers collages (using cached data)...")
     branch_best = analyzer.compare_branch_best_performers()
     best_performers_collage_data = {}
     
     for exp_name, branches_data in branch_best.items():
         for branch_name, best_info in branches_data.items():
             best_run = best_info['run']
-            all_sim_data = load_all_var_files(hpc_run_base_dir / best_run)
-            if all_sim_data:
-                all_analytical_data = []
-                for sim_data in all_sim_data:
-                    analytical = get_analytical_solution(sim_data['params'], sim_data['x'], sim_data['t'])
-                    if analytical:
-                        all_analytical_data.append(analytical)
-                
+            
+            # Use cached data instead of reloading
+            if best_run in loaded_data_cache:
+                cached = loaded_data_cache[best_run]
                 best_performers_collage_data[f"{exp_name}/{branch_name}"] = {
-                    'sim_data_list': all_sim_data,
-                    'analytical_data_list': all_analytical_data,
+                    'sim_data_list': cached['sim_data'],
+                    'analytical_data_list': cached['analytical_data'],
                     'run_name': best_run
                 }
+            else:
+                logger.warning(f"Cached data not found for best performer: {best_run}")
     
     for var in ['rho', 'ux', 'pp', 'ee']:
         create_best_performers_var_evolution_collage(
@@ -386,6 +407,7 @@ def analyze_suite_comprehensive(experiment_name: str):
     
     logger.success(f"Comprehensive analysis for '{experiment_name}' finished successfully.")
     logger.info(f"Results saved to: {analysis_dir}")
+    logger.info(f"Performance: Loaded {len(loaded_data_cache)} runs with cached VAR data (no redundant file loading)")
 
 def generate_quarto_report(experiment_name: str, report_dir: Path, run_names: list):
     """Renders the Quarto report template."""

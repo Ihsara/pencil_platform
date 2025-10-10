@@ -42,9 +42,16 @@ def submit_suite(experiment_name: str, submit_script_path: Path, plan: dict):
         logger.error("SLURM job submission failed.")
         logger.error(f"  STDERR: {e.stderr}")
 
-def check_suite_status(experiment_name: str):
+def check_suite_status(experiment_name: str, return_status: bool = False):
     """
     Checks the status of a submitted SLURM job array using the saved batch ID.
+    
+    Args:
+        experiment_name: Name of the experiment
+        return_status: If True, returns a dict with status counts instead of just logging
+        
+    Returns:
+        Dict with status counts if return_status=True, otherwise None
     """
     logger.info(f"--- STATUS CHECK MODE for '{experiment_name}' ---")
     
@@ -134,10 +141,82 @@ def check_suite_status(experiment_name: str):
             for run_name in failed_runs:
                 print(f"  - {hpc_run_base_dir / run_name}")
         
+        if return_status:
+            return counts
+        
     except FileNotFoundError:
         logger.error("`sacct` command not found. Are you on an HPC login node?")
+        if return_status:
+            return None
     except subprocess.CalledProcessError as e:
         logger.error("Error querying SLURM job status. This can happen if the job ID is invalid or has expired from the accounting database.")
         logger.error(f"  STDERR: {e.stderr.strip()}")
+        if return_status:
+            return None
     except Exception as e:
         logger.exception(f"An unexpected error occurred during status check: {e}")
+        if return_status:
+            return None
+
+
+def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait: int = None):
+    """
+    Waits for a SLURM job array to complete by polling status periodically.
+    
+    Args:
+        experiment_name: Name of the experiment
+        poll_interval: Seconds between status checks (default: 60)
+        max_wait: Maximum seconds to wait before giving up (default: None = wait forever)
+        
+    Returns:
+        True if job completed successfully, False if failed or timed out
+    """
+    import time
+    from rich.console import Console
+    from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
+    
+    console = Console()
+    console.print(f"\n[cyan]Waiting for job completion: {experiment_name}[/cyan]")
+    console.print(f"[dim]Poll interval: {poll_interval}s[/dim]\n")
+    
+    start_time = time.time()
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        TimeElapsedColumn(),
+        console=console
+    ) as progress:
+        task = progress.add_task("[cyan]Checking job status...", total=None)
+        
+        while True:
+            # Check status
+            status = check_suite_status(experiment_name, return_status=True)
+            
+            if status is None:
+                logger.error("Failed to check job status")
+                return False
+            
+            # Check if all jobs are completed or failed
+            total = sum(status.values())
+            completed_or_failed = status['COMPLETED'] + status['FAILED']
+            
+            if completed_or_failed == total and (status['PENDING'] == 0 and status['RUNNING'] == 0):
+                # All jobs done
+                if status['FAILED'] > 0:
+                    logger.warning(f"Job array completed with {status['FAILED']} failures")
+                    return False
+                else:
+                    logger.success(f"Job array completed successfully!")
+                    return True
+            
+            # Update progress description
+            progress.update(task, description=f"[cyan]Running: {status['RUNNING']}, Pending: {status['PENDING']}, Completed: {status['COMPLETED']}, Failed: {status['FAILED']}")
+            
+            # Check timeout
+            if max_wait and (time.time() - start_time) > max_wait:
+                logger.warning(f"Timed out after {max_wait}s while waiting for job completion")
+                return False
+            
+            # Wait before next poll
+            time.sleep(poll_interval)

@@ -345,8 +345,15 @@ class ExperimentErrorAnalyzer:
         logger.info(f"Saved best performers comparison to {output_file}")
     
     def generate_summary_report(self, output_dir: Path):
-        """Generate a comprehensive summary report."""
+        """Generate a comprehensive summary report with rich formatting."""
+        from rich.console import Console
+        from rich.table import Table
+        from rich.panel import Panel
+        from rich.text import Text
+        
         output_dir.mkdir(parents=True, exist_ok=True)
+        
+        console = Console()
         
         # Find top performers
         top_3 = self.find_top_performers(top_n=3)
@@ -357,7 +364,79 @@ class ExperimentErrorAnalyzer:
         # Compare branch best performers
         branch_best = self.compare_branch_best_performers()
         
-        # Generate markdown report
+        # === RICH CONSOLE OUTPUT ===
+        console.print("\n")
+        console.print(Panel.fit(
+            "[bold cyan]Error Analysis Summary Report[/bold cyan]",
+            border_style="cyan"
+        ))
+        
+        # Top 3 Performers Table
+        console.print("\n")
+        top_table = Table(title="🏆 Top 3 Overall Performers", 
+                         title_style="bold green",
+                         border_style="green")
+        top_table.add_column("Rank", style="bold yellow", justify="center", width=6)
+        top_table.add_column("Experiment/Branch/Run", style="cyan")
+        top_table.add_column("Mean Std Dev", justify="right", style="magenta")
+        
+        for idx, (exp_branch, run, score) in enumerate(top_3, 1):
+            rank_emoji = "🥇" if idx == 1 else "🥈" if idx == 2 else "🥉"
+            top_table.add_row(
+                f"{rank_emoji} {idx}",
+                f"{exp_branch}/{run}",
+                f"{score:.6e}"
+            )
+        
+        console.print(top_table)
+        
+        # Worst Deviations by Variable
+        console.print("\n")
+        for var, worst_data in worst_devs.items():
+            var_panel = Panel(
+                f"[bold red]Worst Mean:[/bold red] {worst_data['worst_mean']['experiment']}\n"
+                f"  └─ VAR {worst_data['worst_mean']['var_idx']}, "
+                f"t={worst_data['worst_mean']['timestep']:.4e}, "
+                f"value=[bold]{worst_data['worst_mean']['value']:.6e}[/bold]\n\n"
+                f"[bold red]Worst Max:[/bold red] {worst_data['worst_max']['experiment']}\n"
+                f"  └─ VAR {worst_data['worst_max']['var_idx']}, "
+                f"t={worst_data['worst_max']['timestep']:.4e}, "
+                f"value=[bold]{worst_data['worst_max']['value']:.6e}[/bold]",
+                title=f"⚠️  Variable: {var.upper()}",
+                title_align="left",
+                border_style="red"
+            )
+            console.print(var_panel)
+        
+        # Best Performers by Branch
+        console.print("\n")
+        for exp_name, branches in branch_best.items():
+            branch_table = Table(
+                title=f"✨ Best Performers: {exp_name}",
+                title_style="bold blue",
+                border_style="blue"
+            )
+            branch_table.add_column("Branch", style="cyan", width=20)
+            branch_table.add_column("Best Run", style="green")
+            branch_table.add_column("Score", justify="right", style="yellow")
+            
+            for branch_name, best_data in branches.items():
+                branch_table.add_row(
+                    branch_name,
+                    best_data['run'],
+                    f"{best_data['score']:.6e}"
+                )
+            
+            console.print(branch_table)
+        
+        console.print("\n")
+        console.print(Panel(
+            f"[green]✓[/green] Analysis complete! Results saved to:\n"
+            f"[cyan]{output_dir}[/cyan]",
+            border_style="green"
+        ))
+        
+        # === SAVE MARKDOWN REPORT ===
         report = ["# Error Analysis Summary Report\n"]
         report.append("## Top 3 Overall Performers\n")
         for idx, (exp_branch, run, score) in enumerate(top_3, 1):
@@ -379,12 +458,9 @@ class ExperimentErrorAnalyzer:
             for branch_name, best_data in branches.items():
                 report.append(f"- **{branch_name}**: {best_data['run']} (score: {best_data['score']:.6e})\n")
         
-        # Save report
+        # Save markdown report
         report_file = output_dir / "error_analysis_summary.md"
         with open(report_file, 'w') as f:
             f.writelines(report)
         
         logger.success(f"Generated summary report at {report_file}")
-        
-        # Also print to console
-        logger.info("\n" + "".join(report))

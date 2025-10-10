@@ -8,7 +8,7 @@ from loguru import logger
 # Import logic from the src directory
 from src.suite_generator import run_suite
 from src.post_processing import visualize_suite, analyze_suite_comprehensive
-from src.job_manager import submit_suite, check_suite_status
+from src.job_manager import submit_suite, check_suite_status, wait_for_completion
 from src.constants import DIRS, FILES
 
 def configure_logging():
@@ -43,6 +43,8 @@ def main():
                        help="Forcefully rebuild the executables in each new run directory.")
     parser.add_argument("--check", action="store_true", 
                        help="Check the status of the last submitted job for an experiment.")
+    parser.add_argument("--wait", action="store_true",
+                       help="Wait for job completion before proceeding. Useful with --analyze to auto-run analysis after jobs finish.")
     
     args = parser.parse_args()
     experiment_name = args.experiment_name
@@ -75,6 +77,20 @@ def main():
     try:
         if args.check:
             check_suite_status(experiment_name)
+        elif args.wait:
+            # Wait for job completion
+            if wait_for_completion(experiment_name):
+                # Job completed successfully
+                if args.analyze:
+                    logger.info("Job completed! Starting comprehensive error analysis...")
+                    analyze_suite_comprehensive(experiment_name)
+                else:
+                    logger.success("Job completed! You can now run analysis or visualization.")
+                    logger.info(f"Analysis: python main.py {experiment_name} --analyze")
+                    logger.info(f"Visualization: python main.py {experiment_name} --viz")
+            else:
+                logger.error("Job did not complete successfully")
+                sys.exit(1)
         elif args.analyze:
             logger.info("--- COMPREHENSIVE ERROR ANALYSIS MODE ---")
             analyze_suite_comprehensive(experiment_name)
