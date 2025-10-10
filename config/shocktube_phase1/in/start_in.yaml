@@ -11,7 +11,7 @@ data:
     unit_length: 3.08567758e+21
     unit_velocity: 9.778122994895071e+4
     unit_density: 1.6737236e-24
-    lfix_unit_std: T
+    lfix_unit_std: true
 
   density_init_pars:
     initlnrho: 'xjump'

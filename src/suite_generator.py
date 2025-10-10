@@ -10,6 +10,24 @@ import jinja2
 
 from .constants import DIRS, FILES
 
+def _deep_merge_configs(base: dict, override: dict) -> dict:
+    """
+    Deep merge two configuration dictionaries.
+    Override values take precedence over base values.
+    For nested dictionaries, merge recursively.
+    """
+    result = deepcopy(base)
+    
+    for key, value in override.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            # Recursively merge nested dictionaries
+            result[key] = _deep_merge_configs(result[key], value)
+        else:
+            # Override or add new key
+            result[key] = deepcopy(value)
+    
+    return result
+
 def _generate_sweep_combinations(plan: dict) -> list:
     """
     Parses the 'parameter_sweeps' section of a plan and returns a list of
@@ -84,14 +102,21 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     base_configs = {p.name: yaml.safe_load(p.read_text()) for p in base_config_path.glob("*.yaml")}
     logger.info(f"Loaded {len(base_configs)} config file(s) from base experiment '{plan['base_experiment']}'")
     
-    # Load specific experiment configs and override base configs (specific experiment has higher precedence)
+    # Load specific experiment configs and merge with base configs (specific experiment has higher precedence)
     experiment_name = plan_file.parent.parent.name
     specific_config_path = DIRS.config / experiment_name / DIRS.in_subdir
     if specific_config_path.exists() and specific_config_path != base_config_path:
         specific_configs = {p.name: yaml.safe_load(p.read_text()) for p in specific_config_path.glob("*.yaml")}
         if specific_configs:
-            logger.info(f"Loaded {len(specific_configs)} config file(s) from specific experiment '{experiment_name}' (overriding base)")
-            base_configs.update(specific_configs)  # Override base configs with specific experiment configs
+            logger.info(f"Loaded {len(specific_configs)} config file(s) from specific experiment '{experiment_name}'")
+            # Deep merge each config file: base parameters are preserved, specific parameters override/add
+            for config_name, specific_config in specific_configs.items():
+                if config_name in base_configs:
+                    logger.info(f"  Merging '{config_name}': base + specific overrides")
+                    base_configs[config_name] = _deep_merge_configs(base_configs[config_name], specific_config)
+                else:
+                    logger.info(f"  Adding new config '{config_name}' from specific experiment")
+                    base_configs[config_name] = specific_config
     
     auto_rebuild = False
     rebuild_reason = ""
