@@ -304,6 +304,9 @@ def analyze_suite_comprehensive(experiment_name: str):
     with open(manifest_file, 'r') as f: 
         run_names = [line.strip() for line in f if line.strip()]
     
+    total_runs = len(run_names)
+    logger.info(f"Total experiments to analyze: {total_runs}")
+    
     # Initialize error analyzer
     analyzer = ExperimentErrorAnalyzer(analysis_dir)
     
@@ -311,61 +314,109 @@ def analyze_suite_comprehensive(experiment_name: str):
     branches = plan.get('branches', [])
     branch_names = [b['name'] for b in branches] if branches else ['default']
     
+    # Count runs per branch for progress tracking
+    runs_per_branch = {branch: [] for branch in branch_names}
+    for run_name in run_names:
+        for branch_name in branch_names:
+            if branch_name in run_name:
+                runs_per_branch[branch_name].append(run_name)
+                break
+        else:
+            runs_per_branch['default'].append(run_name)
+    
     # OPTIMIZATION: Cache all loaded VAR data to avoid redundant file loading
-    logger.info("Loading and analyzing all VAR files (caching for reuse)...")
+    logger.info("=" * 80)
+    logger.info("PHASE 1: Loading and analyzing all VAR files (caching for reuse)")
+    logger.info("=" * 80)
     loaded_data_cache = {}  # Structure: {run_name: {'sim_data': [...], 'analytical_data': [...]}}
     
-    # Process each run and cache loaded data
-    for run_name in run_names:
-        # Determine which branch this run belongs to
-        branch_name = 'default'
-        for b_name in branch_names:
-            if b_name in run_name:
-                branch_name = b_name
-                break
+    # Process each run and cache loaded data with progress tracking
+    runs_processed = 0
+    for branch_name, branch_runs in runs_per_branch.items():
+        if not branch_runs:
+            continue
         
-        result = process_run_analysis(hpc_run_base_dir / run_name, run_name, branch_name)
-        if result:
-            std_devs, abs_devs, all_sim_data, all_analytical_data = result
+        branch_total = len(branch_runs)
+        logger.info(f"\n📂 Processing branch: {branch_name} ({branch_total} runs)")
+        
+        for branch_idx, run_name in enumerate(branch_runs, 1):
+            runs_processed += 1
             
-            # Add error metrics to analyzer
-            analyzer.add_experiment_data(experiment_name, run_name, branch_name, std_devs, abs_devs)
+            # Progress indicators
+            branch_pct = (branch_idx / branch_total) * 100
+            overall_pct = (runs_processed / total_runs) * 100
             
-            # Cache loaded data for reuse
-            loaded_data_cache[run_name] = {
-                'sim_data': all_sim_data,
-                'analytical_data': all_analytical_data,
-                'branch': branch_name,
-                'std_devs': std_devs
-            }
-            
-            logger.info(f"✓ Cached {len(all_sim_data)} VAR files for {run_name}")
+            logger.info(f"  ├─ [{runs_processed}/{total_runs}] ({overall_pct:.1f}%) | "
+                       f"Branch: [{branch_idx}/{branch_total}] ({branch_pct:.1f}%) | "
+                       f"Run: {run_name}")
+            result = process_run_analysis(hpc_run_base_dir / run_name, run_name, branch_name)
+            if result:
+                std_devs, abs_devs, all_sim_data, all_analytical_data = result
+                
+                # Add error metrics to analyzer
+                analyzer.add_experiment_data(experiment_name, run_name, branch_name, std_devs, abs_devs)
+                
+                # Cache loaded data for reuse
+                loaded_data_cache[run_name] = {
+                    'sim_data': all_sim_data,
+                    'analytical_data': all_analytical_data,
+                    'branch': branch_name,
+                    'std_devs': std_devs
+                }
+                
+                logger.info(f"     └─ ✓ Cached {len(all_sim_data)} VAR files")
+            else:
+                logger.warning(f"     └─ ✗ Failed to process run")
     
     # Save intermediate data
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 2: Generating visualizations")
+    logger.info("=" * 80)
     analyzer.save_intermediate_data(experiment_name)
     
-    # Generate all comparison plots
-    logger.info("Generating error analysis visualizations...")
+    # Count total visualization tasks
+    total_individual_plots = sum(len(runs) for runs in analyzer.experiment_data[experiment_name].values())
+    total_viz_tasks = (
+        total_individual_plots +  # Individual plots
+        4 +  # Branch comparison plots (4 variables)
+        1 +  # Best performers comparison
+        len(loaded_data_cache) * 3 +  # Individual collages + 2 videos per run
+        len(runs_per_branch) * 4 +  # Branch collages (4 vars per branch)
+        4  # Best performers collages (4 vars)
+    )
+    
+    viz_completed = 0
     
     # 1. Individual experiment plots
-    logger.info("Creating individual experiment plots...")
+    logger.info(f"\n📊 Creating individual experiment plots ({total_individual_plots} plots)...")
     for branch_name, runs in analyzer.experiment_data[experiment_name].items():
         for run_name in runs.keys():
+            viz_completed += 1
+            viz_pct = (viz_completed / total_viz_tasks) * 100
+            logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Individual plot: {run_name}")
+            
             analyzer.plot_individual_experiment_std(
                 experiment_name, branch_name, run_name, 
                 analysis_dir / "individual"
             )
     
     # 2. Branch comparison plots
-    logger.info("Creating branch comparison plots...")
+    logger.info(f"\n📊 Creating branch comparison plots (4 variables)...")
+    for var in ['rho', 'ux', 'pp', 'ee']:
+        viz_completed += 1
+        viz_pct = (viz_completed / total_viz_tasks) * 100
+        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Branch comparison: {var}")
+    
     analyzer.plot_branch_comparison(experiment_name, analysis_dir / "branch_comparison")
     
     # 3. Best performers comparison
-    logger.info("Creating best performers comparison...")
+    viz_completed += 1
+    viz_pct = (viz_completed / total_viz_tasks) * 100
+    logger.info(f"\n📊 [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Creating best performers comparison...")
     analyzer.plot_best_performers_comparison(analysis_dir / "best_performers")
     
     # 4. Generate VAR evolution collages and videos (USING CACHED DATA - NO RELOADING)
-    logger.info("Creating VAR evolution collages and videos (using cached data)...")
+    logger.info(f"\n🎬 Creating VAR evolution collages and videos ({len(loaded_data_cache)} runs)...")
     collage_dir = analysis_dir / "var_evolution"
     video_dir = analysis_dir / "videos"
     collage_dir.mkdir(parents=True, exist_ok=True)
@@ -373,26 +424,36 @@ def analyze_suite_comprehensive(experiment_name: str):
     
     # Organize cached data by branch for collages
     branch_collage_data_by_branch = {}
-    for run_name, cached in loaded_data_cache.items():
+    for idx, (run_name, cached) in enumerate(loaded_data_cache.items(), 1):
         branch_name = cached['branch']
         if branch_name not in branch_collage_data_by_branch:
             branch_collage_data_by_branch[branch_name] = {}
         
         # Individual run collage (using cached data)
+        viz_completed += 1
+        viz_pct = (viz_completed / total_viz_tasks) * 100
+        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Collage: {run_name}")
+        
         create_var_evolution_collage(
             cached['sim_data'], cached['analytical_data'], 
             collage_dir / "individual", run_name
         )
         
         # Individual run VAR evolution video
-        logger.info(f"Creating VAR evolution video for {run_name}...")
+        viz_completed += 1
+        viz_pct = (viz_completed / total_viz_tasks) * 100
+        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) VAR video: {run_name}")
+        
         create_var_evolution_video(
             cached['sim_data'], cached['analytical_data'],
             video_dir / "var_evolution", run_name, fps=2
         )
         
         # Individual run error evolution video
-        logger.info(f"Creating error evolution video for {run_name}...")
+        viz_completed += 1
+        viz_pct = (viz_completed / total_viz_tasks) * 100
+        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Error video: {run_name}")
+        
         create_error_evolution_video(
             cached['std_devs'], video_dir / "error_evolution", run_name, fps=2
         )
@@ -404,15 +465,20 @@ def analyze_suite_comprehensive(experiment_name: str):
         }
     
     # Branch-level collages for each variable (using cached data)
+    logger.info(f"\n🎬 Creating branch-level collages ({len(branch_collage_data_by_branch)} branches × 4 vars)...")
     for branch_name, branch_collage_data in branch_collage_data_by_branch.items():
         for var in ['rho', 'ux', 'pp', 'ee']:
+            viz_completed += 1
+            viz_pct = (viz_completed / total_viz_tasks) * 100
+            logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Branch collage: {branch_name}/{var}")
+            
             create_branch_var_evolution_collage(
                 branch_collage_data, collage_dir / "branch", 
                 experiment_name, branch_name, var
             )
     
     # 5. Best performers collages (USING CACHED DATA - NO RELOADING)
-    logger.info("Creating best performers collages (using cached data)...")
+    logger.info(f"\n🏆 Creating best performers collages (4 variables)...")
     branch_best = analyzer.compare_branch_best_performers()
     best_performers_collage_data = {}
     
@@ -432,17 +498,25 @@ def analyze_suite_comprehensive(experiment_name: str):
                 logger.warning(f"Cached data not found for best performer: {best_run}")
     
     for var in ['rho', 'ux', 'pp', 'ee']:
+        viz_completed += 1
+        viz_pct = (viz_completed / total_viz_tasks) * 100
+        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Best performers: {var}")
+        
         create_best_performers_var_evolution_collage(
             best_performers_collage_data, collage_dir / "best_performers", var
         )
     
     # 6. Generate summary report
-    logger.info("Generating summary report...")
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 3: Generating summary report")
+    logger.info("=" * 80)
     analyzer.generate_summary_report(analysis_dir)
     
-    logger.success(f"Comprehensive analysis for '{experiment_name}' finished successfully.")
-    logger.info(f"Results saved to: {analysis_dir}")
-    logger.info(f"Performance: Loaded {len(loaded_data_cache)} runs with cached VAR data (no redundant file loading)")
+    logger.info("\n" + "=" * 80)
+    logger.success(f"✓ Comprehensive analysis completed: 100% ({total_viz_tasks}/{total_viz_tasks} tasks)")
+    logger.success(f"✓ Results saved to: {analysis_dir}")
+    logger.info(f"📊 Performance: Loaded {len(loaded_data_cache)} runs with cached VAR data (no redundant file loading)")
+    logger.info("=" * 80)
 
 def generate_quarto_report(experiment_name: str, report_dir: Path, run_names: list):
     """Renders the Quarto report template."""
