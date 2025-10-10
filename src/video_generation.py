@@ -234,71 +234,68 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
     logger.info(f"To create video manually, run: ffmpeg -framerate 2 -i {frames_dir}/frame_%04d.png -c:v libx264 -pix_fmt yuv420p {output_path}/{run_name}_var_evolution.mp4")
 
 
-def create_error_evolution_video(std_devs: Dict, output_path: Path, run_name: str, fps: int = 2):
+def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_name: str, 
+                                fps: int = 2, unit_length: float = 1.0):
     """
-    Creates an animated video showing error evolution across VAR files with point-to-point tracking.
+    Creates an animated video showing spatial error evolution across VAR files.
+    Shows x position (kpc) vs error at each point.
     
     Args:
-        std_devs: Dictionary containing standard deviation metrics
+        spatial_errors: Dictionary containing spatial error data from calculate_spatial_errors()
         output_path: Directory to save the video
         run_name: Name of the run
         fps: Frames per second
+        unit_length: Unit conversion factor for length (e.g., to kpc)
     """
     output_path.mkdir(parents=True, exist_ok=True)
     
     # Check if ffmpeg is available
     if not shutil.which('ffmpeg'):
         logger.warning("ffmpeg not found. Cannot create video. Creating individual frames instead...")
-        create_error_evolution_frames(std_devs, output_path, run_name)
+        create_error_evolution_frames(spatial_errors, output_path, run_name, unit_length)
         return
     
     variables = ['rho', 'ux', 'pp', 'ee']
     var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
     
     # Filter to only variables with data
-    valid_vars = [(var, label) for var, label in zip(variables, var_labels) if var in std_devs]
+    valid_vars = [(var, label) for var, label in zip(variables, var_labels) if var in spatial_errors]
     
     if not valid_vars:
-        logger.warning("No valid variables with std_dev data")
+        logger.warning("No valid variables with spatial error data")
         return
     
     fig, axes = plt.subplots(2, 2, figsize=(16, 12))
     axes = axes.flatten()
     
-    # Get max number of timesteps
-    max_timesteps = max(len(std_devs[var]['per_timestep']) for var, _ in valid_vars)
+    # Get max number of timesteps and x coordinates
+    max_timesteps = max(len(spatial_errors[var]['errors_per_timestep']) for var, _ in valid_vars)
+    error_method = spatial_errors[list(spatial_errors.keys())[0]]['error_method']
     
     # Initialize plot elements
     lines = {}
-    scatter_current = {}
-    scatter_mean = {}
-    scatter_max = {}
-    scatter_min = {}
     annotations = {}
     
     for idx, (var, label) in enumerate(valid_vars):
         ax = axes[idx]
-        timesteps = range(len(std_devs[var]['per_timestep']))
+        x_coords = spatial_errors[var]['x'] * unit_length
         
-        # Create empty line and scatter objects
-        lines[var], = ax.plot([], [], 'o-', linewidth=2, markersize=6, color='#1f77b4', alpha=0.7)
-        scatter_current[var] = ax.scatter([], [], s=150, c='red', marker='o', zorder=5, label='Current VAR')
-        scatter_mean[var] = ax.scatter([], [], s=100, c='green', marker='s', zorder=4, label='Mean')
-        scatter_max[var] = ax.scatter([], [], s=100, c='orange', marker='^', zorder=4, label='Max')
-        scatter_min[var] = ax.scatter([], [], s=100, c='blue', marker='v', zorder=4, label='Min')
+        # Create empty line object
+        lines[var], = ax.plot([], [], '-', linewidth=2, color='#1f77b4', alpha=0.8)
         
-        ax.set_xlabel('VAR File Index', fontsize=11)
-        ax.set_ylabel(f'Std Dev of {label}', fontsize=11)
-        ax.set_title(f'{label} Standard Deviation Evolution', fontsize=12)
-        ax.set_xlim(-0.5, len(timesteps) - 0.5)
+        ax.set_xlabel('Position (x) [kpc]', fontsize=11)
+        ax.set_ylabel(f'Error in {label}', fontsize=11)
+        ax.set_title(f'{label} Spatial Error Evolution', fontsize=12)
+        ax.set_xlim(x_coords.min(), x_coords.max())
         
-        # Set y limits
-        all_vals = std_devs[var]['per_timestep']
-        y_range = max(all_vals) - min(all_vals)
-        ax.set_ylim(min(all_vals) - 0.1*y_range, max(all_vals) + 0.2*y_range)
+        # Set y limits based on all timesteps
+        all_errors = np.concatenate(spatial_errors[var]['errors_per_timestep'])
+        y_min = all_errors.min()
+        y_max = all_errors.max()
+        y_range = y_max - y_min
+        ax.set_ylim(y_min - 0.1*y_range, y_max + 0.1*y_range)
         
         ax.grid(True, alpha=0.3)
-        ax.legend(fontsize=8, loc='upper right')
         
         # Annotation for statistics
         annotations[var] = ax.text(0.02, 0.98, '', transform=ax.transAxes,
@@ -311,58 +308,38 @@ def create_error_evolution_video(std_devs: Dict, output_path: Path, run_name: st
         """Initialize animation"""
         for var, _ in valid_vars:
             lines[var].set_data([], [])
-            scatter_current[var].set_offsets(np.empty((0, 2)))
-            scatter_mean[var].set_offsets(np.empty((0, 2)))
-            scatter_max[var].set_offsets(np.empty((0, 2)))
-            scatter_min[var].set_offsets(np.empty((0, 2)))
             annotations[var].set_text('')
-        title.set_text(f'Error Evolution\n{run_name}\nVAR 0/{max_timesteps}')
-        return (list(lines.values()) + list(scatter_current.values()) + 
-                list(scatter_mean.values()) + list(scatter_max.values()) + 
-                list(scatter_min.values()) + list(annotations.values()) + [title])
+        title.set_text(f'Spatial Error Evolution ({error_method})\n{run_name}\nVAR 0/{max_timesteps}')
+        return list(lines.values()) + list(annotations.values()) + [title]
     
     def animate(frame):
         """Animation function"""
         for var, label in valid_vars:
-            if var in std_devs:
-                per_timestep = std_devs[var]['per_timestep']
-                timesteps = list(range(len(per_timestep)))
+            if var in spatial_errors:
+                x_coords = spatial_errors[var]['x'] * unit_length
+                errors = spatial_errors[var]['errors_per_timestep'][frame]
+                var_file = spatial_errors[var]['var_files'][frame]
+                timestep = spatial_errors[var]['timesteps'][frame]
                 
-                # Show data up to current frame
-                current_frame = min(frame, len(timesteps) - 1)
-                x_data = timesteps[:current_frame + 1]
-                y_data = per_timestep[:current_frame + 1]
+                lines[var].set_data(x_coords, errors)
                 
-                lines[var].set_data(x_data, y_data)
+                # Calculate statistics for annotation
+                mean_err = np.mean(errors)
+                max_err = np.max(errors)
+                min_err = np.min(errors)
+                std_err = np.std(errors)
                 
-                # Highlight current point
-                if x_data:
-                    scatter_current[var].set_offsets([[x_data[-1], y_data[-1]]])
-                
-                # Calculate and show mean/max/min so far
-                if y_data:
-                    mean_val = np.mean(y_data)
-                    max_val = np.max(y_data)
-                    min_val = np.min(y_data)
-                    max_idx = x_data[np.argmax(y_data)]
-                    min_idx = x_data[np.argmin(y_data)]
-                    
-                    scatter_mean[var].set_offsets([[x_data[-1], mean_val]])
-                    scatter_max[var].set_offsets([[max_idx, max_val]])
-                    scatter_min[var].set_offsets([[min_idx, min_val]])
-                    
-                    annotations[var].set_text(
-                        f'Current: {y_data[-1]:.4e}\n'
-                        f'Mean: {mean_val:.4e}\n'
-                        f'Max: {max_val:.4e} (VAR {max_idx})\n'
-                        f'Min: {min_val:.4e} (VAR {min_idx})'
-                    )
+                annotations[var].set_text(
+                    f'{var_file}\nt = {timestep:.4e} s\n'
+                    f'Mean: {mean_err:.4e}\n'
+                    f'Max: {max_err:.4e}\n'
+                    f'Min: {min_err:.4e}\n'
+                    f'Std: {std_err:.4e}'
+                )
         
-        title.set_text(f'Error Evolution\n{run_name}\nVAR {frame+1}/{max_timesteps}')
+        title.set_text(f'Spatial Error Evolution ({error_method})\n{run_name}\nVAR {frame+1}/{max_timesteps}')
         
-        return (list(lines.values()) + list(scatter_current.values()) + 
-                list(scatter_mean.values()) + list(scatter_max.values()) + 
-                list(scatter_min.values()) + list(annotations.values()) + [title])
+        return list(lines.values()) + list(annotations.values()) + [title]
     
     # Create animation
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
@@ -383,14 +360,16 @@ def create_error_evolution_video(std_devs: Dict, output_path: Path, run_name: st
         plt.close()
 
 
-def create_error_evolution_frames(std_devs: Dict, output_path: Path, run_name: str):
+def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_name: str,
+                                  unit_length: float = 1.0):
     """
-    Creates individual PNG frames showing error evolution.
+    Creates individual PNG frames showing spatial error evolution.
     
     Args:
-        std_devs: Dictionary containing standard deviation metrics
+        spatial_errors: Dictionary containing spatial error data from calculate_spatial_errors()
         output_path: Directory to save the frames
         run_name: Name of the run
+        unit_length: Unit conversion factor for length (e.g., to kpc)
     """
     frames_dir = output_path / f"{run_name}_error_frames"
     frames_dir.mkdir(parents=True, exist_ok=True)
@@ -399,80 +378,65 @@ def create_error_evolution_frames(std_devs: Dict, output_path: Path, run_name: s
     var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
     
     # Filter to only variables with data
-    valid_vars = [(var, label) for var, label in zip(variables, var_labels) if var in std_devs]
+    valid_vars = [(var, label) for var, label in zip(variables, var_labels) if var in spatial_errors]
     
     if not valid_vars:
-        logger.warning("No valid variables with std_dev data")
+        logger.warning("No valid variables with spatial error data")
         return
     
-    # Get max number of timesteps
-    max_timesteps = max(len(std_devs[var]['per_timestep']) for var, _ in valid_vars)
+    # Get max number of timesteps and error method
+    max_timesteps = max(len(spatial_errors[var]['errors_per_timestep']) for var, _ in valid_vars)
+    error_method = spatial_errors[list(spatial_errors.keys())[0]]['error_method']
     
-    logger.info(f"Creating {max_timesteps} error evolution frames...")
+    logger.info(f"Creating {max_timesteps} spatial error evolution frames...")
     
     for frame in range(max_timesteps):
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-        fig.suptitle(f'Error Evolution\n{run_name}\nVAR {frame+1}/{max_timesteps}', 
+        fig.suptitle(f'Spatial Error Evolution ({error_method})\n{run_name}\nVAR {frame+1}/{max_timesteps}', 
                      fontsize=16, fontweight='bold')
         axes = axes.flatten()
         
         for idx, (var, label) in enumerate(valid_vars):
             ax = axes[idx]
             
-            if var in std_devs:
-                per_timestep = std_devs[var]['per_timestep']
-                timesteps = list(range(len(per_timestep)))
+            if var in spatial_errors:
+                x_coords = spatial_errors[var]['x'] * unit_length
+                errors = spatial_errors[var]['errors_per_timestep'][frame]
+                var_file = spatial_errors[var]['var_files'][frame]
+                timestep = spatial_errors[var]['timesteps'][frame]
                 
-                # Show data up to current frame
-                current_frame = min(frame, len(timesteps) - 1)
-                x_data = timesteps[:current_frame + 1]
-                y_data = per_timestep[:current_frame + 1]
+                # Plot spatial error distribution
+                ax.plot(x_coords, errors, '-', linewidth=2, color='#1f77b4', alpha=0.8)
                 
-                # Plot line
-                ax.plot(x_data, y_data, 'o-', linewidth=2, markersize=6, 
-                       color='#1f77b4', alpha=0.7)
+                # Calculate statistics for annotation
+                mean_err = np.mean(errors)
+                max_err = np.max(errors)
+                min_err = np.min(errors)
+                std_err = np.std(errors)
                 
-                # Highlight current point
-                if x_data:
-                    ax.scatter([x_data[-1]], [y_data[-1]], s=150, c='red', 
-                             marker='o', zorder=5, label='Current VAR')
+                # Add text annotation
+                ax.text(0.02, 0.98, 
+                       f'{var_file}\nt = {timestep:.4e} s\n'
+                       f'Mean: {mean_err:.4e}\n'
+                       f'Max: {max_err:.4e}\n'
+                       f'Min: {min_err:.4e}\n'
+                       f'Std: {std_err:.4e}',
+                       transform=ax.transAxes, verticalalignment='top', fontsize=9,
+                       bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
                 
-                # Calculate and show mean/max/min so far
-                if y_data:
-                    mean_val = np.mean(y_data)
-                    max_val = np.max(y_data)
-                    min_val = np.min(y_data)
-                    max_idx = x_data[np.argmax(y_data)]
-                    min_idx = x_data[np.argmin(y_data)]
-                    
-                    ax.scatter([x_data[-1]], [mean_val], s=100, c='green', 
-                             marker='s', zorder=4, label='Mean')
-                    ax.scatter([max_idx], [max_val], s=100, c='orange', 
-                             marker='^', zorder=4, label='Max')
-                    ax.scatter([min_idx], [min_val], s=100, c='blue', 
-                             marker='v', zorder=4, label='Min')
-                    
-                    # Add text annotation
-                    ax.text(0.02, 0.98, 
-                           f'Current: {y_data[-1]:.4e}\n'
-                           f'Mean: {mean_val:.4e}\n'
-                           f'Max: {max_val:.4e} (VAR {max_idx})\n'
-                           f'Min: {min_val:.4e} (VAR {min_idx})',
-                           transform=ax.transAxes, verticalalignment='top', fontsize=9,
-                           bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+                ax.set_xlabel('Position (x) [kpc]', fontsize=11)
+                ax.set_ylabel(f'Error in {label}', fontsize=11)
+                ax.set_title(f'{label} Spatial Error', fontsize=12)
                 
-                ax.set_xlabel('VAR File Index', fontsize=11)
-                ax.set_ylabel(f'Std Dev of {label}', fontsize=11)
-                ax.set_title(f'{label} Standard Deviation Evolution', fontsize=12)
-                ax.set_xlim(-0.5, len(timesteps) - 0.5)
-                
-                # Set y limits
-                all_vals = per_timestep
-                y_range = max(all_vals) - min(all_vals)
-                ax.set_ylim(min(all_vals) - 0.1*y_range, max(all_vals) + 0.2*y_range)
+                # Set limits
+                ax.set_xlim(x_coords.min(), x_coords.max())
+                all_errors = np.concatenate(spatial_errors[var]['errors_per_timestep'])
+                y_min = all_errors.min()
+                y_max = all_errors.max()
+                y_range = y_max - y_min
+                ax.set_ylim(y_min - 0.1*y_range, y_max + 0.1*y_range)
                 
                 ax.grid(True, alpha=0.3)
-                ax.legend(fontsize=8, loc='upper right')
         
         plt.tight_layout()
         frame_file = frames_dir / f"frame_{frame:04d}.png"

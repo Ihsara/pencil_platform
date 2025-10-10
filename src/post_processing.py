@@ -14,6 +14,7 @@ from .visualization import plot_simulation_vs_analytical
 from .error_analysis import (
     calculate_std_deviation_across_vars, 
     calculate_absolute_deviation_per_var,
+    calculate_spatial_errors,
     ExperimentErrorAnalyzer
 )
 from .visualization_collage import (
@@ -198,11 +199,18 @@ def process_run_visualization(run_path: Path, report_dir: Path, run_name: str,
     return compare_simulation_to_analytical(sim_data, analytical_data)
 
 
-def process_run_analysis(run_path: Path, run_name: str, branch_name: str) -> tuple[dict, dict, list, list] | None:
+def process_run_analysis(run_path: Path, run_name: str, branch_name: str, 
+                        error_method: str = 'absolute') -> tuple[dict, dict, dict, list, list] | None:
     """Processes a single run for comprehensive error analysis across all VAR files.
     
+    Args:
+        run_path: Path to the run directory
+        run_name: Name of the run
+        branch_name: Name of the branch
+        error_method: Error calculation method ('absolute', 'relative', 'difference', 'squared')
+    
     Returns:
-        Tuple of (std_devs, abs_devs, all_sim_data, all_analytical_data) or None if failed.
+        Tuple of (std_devs, abs_devs, spatial_errors, all_sim_data, all_analytical_data) or None if failed.
         The loaded data is returned to enable caching and reuse for collage generation.
     """
     logger.info(f"--- Analyzing run: {run_name} (branch: {branch_name}) ---")
@@ -241,9 +249,10 @@ def process_run_analysis(run_path: Path, run_name: str, branch_name: str) -> tup
     # Calculate error metrics
     std_devs = calculate_std_deviation_across_vars(all_sim_data, all_analytical_data)
     abs_devs = calculate_absolute_deviation_per_var(all_sim_data, all_analytical_data)
+    spatial_errors = calculate_spatial_errors(all_sim_data, all_analytical_data, error_method=error_method)
     
     # Return loaded data along with metrics for caching/reuse
-    return std_devs, abs_devs, all_sim_data, all_analytical_data
+    return std_devs, abs_devs, spatial_errors, all_sim_data, all_analytical_data
 
 def visualize_suite(experiment_name: str, specific_runs: list = None, var_selection: str = None):
     """Visualize an experiment suite (formerly analyze_suite)."""
@@ -285,8 +294,13 @@ def visualize_suite(experiment_name: str, specific_runs: list = None, var_select
     logger.success(f"Visualization for '{experiment_name}' finished successfully.")
 
 
-def analyze_suite_comprehensive(experiment_name: str):
+def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absolute'):
     """Comprehensive error analysis across all VAR files for an experiment suite.
+    
+    Args:
+        experiment_name: Name of the experiment suite
+        error_method: Error calculation method for spatial errors 
+                     ('absolute', 'relative', 'difference', 'squared')
     
     OPTIMIZED: VAR files are loaded once and cached for reuse in all visualizations.
     """
@@ -349,19 +363,20 @@ def analyze_suite_comprehensive(experiment_name: str):
             logger.info(f"  ├─ [{runs_processed}/{total_runs}] ({overall_pct:.1f}%) | "
                        f"Branch: [{branch_idx}/{branch_total}] ({branch_pct:.1f}%) | "
                        f"Run: {run_name}")
-            result = process_run_analysis(hpc_run_base_dir / run_name, run_name, branch_name)
+            result = process_run_analysis(hpc_run_base_dir / run_name, run_name, branch_name, error_method)
             if result:
-                std_devs, abs_devs, all_sim_data, all_analytical_data = result
+                std_devs, abs_devs, spatial_errors, all_sim_data, all_analytical_data = result
                 
                 # Add error metrics to analyzer
                 analyzer.add_experiment_data(experiment_name, run_name, branch_name, std_devs, abs_devs)
                 
-                # Cache loaded data for reuse
+                # Cache loaded data for reuse (including spatial errors)
                 loaded_data_cache[run_name] = {
                     'sim_data': all_sim_data,
                     'analytical_data': all_analytical_data,
                     'branch': branch_name,
-                    'std_devs': std_devs
+                    'std_devs': std_devs,
+                    'spatial_errors': spatial_errors
                 }
                 
                 logger.info(f"     └─ ✓ Cached {len(all_sim_data)} VAR files")
@@ -449,13 +464,20 @@ def analyze_suite_comprehensive(experiment_name: str):
             video_dir / "var_evolution", run_name, fps=2
         )
         
-        # Individual run error evolution video
+        # Individual run error evolution video (using spatial errors)
         viz_completed += 1
         viz_pct = (viz_completed / total_viz_tasks) * 100
         logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Error video: {run_name}")
         
+        # Get unit_length from params for kpc conversion
+        unit_length = 1.0
+        if cached['sim_data'] and 'params' in cached['sim_data'][0]:
+            params = cached['sim_data'][0]['params']
+            if hasattr(params, 'unit_length'):
+                unit_length = params.unit_length * 3.086e21  # Convert to kpc
+        
         create_error_evolution_video(
-            cached['std_devs'], video_dir / "error_evolution", run_name, fps=2
+            cached['spatial_errors'], video_dir / "error_evolution", run_name, fps=2, unit_length=unit_length
         )
         
         # Store for branch collage

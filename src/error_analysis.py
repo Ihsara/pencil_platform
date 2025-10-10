@@ -9,6 +9,72 @@ import json
 from typing import Dict, List, Tuple, Optional
 import seaborn as sns
 
+def calculate_spatial_errors(sim_data_list: List[dict], analytical_data_list: List[dict],
+                            variables: List[str] = ['rho', 'ux', 'pp', 'ee'],
+                            error_method: str = 'absolute') -> Dict:
+    """
+    Calculate spatial errors (point-by-point) between numerical and analytical solutions.
+    
+    Args:
+        sim_data_list: List of simulation data dictionaries from all VAR files
+        analytical_data_list: List of corresponding analytical solutions
+        variables: List of variable names to analyze
+        error_method: Error calculation method:
+            - 'absolute': |sim - analytical|
+            - 'relative': |sim - analytical| / |analytical|
+            - 'difference': sim - analytical (signed)
+            - 'squared': (sim - analytical)^2
+            
+    Returns:
+        Dictionary containing spatial errors for each variable across all timesteps
+    """
+    # Validation logging
+    if len(sim_data_list) != len(analytical_data_list):
+        logger.error(f"List length mismatch: {len(sim_data_list)} sim vs {len(analytical_data_list)} analytical")
+        return {}
+    
+    logger.debug(f"Calculating spatial errors for {len(sim_data_list)} timesteps using method: {error_method}")
+    
+    spatial_errors = {}
+    
+    for var in variables:
+        errors_per_timestep = []
+        x_coords = None
+        
+        for idx, (sim_data, analytical_data) in enumerate(zip(sim_data_list, analytical_data_list)):
+            if var in sim_data and var in analytical_data:
+                if x_coords is None:
+                    x_coords = sim_data['x']
+                
+                # Calculate error based on specified method
+                if error_method == 'absolute':
+                    error = np.abs(sim_data[var] - analytical_data[var])
+                elif error_method == 'relative':
+                    # Avoid division by zero
+                    analytical_safe = np.where(np.abs(analytical_data[var]) < 1e-10, 1e-10, analytical_data[var])
+                    error = np.abs(sim_data[var] - analytical_data[var]) / np.abs(analytical_safe)
+                elif error_method == 'difference':
+                    error = sim_data[var] - analytical_data[var]
+                elif error_method == 'squared':
+                    error = (sim_data[var] - analytical_data[var])**2
+                else:
+                    logger.warning(f"Unknown error method '{error_method}', using 'absolute'")
+                    error = np.abs(sim_data[var] - analytical_data[var])
+                
+                errors_per_timestep.append(error)
+        
+        if errors_per_timestep and x_coords is not None:
+            spatial_errors[var] = {
+                'x': x_coords,
+                'errors_per_timestep': errors_per_timestep,
+                'timesteps': [sim_data_list[i]['t'] for i in range(len(errors_per_timestep))],
+                'var_files': [sim_data_list[i].get('var_file', f'VAR{i}') for i in range(len(errors_per_timestep))],
+                'error_method': error_method
+            }
+    
+    return spatial_errors
+
+
 def calculate_std_deviation_across_vars(sim_data_list: List[dict], analytical_data_list: List[dict], 
                                         variables: List[str] = ['rho', 'ux', 'pp', 'ee']) -> Dict:
     """
