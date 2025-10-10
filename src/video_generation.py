@@ -135,6 +135,10 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_vars,
                                   interval=1000//fps, blit=True, repeat=True)
     
+    # Always create individual frames first (as part of normal workflow)
+    logger.info("Creating individual frames...")
+    create_var_evolution_frames(sim_data_list, analytical_data_list, output_path, run_name, variables)
+    
     # Save animation as GIF using PillowWriter
     output_file = output_path / f"{run_name}_var_evolution.gif"
     try:
@@ -143,8 +147,6 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
         logger.success(f"Saved VAR evolution animation to {output_file}")
     except Exception as e:
         logger.error(f"Failed to save animation: {e}")
-        logger.info("Creating individual frames instead...")
-        create_var_evolution_frames(sim_data_list, analytical_data_list, output_path, run_name, variables)
     finally:
         plt.close()
 
@@ -359,6 +361,10 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
                                   interval=1000//fps, blit=True, repeat=True)
     
+    # Always create individual frames first (as part of normal workflow)
+    logger.info("Creating individual frames...")
+    create_error_evolution_frames(spatial_errors, output_path, run_name, unit_length)
+    
     # Save animation as GIF using PillowWriter
     output_file = output_path / f"{run_name}_error_evolution.gif"
     try:
@@ -367,8 +373,6 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         logger.success(f"Saved error evolution animation to {output_file}")
     except Exception as e:
         logger.error(f"Failed to save animation: {e}")
-        logger.info("Creating individual frames instead...")
-        create_error_evolution_frames(spatial_errors, output_path, run_name, unit_length)
     finally:
         plt.close()
 
