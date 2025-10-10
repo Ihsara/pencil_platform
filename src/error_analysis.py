@@ -22,11 +22,18 @@ def calculate_std_deviation_across_vars(sim_data_list: List[dict], analytical_da
     Returns:
         Dictionary containing standard deviation metrics for each variable across all timesteps
     """
+    # Validation logging
+    if len(sim_data_list) != len(analytical_data_list):
+        logger.error(f"List length mismatch: {len(sim_data_list)} sim vs {len(analytical_data_list)} analytical")
+        return {}
+    
+    logger.debug(f"Calculating std deviations for {len(sim_data_list)} timesteps")
+    
     std_devs = {}
     
     for var in variables:
         deviations = []
-        for sim_data, analytical_data in zip(sim_data_list, analytical_data_list):
+        for idx, (sim_data, analytical_data) in enumerate(zip(sim_data_list, analytical_data_list)):
             if var in sim_data and var in analytical_data:
                 diff = sim_data[var] - analytical_data[var]
                 deviations.append(np.std(diff))

@@ -208,6 +208,8 @@ def process_run_analysis(run_path: Path, run_name: str, branch_name: str) -> tup
     if not all_sim_data:
         return None
     
+    logger.info(f"Loaded {len(all_sim_data)} VAR files (t={all_sim_data[0]['t']:.3e} to {all_sim_data[-1]['t']:.3e})")
+    
     # Generate analytical solutions for all timesteps
     all_analytical_data = []
     for sim_data in all_sim_data:
@@ -218,6 +220,19 @@ def process_run_analysis(run_path: Path, run_name: str, branch_name: str) -> tup
     if not all_analytical_data:
         logger.error(f"Failed to generate analytical solutions for {run_name}")
         return None
+    
+    # Validation: Ensure we have one analytical solution per VAR file
+    if len(all_analytical_data) != len(all_sim_data):
+        logger.error(f"Mismatch: {len(all_sim_data)} VAR files but {len(all_analytical_data)} analytical solutions")
+        return None
+    
+    # Validation: Verify timestep pairing is correct
+    for idx, (sim, anal) in enumerate(zip(all_sim_data, all_analytical_data)):
+        if abs(sim['t'] - anal['t']) > 1e-10:
+            logger.error(f"Timestep mismatch at VAR {idx}: sim_t={sim['t']:.6e} vs anal_t={anal['t']:.6e}")
+            return None
+    
+    logger.info(f"✓ Generated {len(all_analytical_data)} analytical solutions with correct timestep pairing")
     
     # Calculate error metrics
     std_devs = calculate_std_deviation_across_vars(all_sim_data, all_analytical_data)
