@@ -54,7 +54,13 @@ LOGFILE="${RUN_DIR}/simulation.log"
 
 echo "INFO: Starting SLURM task ${SLURM_ARRAY_TASK_ID} for run: ${RUN_NAME}"
 
-# --- 1. Setup the Run Directory ---
+# --- 1. Clean up existing run directory if it exists ---
+if [ -d "${RUN_DIR}" ]; then
+    echo "INFO: Removing existing run directory: ${RUN_DIR}"
+    rm -rf "${RUN_DIR}"
+fi
+
+# --- 2. Setup the Run Directory ---
 {% if rebuild %}
 echo "INFO: REBUILD MODE: Setting up a full copy of the run directory."
 pc_newrun "${SOURCE_BASE_DIR}" "${RUN_DIR}"
@@ -64,16 +70,16 @@ pc_newrun -s "${SOURCE_BASE_DIR}" "${RUN_DIR}"
 {% endif %}
 
 
-# --- 2. Copy Generated Configs ---
+# --- 3. Copy Generated Configs ---
 echo "INFO: Copying generated config files from ${LOCAL_GENERATED_CONFIG_DIR}"
 cp -rv "${LOCAL_GENERATED_CONFIG_DIR}"/* "${RUN_DIR}/"
 
-# --- 3. Navigate and Execute ---
+# --- 4. Navigate and Execute ---
 echo "INFO: Changing to working directory: ${RUN_DIR}"
 cd "$RUN_DIR" || { echo "FATAL ERROR: Could not cd to ${RUN_DIR}"; exit 1; }
 echo "INFO: Starting simulation run..." > $LOGFILE
 
-# --- 4. Build Step (only if rebuilding) ---
+# --- 5. Build Step (only if rebuilding) ---
 {% if rebuild %}
 echo "INFO: REBUILD MODE: Loading modules and building executable..." >> $LOGFILE 2>&1
 # Source the module system initializer
@@ -88,7 +94,7 @@ if [ $? -ne 0 ]; then echo "ERROR: pc_build failed" | tee -a $LOGFILE >&2; exit 
 echo "INFO: Build finished." >> $LOGFILE 2>&1
 {% endif %}
 
-# --- 5. Run the simulation ---
+# --- 6. Run the simulation ---
 if [ ! -e data/param.nml ]; then
     echo "INFO: Running START..." >>$LOGFILE 2>&1
     srun ./start.csh >>$LOGFILE 2>&1

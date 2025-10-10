@@ -55,12 +55,16 @@ modifications:
 # --- Parameter Sweeps ---
 parameter_sweeps:
   - type: linked
-    variables: [nu_shock, chi_shock]
+    variables: [nu_shock, chi_shock, diffrho_shock]
     values: [0.1, 0.5, 1.0, 5.0]
 
 # --- Branches ---
 branches:
-  - name: "massfix"
+  - name: "massfix_default_gamma"
+    settings:
+      run_in.yaml:
+        density_run_pars: { lmassdiff_fix: true }
+  - name: "massfix_gamma_is_1"
     settings:
       run_in.yaml:
         density_run_pars: { lmassdiff_fix: true, lgamma_is_1: true }
