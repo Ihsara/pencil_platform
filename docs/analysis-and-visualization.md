@@ -73,7 +73,9 @@ Performs deep error analysis across **all VAR files** for each run, generating:
 3. Experiment-wide comparisons
 4. Branch comparisons
 5. Best performer identification
-6. VAR evolution collages
+6. **Enhanced VAR evolution collages with clear VAR file counting**
+7. **Animated videos showing VAR evolution over time** (NEW)
+8. **Animated videos showing error evolution with point tracking** (NEW)
 
 ### Usage
 
@@ -117,18 +119,27 @@ analysis/
     │   └── shocktube_phase1_branch_comparison_ee.png
     ├── best_performers/                         # Best performers comparison
     │   └── best_performers_comparison.png
-    └── var_evolution/                           # VAR evolution collages
-        ├── individual/                          # Individual run collages
-        │   ├── run1_var_evolution_collage.png
+    ├── var_evolution/                           # VAR evolution collages (ENHANCED)
+    │   ├── individual/                          # Individual run collages
+    │   │   ├── run1_var_evolution_collage.png  # Now shows "N VAR files" clearly
+    │   │   └── ...
+    │   ├── branch/                              # Branch-level collages
+    │   │   ├── exp_branch1_rho_evolution.png
+    │   │   └── ...
+    │   └── best_performers/                     # Best performers collages
+    │       ├── best_performers_rho_evolution.png
+    │       ├── best_performers_ux_evolution.png
+    │       ├── best_performers_pp_evolution.png
+    │       └── best_performers_ee_evolution.png
+    └── videos/                                  # NEW: Animated videos
+        ├── var_evolution/                       # VAR evolution videos
+        │   ├── run1_var_evolution.mp4          # Shows evolution across all VAR files
+        │   ├── run1_frames/                    # Individual frames (if ffmpeg unavailable)
         │   └── ...
-        ├── branch/                              # Branch-level collages
-        │   ├── exp_branch1_rho_evolution.png
-        │   └── ...
-        └── best_performers/                     # Best performers collages
-            ├── best_performers_rho_evolution.png
-            ├── best_performers_ux_evolution.png
-            ├── best_performers_pp_evolution.png
-            └── best_performers_ee_evolution.png
+        └── error_evolution/                     # Error evolution videos
+            ├── run1_error_evolution.mp4        # Shows error with mean/max/min tracking
+            ├── run1_error_frames/              # Individual frames (if ffmpeg unavailable)
+            └── ...
 ```
 
 ### Understanding the Results
@@ -162,18 +173,54 @@ For each branch, identifies the best performing run and compares these across br
 - Identify optimal branch configurations
 - Guide future parameter selection
 
-#### 5. VAR Evolution Collages
+#### 5. VAR Evolution Collages (ENHANCED)
 
 Visual representations showing how each variable evolves across all timesteps:
 
 - **Individual collages**: Show how a single run evolves over time
-- **Branch collages**: Compare evolution across different runs in the same branch
+  - **NEW**: Title clearly states "N VAR files" analyzed
+  - **NEW**: Shows exactly 2 analytical solutions (initial & final) to avoid confusion
+  - **NEW**: Selective VAR file labeling (~8 labels) with file names and timesteps
+  - **FIX**: Previous versions showed misleading label counts
+- **Branch collages**: Compare evolution across different runs in the same branch  
 - **Best performer collages**: Compare evolution of the best run from each branch
 
 These help identify:
 - Convergence behavior
-- Stability issues
+- Stability issues  
 - Temporal error growth
+- **NEW**: Exact VAR file count being analyzed
+
+#### 6. Animated Evolution Videos (NEW)
+
+Two types of videos are automatically generated for each run:
+
+**VAR Evolution Videos** (`videos/var_evolution/*.mp4`):
+- Animates all 4 variables (ρ, u_x, p, e) frame-by-frame through all VAR files
+- Each frame shows numerical (blue) vs analytical (red dashed) solution
+- Title displays progress: "VAR N/Total"
+- Each subplot annotated with VAR file name and timestamp
+- Default: 2 fps, adjustable
+- Requires ffmpeg (falls back to individual PNG frames if unavailable)
+
+**Error Evolution Videos** (`videos/error_evolution/*.mp4`):
+- Animates standard deviation evolution for all 4 variables
+- **Point-to-point tracking** shows error progression through VAR files
+- **Real-time statistics** with visual markers:
+  - 🔴 **Current VAR** (red circle): Error at current timestep
+  - 🟢 **Mean** (green square): Running mean error  
+  - 🟠 **Max** (orange triangle): Peak error with VAR index
+  - 🔵 **Min** (blue triangle): Lowest error with VAR index
+- Text box shows numerical values for current/mean/max/min
+- **Identifies problematic VAR files** where errors spike
+- Default: 2 fps, adjustable
+- Requires ffmpeg (falls back to individual PNG frames if unavailable)
+
+**Why Videos?**
+- See temporal evolution patterns at a glance
+- Identify problematic timesteps quickly
+- Great for presentations and sharing results
+- Review many VAR files without manual clicking
 
 ## Summary Report
 
@@ -258,18 +305,25 @@ python main.py shocktube_phase1 --viz ? --var random
 2. Processing branches separately
 3. Using the intermediate JSON data for iterative analysis
 
-## Interpreting Standard Deviation Plots
+## Interpreting Standard Deviation Plots (ENHANCED)
 
 ### Individual Experiment Plots
 
-Shows how error evolves over time (across VAR files):
+Shows how error evolves over time (across VAR files) with enhanced visual markers:
 
-- **Horizontal line**: Mean standard deviation
-- **Points**: Per-timestep standard deviation
-- **Trends**:
-  - Flat line: Consistent error throughout simulation
-  - Increasing trend: Error accumulation over time
-  - Spikes: Particular timesteps with issues
+- **Blue line with points**: Per-VAR standard deviation evolution
+- **Green dashed line**: Mean standard deviation across all VARs
+- **Orange triangle** (🔺): Maximum error point with VAR index label
+- **Blue triangle** (🔻): Minimum error point with VAR index label
+- **Text box**: Statistical summary showing value ranges and std of std
+- **X-axis**: "VAR File Index (0 to N-1)" - clearly labeled
+- **Title**: Shows total number of VAR files analyzed
+
+**Trends to look for**:
+- Flat line: Consistent error throughout simulation
+- Increasing trend: Error accumulation over time
+- Spikes: Identify specific VAR files with issues (now labeled!)
+- Max/min markers: Quickly see best and worst performing timesteps
 
 ### Branch Comparison Plots
 
@@ -294,8 +348,11 @@ Compares the champion from each branch:
 3. **Use interactive mode** (`--viz ?`) to explore specific runs
 4. **Check summary report first** before diving into individual plots
 5. **Compare branch best performers** to guide methodology decisions
-6. **Look for temporal trends** in evolution collages
+6. **Look for temporal trends** in evolution collages **and videos** 🎥
 7. **Investigate worst deviations** to find parameter space boundaries
+8. **Watch error evolution videos** to spot when/where errors spike
+9. **Check VAR file counts** in titles to ensure all data was analyzed
+10. **Use frame sequences** if ffmpeg is unavailable - can still create videos manually
 
 ## Troubleshooting
 
@@ -313,11 +370,24 @@ Compares the champion from each branch:
 - Reduce number of runs with `--viz specific_runs`
 - Process one branch at a time
 - Run on compute node with more resources
+- **Video generation adds time but runs in parallel with collages**
 
 ### Out of memory
 - Process smaller subsets of runs
 - Use visualization mode instead
 - Increase available RAM or use HPC
+
+### Videos not generating
+- **Install ffmpeg**: `conda install ffmpeg` or system package manager
+- **Check ffmpeg**: Run `ffmpeg -version` to verify installation
+- **Use frame sequences**: Even without ffmpeg, individual PNG frames are generated
+- **Manual video creation**: Use provided ffmpeg command in logs to create videos from frames
+
+### ffmpeg not found
+- Platform automatically falls back to generating individual PNG frames
+- Frames saved in `*_frames/` directories
+- Console will show ffmpeg command to manually create videos
+- Example: `ffmpeg -framerate 2 -i frames/frame_%04d.png -c:v libx264 -pix_fmt yuv420p output.mp4`
 
 ## Advanced Usage
 

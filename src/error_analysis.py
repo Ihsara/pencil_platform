@@ -243,14 +243,17 @@ class ExperimentErrorAnalyzer:
     
     def plot_individual_experiment_std(self, experiment_name: str, branch_name: str, 
                                        run_name: str, output_dir: Path):
-        """Plot standard deviation evolution for individual experiment."""
+        """Plot standard deviation evolution for individual experiment with enhanced labeling."""
         output_dir.mkdir(parents=True, exist_ok=True)
         
         data = self.experiment_data[experiment_name][branch_name][run_name]
         std_devs = data['std_devs']
         
-        fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-        fig.suptitle(f'Standard Deviation Evolution\n{experiment_name}/{branch_name}/{run_name}', 
+        fig, axes = plt.subplots(2, 2, figsize=(17, 13))
+        
+        # Get total number of VAR files for title
+        n_vars = len(std_devs.get('rho', std_devs.get('ux', std_devs.get('pp', std_devs.get('ee', {})))).get('per_timestep', []))
+        fig.suptitle(f'Standard Deviation Evolution Across {n_vars} VAR Files\n{experiment_name}/{branch_name}/{run_name}', 
                      fontsize=16, fontweight='bold')
         
         axes = axes.flatten()
@@ -259,16 +262,45 @@ class ExperimentErrorAnalyzer:
         
         for idx, (var, label) in enumerate(zip(variables, var_labels)):
             if var in std_devs:
-                timesteps = range(len(std_devs[var]['per_timestep']))
-                axes[idx].plot(timesteps, std_devs[var]['per_timestep'], 
-                              'o-', linewidth=2, markersize=6)
-                axes[idx].axhline(y=std_devs[var]['mean_std'], color='r', 
-                                 linestyle='--', label=f"Mean: {std_devs[var]['mean_std']:.4e}")
-                axes[idx].set_xlabel('VAR File Index', fontsize=11)
+                per_timestep = std_devs[var]['per_timestep']
+                timesteps = list(range(len(per_timestep)))
+                
+                # Plot main line
+                axes[idx].plot(timesteps, per_timestep, 
+                              'o-', linewidth=2, markersize=6, color='#1f77b4', alpha=0.7,
+                              label='Per-VAR Std Dev')
+                
+                # Highlight mean
+                mean_val = std_devs[var]['mean_std']
+                axes[idx].axhline(y=mean_val, color='green', linewidth=2,
+                                 linestyle='--', label=f'Mean: {mean_val:.4e}', zorder=3)
+                
+                # Highlight max
+                max_val = std_devs[var]['max_std']
+                max_idx = np.argmax(per_timestep)
+                axes[idx].scatter([max_idx], [max_val], s=150, c='orange', marker='^', 
+                                 zorder=5, label=f'Max: {max_val:.4e} (VAR {max_idx})',
+                                 edgecolors='black', linewidths=1.5)
+                
+                # Highlight min
+                min_val = std_devs[var]['min_std']
+                min_idx = np.argmin(per_timestep)
+                axes[idx].scatter([min_idx], [min_val], s=150, c='blue', marker='v', 
+                                 zorder=5, label=f'Min: {min_val:.4e} (VAR {min_idx})',
+                                 edgecolors='black', linewidths=1.5)
+                
+                axes[idx].set_xlabel('VAR File Index (0 to N-1)', fontsize=11)
                 axes[idx].set_ylabel(f'Std Dev of {label}', fontsize=11)
-                axes[idx].set_title(f'{label} Standard Deviation', fontsize=12)
-                axes[idx].legend()
+                axes[idx].set_title(f'{label} Standard Deviation Evolution', fontsize=12)
+                axes[idx].legend(fontsize=8, loc='best', framealpha=0.9)
                 axes[idx].grid(True, alpha=0.3)
+                
+                # Add text box with statistics
+                stats_text = (f'Range: [{min_val:.3e}, {max_val:.3e}]\n'
+                            f'Std of Std: {std_devs[var]["std_of_std"]:.3e}')
+                axes[idx].text(0.02, 0.98, stats_text, transform=axes[idx].transAxes,
+                              verticalalignment='top', fontsize=8,
+                              bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.7))
         
         plt.tight_layout()
         output_file = output_dir / f"{run_name}_std_evolution.png"

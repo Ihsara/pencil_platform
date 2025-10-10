@@ -22,6 +22,10 @@ from .visualization_collage import (
     create_best_performers_var_evolution_collage,
     select_var_file_for_viz
 )
+from .video_generation import (
+    create_var_evolution_video,
+    create_error_evolution_video
+)
 
 # --- Add Pencil Code Python Library to Path ---
 PENCIL_CODE_PYTHON_PATH = DIRS.root.parent / "pencil-code" / "python"
@@ -331,7 +335,8 @@ def analyze_suite_comprehensive(experiment_name: str):
             loaded_data_cache[run_name] = {
                 'sim_data': all_sim_data,
                 'analytical_data': all_analytical_data,
-                'branch': branch_name
+                'branch': branch_name,
+                'std_devs': std_devs
             }
             
             logger.info(f"✓ Cached {len(all_sim_data)} VAR files for {run_name}")
@@ -359,10 +364,12 @@ def analyze_suite_comprehensive(experiment_name: str):
     logger.info("Creating best performers comparison...")
     analyzer.plot_best_performers_comparison(analysis_dir / "best_performers")
     
-    # 4. Generate VAR evolution collages (USING CACHED DATA - NO RELOADING)
-    logger.info("Creating VAR evolution collages (using cached data)...")
+    # 4. Generate VAR evolution collages and videos (USING CACHED DATA - NO RELOADING)
+    logger.info("Creating VAR evolution collages and videos (using cached data)...")
     collage_dir = analysis_dir / "var_evolution"
+    video_dir = analysis_dir / "videos"
     collage_dir.mkdir(parents=True, exist_ok=True)
+    video_dir.mkdir(parents=True, exist_ok=True)
     
     # Organize cached data by branch for collages
     branch_collage_data_by_branch = {}
@@ -375,6 +382,19 @@ def analyze_suite_comprehensive(experiment_name: str):
         create_var_evolution_collage(
             cached['sim_data'], cached['analytical_data'], 
             collage_dir / "individual", run_name
+        )
+        
+        # Individual run VAR evolution video
+        logger.info(f"Creating VAR evolution video for {run_name}...")
+        create_var_evolution_video(
+            cached['sim_data'], cached['analytical_data'],
+            video_dir / "var_evolution", run_name, fps=2
+        )
+        
+        # Individual run error evolution video
+        logger.info(f"Creating error evolution video for {run_name}...")
+        create_error_evolution_video(
+            cached['std_devs'], video_dir / "error_evolution", run_name, fps=2
         )
         
         # Store for branch collage

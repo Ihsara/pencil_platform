@@ -38,13 +38,13 @@ def create_var_evolution_collage(sim_data_list: List[dict], analytical_data_list
     }
     
     # Create figure with subplots for each variable
-    fig, axes = plt.subplots(2, 2, figsize=(16, 14))
-    fig.suptitle(f'Variable Evolution Across All VAR Files\n{run_name}', 
+    fig, axes = plt.subplots(2, 2, figsize=(18, 15))
+    n_vars = len(sim_data_list)
+    fig.suptitle(f'Variable Evolution Across {n_vars} VAR Files\n{run_name}', 
                  fontsize=16, fontweight='bold')
     axes = axes.flatten()
     
     # Color map for different timesteps
-    n_vars = len(sim_data_list)
     colors = plt.cm.viridis(np.linspace(0, 1, n_vars))
     
     for idx, var in enumerate(variables):
@@ -64,27 +64,36 @@ def create_var_evolution_collage(sim_data_list: List[dict], analytical_data_list
                     unit = sim_data['params'].unit_velocity ** 2
                 break
         
-        # Plot analytical solution for first and last timestep
+        # Plot analytical solution for first and last timestep ONLY
         if analytical_data_list:
             ax.plot(analytical_data_list[0]['x'], analytical_data_list[0][var]*unit, 
-                   'k--', linewidth=2, alpha=0.7, label='Analytical (t=0)')
+                   'k--', linewidth=2.5, alpha=0.9, label='Analytical (t₀)', zorder=10)
             if len(analytical_data_list) > 1:
                 ax.plot(analytical_data_list[-1]['x'], analytical_data_list[-1][var]*unit, 
-                       'k:', linewidth=2, alpha=0.7, label=f'Analytical (t={analytical_data_list[-1]["t"]:.2e})')
+                       'k:', linewidth=2.5, alpha=0.9, label=f'Analytical (t_final)', zorder=10)
         
-        # Plot simulation data evolution
+        # Plot simulation data evolution with clear labels showing count
+        label_every = max(1, n_vars // 8)  # Show ~8 labels max
         for var_idx, (sim_data, color) in enumerate(zip(sim_data_list, colors)):
             if var in sim_data:
                 alpha = 0.3 + 0.7 * (var_idx / max(1, n_vars-1))  # Increase alpha with time
-                label = f't={sim_data["t"]:.2e}' if var_idx % max(1, n_vars//5) == 0 else None
+                var_file_name = sim_data.get('var_file', f'VAR{var_idx}')
+                
+                # Create label for selected timesteps
+                if var_idx % label_every == 0 or var_idx == n_vars - 1:
+                    label = f'{var_file_name} (t={sim_data["t"]:.2e})'
+                else:
+                    label = None
+                    
                 ax.plot(sim_data['x'], sim_data[var]*unit, 
-                       color=color, linewidth=1.5, alpha=alpha, label=label)
+                       color=color, linewidth=1.8, alpha=alpha, label=label)
         
-        ax.set_xlabel('Position (x) [kpc]', fontsize=11)
-        ax.set_ylabel(var_labels.get(var, var), fontsize=11)
+        ax.set_xlabel('Position (x) [kpc]', fontsize=12)
+        ax.set_ylabel(var_labels.get(var, var), fontsize=12)
         ax.set_yscale(var_scales.get(var, 'linear'))
-        ax.set_title(f'{var.upper()} Evolution', fontsize=12)
-        ax.legend(fontsize=8, loc='best', ncol=2)
+        ax.set_title(f'{var.upper()} Evolution (Numerical: {n_vars} VAR files, Analytical: 2 times)', 
+                    fontsize=12, pad=10)
+        ax.legend(fontsize=7, loc='best', ncol=1, framealpha=0.9)
         ax.grid(True, alpha=0.3)
     
     plt.tight_layout()
