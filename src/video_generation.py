@@ -6,7 +6,6 @@ import numpy as np
 from pathlib import Path
 from loguru import logger
 from typing import Dict, List
-import shutil
 
 
 def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: List[dict],
@@ -14,24 +13,17 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
                                variables: List[str] = ['rho', 'ux', 'pp', 'ee'],
                                fps: int = 2):
     """
-    Creates an animated video showing evolution of variables across all VAR files.
+    Creates an animated GIF showing evolution of variables across all VAR files using matplotlib.
     
     Args:
         sim_data_list: List of simulation data from all VAR files
         analytical_data_list: List of analytical solutions for all VAR files
-        output_path: Directory to save the video
+        output_path: Directory to save the animation
         run_name: Name of the run for title
         variables: List of variables to plot
-        fps: Frames per second for the video
+        fps: Frames per second for the animation
     """
     output_path.mkdir(parents=True, exist_ok=True)
-    
-    # Check if ffmpeg is available
-    if not shutil.which('ffmpeg'):
-        logger.warning("ffmpeg not found. Cannot create video. Please install ffmpeg.")
-        logger.info("Creating individual frames instead...")
-        create_var_evolution_frames(sim_data_list, analytical_data_list, output_path, run_name, variables)
-        return
     
     var_labels = {
         'rho': r'$\rho$ [g cm$^{-3}$]',
@@ -143,15 +135,14 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_vars,
                                   interval=1000//fps, blit=True, repeat=True)
     
-    # Save video
-    output_file = output_path / f"{run_name}_var_evolution.mp4"
+    # Save animation as GIF using PillowWriter
+    output_file = output_path / f"{run_name}_var_evolution.gif"
     try:
-        Writer = animation.writers['ffmpeg']
-        writer = Writer(fps=fps, metadata=dict(artist='Pencil Platform'), bitrate=1800)
+        writer = animation.PillowWriter(fps=fps, metadata=dict(artist='Pencil Platform'))
         anim.save(output_file, writer=writer)
-        logger.success(f"Saved VAR evolution video to {output_file}")
+        logger.success(f"Saved VAR evolution animation to {output_file}")
     except Exception as e:
-        logger.error(f"Failed to save video: {e}")
+        logger.error(f"Failed to save animation: {e}")
         logger.info("Creating individual frames instead...")
         create_var_evolution_frames(sim_data_list, analytical_data_list, output_path, run_name, variables)
     finally:
@@ -231,29 +222,27 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
         plt.close()
     
     logger.success(f"Saved {n_vars} frames to {frames_dir}")
-    logger.info(f"To create video manually, run: ffmpeg -framerate 2 -i {frames_dir}/frame_%04d.png -c:v libx264 -pix_fmt yuv420p {output_path}/{run_name}_var_evolution.mp4")
 
 
 def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_name: str, 
                                 fps: int = 2, unit_length: float = 1.0):
     """
-    Creates an animated video showing spatial error evolution across VAR files.
+    Creates an animated GIF showing spatial error evolution across VAR files using matplotlib.
     Shows x position (kpc) vs error at each point.
     
     Args:
         spatial_errors: Dictionary containing spatial error data from calculate_spatial_errors()
-        output_path: Directory to save the video
+        output_path: Directory to save the animation
         run_name: Name of the run
         fps: Frames per second
         unit_length: Unit conversion factor for length (e.g., to kpc)
     """
     output_path.mkdir(parents=True, exist_ok=True)
     
-    # Check if ffmpeg is available
-    if not shutil.which('ffmpeg'):
-        logger.warning("ffmpeg not found. Cannot create video. Creating individual frames instead...")
-        create_error_evolution_frames(spatial_errors, output_path, run_name, unit_length)
-        return
+    # Validate unit_length to prevent overflow
+    if not np.isfinite(unit_length) or unit_length > 1e20 or unit_length == 0:
+        logger.warning(f"Invalid unit_length value ({unit_length}). Using 1.0 instead.")
+        unit_length = 1.0
     
     variables = ['rho', 'ux', 'pp', 'ee']
     var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
@@ -278,15 +267,32 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     
     for idx, (var, label) in enumerate(valid_vars):
         ax = axes[idx]
-        x_coords = spatial_errors[var]['x'] * unit_length
+        
+        # Safely convert x coordinates to physical units
+        x_raw = spatial_errors[var]['x']
+        try:
+            x_coords = x_raw * unit_length
+            # Check for overflow
+            if not np.all(np.isfinite(x_coords)):
+                logger.warning(f"Overflow in x coordinate conversion for {var}. Using normalized coordinates.")
+                x_coords = x_raw
+                unit_length = 1.0
+        except (OverflowError, RuntimeWarning):
+            logger.warning(f"Cannot convert x coordinates for {var}. Using normalized coordinates.")
+            x_coords = x_raw
+            unit_length = 1.0
         
         # Create empty line object
         lines[var], = ax.plot([], [], '-', linewidth=2, color='#1f77b4', alpha=0.8)
         
-        ax.set_xlabel('Position (x) [kpc]', fontsize=11)
+        # Determine appropriate x-axis label
+        x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
+        ax.set_xlabel(x_label, fontsize=11)
         ax.set_ylabel(f'Error in {label}', fontsize=11)
         ax.set_title(f'{label} Spatial Error Evolution', fontsize=12)
-        ax.set_xlim(x_coords.min(), x_coords.max())
+        
+        if np.all(np.isfinite(x_coords)):
+            ax.set_xlim(x_coords.min(), x_coords.max())
         
         # Set y limits based on all timesteps
         all_errors = np.concatenate(spatial_errors[var]['errors_per_timestep'])
@@ -316,7 +322,15 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         """Animation function"""
         for var, label in valid_vars:
             if var in spatial_errors:
-                x_coords = spatial_errors[var]['x'] * unit_length
+                # Safely convert x coordinates
+                x_raw = spatial_errors[var]['x']
+                try:
+                    x_coords = x_raw * unit_length
+                    if not np.all(np.isfinite(x_coords)):
+                        x_coords = x_raw
+                except (OverflowError, RuntimeWarning):
+                    x_coords = x_raw
+                
                 errors = spatial_errors[var]['errors_per_timestep'][frame]
                 var_file = spatial_errors[var]['var_files'][frame]
                 timestep = spatial_errors[var]['timesteps'][frame]
@@ -345,17 +359,16 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
                                   interval=1000//fps, blit=True, repeat=True)
     
-    # Save video
-    output_file = output_path / f"{run_name}_error_evolution.mp4"
+    # Save animation as GIF using PillowWriter
+    output_file = output_path / f"{run_name}_error_evolution.gif"
     try:
-        Writer = animation.writers['ffmpeg']
-        writer = Writer(fps=fps, metadata=dict(artist='Pencil Platform'), bitrate=1800)
+        writer = animation.PillowWriter(fps=fps, metadata=dict(artist='Pencil Platform'))
         anim.save(output_file, writer=writer)
-        logger.success(f"Saved error evolution video to {output_file}")
+        logger.success(f"Saved error evolution animation to {output_file}")
     except Exception as e:
-        logger.error(f"Failed to save video: {e}")
+        logger.error(f"Failed to save animation: {e}")
         logger.info("Creating individual frames instead...")
-        create_error_evolution_frames(std_devs, output_path, run_name)
+        create_error_evolution_frames(spatial_errors, output_path, run_name, unit_length)
     finally:
         plt.close()
 
@@ -384,6 +397,11 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
         logger.warning("No valid variables with spatial error data")
         return
     
+    # Validate unit_length to prevent overflow
+    if not np.isfinite(unit_length) or unit_length > 1e20 or unit_length == 0:
+        logger.warning(f"Invalid unit_length value ({unit_length}). Using 1.0 instead.")
+        unit_length = 1.0
+    
     # Get max number of timesteps and error method
     max_timesteps = max(len(spatial_errors[var]['errors_per_timestep']) for var, _ in valid_vars)
     error_method = spatial_errors[list(spatial_errors.keys())[0]]['error_method']
@@ -400,7 +418,18 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
             ax = axes[idx]
             
             if var in spatial_errors:
-                x_coords = spatial_errors[var]['x'] * unit_length
+                # Safely convert x coordinates to physical units
+                x_raw = spatial_errors[var]['x']
+                try:
+                    x_coords = x_raw * unit_length
+                    # Check for overflow
+                    if not np.all(np.isfinite(x_coords)):
+                        logger.warning(f"Overflow in x coordinate conversion for {var}. Using normalized coordinates.")
+                        x_coords = x_raw
+                except (OverflowError, RuntimeWarning):
+                    logger.warning(f"Cannot convert x coordinates for {var}. Using normalized coordinates.")
+                    x_coords = x_raw
+                
                 errors = spatial_errors[var]['errors_per_timestep'][frame]
                 var_file = spatial_errors[var]['var_files'][frame]
                 timestep = spatial_errors[var]['timesteps'][frame]
@@ -424,17 +453,24 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
                        transform=ax.transAxes, verticalalignment='top', fontsize=9,
                        bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
                 
-                ax.set_xlabel('Position (x) [kpc]', fontsize=11)
+                # Determine appropriate x-axis label
+                x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
+                ax.set_xlabel(x_label, fontsize=11)
                 ax.set_ylabel(f'Error in {label}', fontsize=11)
                 ax.set_title(f'{label} Spatial Error', fontsize=12)
                 
-                # Set limits
-                ax.set_xlim(x_coords.min(), x_coords.max())
+                # Set limits safely
+                if np.all(np.isfinite(x_coords)):
+                    ax.set_xlim(x_coords.min(), x_coords.max())
+                else:
+                    logger.warning(f"Non-finite x coordinates for {var}, skipping xlim")
+                
                 all_errors = np.concatenate(spatial_errors[var]['errors_per_timestep'])
-                y_min = all_errors.min()
-                y_max = all_errors.max()
-                y_range = y_max - y_min
-                ax.set_ylim(y_min - 0.1*y_range, y_max + 0.1*y_range)
+                if np.all(np.isfinite(all_errors)):
+                    y_min = all_errors.min()
+                    y_max = all_errors.max()
+                    y_range = y_max - y_min
+                    ax.set_ylim(y_min - 0.1*y_range, y_max + 0.1*y_range)
                 
                 ax.grid(True, alpha=0.3)
         
@@ -444,4 +480,3 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
         plt.close()
     
     logger.success(f"Saved {max_timesteps} error evolution frames to {frames_dir}")
-    logger.info(f"To create video manually, run: ffmpeg -framerate 2 -i {frames_dir}/frame_%04d.png -c:v libx264 -pix_fmt yuv420p {output_path}/{run_name}_error_evolution.mp4")
