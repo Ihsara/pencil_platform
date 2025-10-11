@@ -22,6 +22,7 @@ from .video_generation import (
     create_var_evolution_video,
     create_error_evolution_video
 )
+from .experiment_name_decoder import format_experiment_title, format_short_experiment_name
 
 # --- Add Pencil Code Python Library to Path ---
 PENCIL_CODE_PYTHON_PATH = DIRS.root.parent / "pencil-code" / "python"
@@ -197,7 +198,7 @@ def create_overlay_error_evolution_video(
         unit_length = 1.0
     
     variables = ['rho', 'ux', 'pp', 'ee']
-    var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+    var_labels = [r'$\rho$ [g cm$^{-3}$]', r'$u_x$ [km s$^{-1}$]', r'$p$ [dyn cm$^{-2}$]', r'$e$ [km$^2$ s$^{-2}$]']
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
     
     fig, axes = plt.subplots(2, 2, figsize=(18, 14))
@@ -426,7 +427,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 if all_sim_data and 'params' in all_sim_data[0]:
                     params = all_sim_data[0]['params']
                     if hasattr(params, 'unit_length'):
-                        unit_length = params.unit_length * 3.086e21
+                        unit_length = params.unit_length  # Already in cm
                 
                 logger.info(f"     ├─ Creating var evolution video...")
                 create_var_evolution_video(
@@ -500,7 +501,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             if first_run_data['sim_data'] and 'params' in first_run_data['sim_data'][0]:
                 params = first_run_data['sim_data'][0]['params']
                 if hasattr(params, 'unit_length'):
-                    unit_length = params.unit_length * 3.086e21
+                    unit_length = params.unit_length  # Already in cm
             
             output_name = f"{experiment_name}_{branch_name}_overlay"
             create_overlay_error_evolution_video(
@@ -531,7 +532,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
         if first_run_data['sim_data'] and 'params' in first_run_data['sim_data'][0]:
             params = first_run_data['sim_data'][0]['params']
             if hasattr(params, 'unit_length'):
-                unit_length = params.unit_length * 3.086e21
+                unit_length = params.unit_length  # Already in cm
         
         output_name = f"{experiment_name}_top3_best_performers_overlay"
         create_overlay_error_evolution_video(
@@ -947,7 +948,7 @@ def create_per_metric_plots(error_norms_cache, metrics, output_dir, experiment_n
     import matplotlib.pyplot as plt
     
     variables = ['rho', 'ux', 'pp', 'ee']
-    var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+    var_labels = [r'$\rho$ [g cm$^{-3}$]', r'$u_x$ [km s$^{-1}$]', r'$p$ [dyn cm$^{-2}$]', r'$e$ [km$^2$ s$^{-2}$]']
     
     for metric in metrics:
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
@@ -1006,7 +1007,7 @@ def create_best_performers_plot(top_5, error_norms_cache, metrics, output_dir, e
     axes = axes.flatten()
     
     variables = ['rho', 'ux', 'pp', 'ee']
-    var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+    var_labels = [r'$\rho$ [g cm$^{-3}$]', r'$u_x$ [km s$^{-1}$]', r'$p$ [dyn cm$^{-2}$]', r'$e$ [km$^2$ s$^{-2}$]']
     
     colors = plt.cm.viridis(np.linspace(0, 1, 5))
     
@@ -1052,7 +1053,7 @@ def create_branch_comparison_plot(branch_best, runs_per_branch, combined_scores,
     """Create comparison of best performers from each branch."""
     import matplotlib.pyplot as plt
     
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(14, 8))
     
     branch_names = []
     best_scores = []
@@ -1079,10 +1080,16 @@ def create_branch_comparison_plot(branch_best, runs_per_branch, combined_scores,
     ax.grid(True, alpha=0.3, axis='y')
     ax.set_yscale('log')
     
-    # Add run names as text
+    # Add run names with decoded experiment details
     for i, (score, run_name) in enumerate(zip(best_scores, best_run_names)):
-        ax.text(i, score * 1.1, run_name[:30], ha='center', va='bottom', 
-               fontsize=8, rotation=45)
+        # Show branch name at top
+        ax.text(i, score * 1.2, f'{branch_names[i]}', ha='center', va='bottom', 
+               fontsize=9, fontweight='bold', color='darkblue')
+        # Show decoded experiment name below
+        decoded_title = format_experiment_title(run_name, max_line_length=40)
+        ax.text(i, score * 0.9, decoded_title, ha='center', va='top', 
+               fontsize=7, rotation=0, style='italic', 
+               bbox=dict(boxstyle='round,pad=0.5', facecolor='wheat', alpha=0.7))
     
     plt.tight_layout()
     output_file = output_dir / f"{experiment_name}_branch_best.png"
@@ -1102,7 +1109,7 @@ def create_error_evolution_plots(top_3, error_norms_cache, metrics, output_dir, 
         axes = axes.flatten()
         
         variables = ['rho', 'ux', 'pp', 'ee']
-        var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+        var_labels = [r'$\rho$ [g cm$^{-3}$]', r'$u_x$ [km s$^{-1}$]', r'$p$ [dyn cm$^{-2}$]', r'$e$ [km$^2$ s$^{-2}$]']
         colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
         
         for idx, (var, label) in enumerate(zip(variables, var_labels)):

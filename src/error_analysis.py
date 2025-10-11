@@ -404,7 +404,7 @@ class ExperimentErrorAnalyzer:
         
         axes = axes.flatten()
         variables = ['rho', 'ux', 'pp', 'ee']
-        var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+        var_labels = [r'$\rho$ [g cm$^{-3}$]', r'$u_x$ [km s$^{-1}$]', r'$p$ [dyn cm$^{-2}$]', r'$e$ [km$^2$ s$^{-2}$]']
         
         for idx, (var, label) in enumerate(zip(variables, var_labels)):
             if var in std_devs:
@@ -460,7 +460,7 @@ class ExperimentErrorAnalyzer:
         
         branches = self.experiment_data[experiment_name]
         variables = ['rho', 'ux', 'pp', 'ee']
-        var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+        var_labels = [r'$\rho$ [g cm$^{-3}$]', r'$u_x$ [km s$^{-1}$]', r'$p$ [dyn cm$^{-2}$]', r'$e$ [km$^2$ s$^{-2}$]']
         
         for var, label in zip(variables, var_labels):
             fig, axes = plt.subplots(1, len(branches), figsize=(6*len(branches), 5))
@@ -493,7 +493,7 @@ class ExperimentErrorAnalyzer:
         
         branch_best = self.compare_branch_best_performers()
         variables = ['rho', 'ux', 'pp', 'ee']
-        var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+        var_labels = [r'$\rho$ [g cm$^{-3}$]', r'$u_x$ [km s$^{-1}$]', r'$p$ [dyn cm$^{-2}$]', r'$e$ [km$^2$ s$^{-2}$]']
         
         fig, axes = plt.subplots(2, 2, figsize=(16, 12))
         fig.suptitle('Best Performers Comparison Across Branches', fontsize=16, fontweight='bold')
