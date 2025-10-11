@@ -18,9 +18,14 @@ from .error_analysis import (
     ExperimentErrorAnalyzer
 )
 from .error_metrics import calculate_errors_over_time
-from .video_generation import (
+from .visualization import (
     create_var_evolution_video,
-    create_error_evolution_video
+    create_error_evolution_video,
+    create_combined_scores_plot,
+    create_per_metric_plots,
+    create_best_performers_plot,
+    create_branch_comparison_plot,
+    create_error_evolution_plots,
 )
 from .experiment_name_decoder import format_experiment_title, format_short_experiment_name
 
