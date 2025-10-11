@@ -317,6 +317,12 @@ def visualize_suite(experiment_name: str, specific_runs: list = None, var_select
     analyze_suite_videos_only(experiment_name)
 
 
+def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absolute'):
+    """Legacy function name - redirects to video-only analysis for backward compatibility."""
+    logger.warning("analyze_suite_comprehensive() is deprecated. Redirecting to video-only analysis...")
+    analyze_suite_videos_only(experiment_name, error_method)
+
+
 def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolute'):
     """Video-only analysis: Creates individual and overlay error evolution videos.
     

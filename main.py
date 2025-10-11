@@ -7,7 +7,7 @@ from loguru import logger
 
 # Import logic from the src directory
 from src.suite_generator import run_suite
-from src.post_processing import visualize_suite, analyze_suite_comprehensive
+from src.post_processing import visualize_suite, analyze_suite_videos_only
 from src.job_manager import submit_suite, check_suite_status, wait_for_completion
 from src.constants import DIRS, FILES
 
@@ -34,7 +34,7 @@ def main():
     parser.add_argument("--test", nargs='?', const=2, type=int, default=None, 
                        help="Enable test mode. Generates a limited number of runs without submitting.")
     parser.add_argument("--analyze", action="store_true", 
-                       help="Run comprehensive error analysis across all VAR files. Generates statistical comparisons and evolution collages.")
+                       help="Run video-only analysis: creates individual error evolution videos and overlay comparisons for branches and top performers.")
     parser.add_argument("--viz", nargs='*', default=None,
                        help="Visualize experiment results. Usage: --viz (all runs), --viz run1 run2 (specific runs), --viz ? (interactive)")
     parser.add_argument("--var", type=str, default=None,
@@ -82,8 +82,8 @@ def main():
             if wait_for_completion(experiment_name):
                 # Job completed successfully
                 if args.analyze:
-                    logger.info("Job completed! Starting comprehensive error analysis...")
-                    analyze_suite_comprehensive(experiment_name)
+                    logger.info("Job completed! Starting video-only analysis...")
+                    analyze_suite_videos_only(experiment_name)
                 else:
                     logger.success("Job completed! You can now run analysis or visualization.")
                     logger.info(f"Analysis: python main.py {experiment_name} --analyze")
@@ -92,8 +92,8 @@ def main():
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
         elif args.analyze:
-            logger.info("--- COMPREHENSIVE ERROR ANALYSIS MODE ---")
-            analyze_suite_comprehensive(experiment_name)
+            logger.info("--- VIDEO-ONLY ANALYSIS MODE ---")
+            analyze_suite_videos_only(experiment_name)
         elif args.viz is not None:
             logger.info("--- VISUALIZATION MODE ---")
             
