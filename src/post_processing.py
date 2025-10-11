@@ -7,30 +7,18 @@ from pathlib import Path
 import jinja2
 import numpy as np
 from loguru import logger
+from typing import Dict, List, Tuple
 
 from .constants import DIRS, FILES
-from .analysis import compare_simulation_to_analytical, format_comparison_table
-from .visualization import plot_simulation_vs_analytical
 from .error_analysis import (
     calculate_std_deviation_across_vars, 
     calculate_absolute_deviation_per_var,
     calculate_spatial_errors,
     ExperimentErrorAnalyzer
 )
-from .visualization_collage import (
-    create_var_evolution_collage,
-    create_branch_var_evolution_collage,
-    create_best_performers_var_evolution_collage,
-    select_var_file_for_viz
-)
 from .video_generation import (
     create_var_evolution_video,
     create_error_evolution_video
-)
-from .advanced_analysis import (
-    perform_comprehensive_analysis,
-    find_best_performer_by_error_norms,
-    compare_branch_performers_by_error_norms
 )
 
 # --- Add Pencil Code Python Library to Path ---
@@ -60,64 +48,6 @@ def get_analytical_solution(params, x: np.ndarray, t: float) -> dict | None:
     except Exception as e:
         logger.error(f"Failed to calculate analytical solution: {e}")
         return None
-
-def load_simulation_data(run_path: Path, var_file_name: str = None) -> dict | None:
-    """Loads and processes snapshot data from a single simulation run.
-    
-    Args:
-        run_path: Path to the run directory
-        var_file_name: Specific VAR file name to load. If None, loads the middle VAR file.
-    """
-    try:
-        if not run_path.is_dir():
-            logger.warning(f"Run directory not found: {run_path}")
-            return None
-            
-        data_dir = run_path / "data"
-        proc_dir = data_dir / "proc0" if (data_dir / "proc0").is_dir() else data_dir
-        var_files = sorted(proc_dir.glob("VAR*"))
-        logger.info(f"Loading data from {run_path}, found {len(var_files)} VAR files.")
-        if not var_files:
-            logger.warning(f"No VAR files found in {proc_dir}")
-            return None
-        
-        # Select which VAR file to load
-        if var_file_name:
-            selected_var = var_file_name
-        else:
-            # Default: select middle VAR file
-            selected_var_path = select_var_file_for_viz(var_files, 'middle')
-            selected_var = selected_var_path.name
-        
-        params = read.param(datadir=str(data_dir), quiet=True)
-        var = read.var(selected_var, datadir=str(data_dir), quiet=True, trimall=True)
-        grid = read.grid(datadir=str(data_dir), quiet=True, trim=True)
-        
-        density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
-        cp, gamma = params.cp, params.gamma
-        cv = cp / gamma
-        
-        if not hasattr(var, 'ss'):
-            logger.error(f"Variable 'ss' not found for {run_path}. Cannot calculate pressure.")
-            return None
-
-        rho0 = getattr(params, 'rho0', 1.0)
-        cs0 = getattr(params, 'cs0', 1.0)
-        lnrho0 = np.log(rho0)
-        lnTT0 = np.log(cs0**2 / (cp * (gamma - 1.0)))
-        
-        pressure = (cp - cv) * np.exp(lnTT0 + (gamma / cp * var.ss) + (gamma * np.log(density)) - ((gamma - 1.0) * lnrho0))
-        internal_energy = pressure / (density * (gamma - 1.0)) if gamma > 1.0 else np.zeros_like(density)
-        
-        return {
-            "x": np.squeeze(grid.x), "rho": np.squeeze(density), "ux": np.squeeze(var.ux),
-            "pp": np.squeeze(pressure), "ee": np.squeeze(internal_energy), 
-            "t": var.t, "params": params
-        }
-    except Exception as e:
-        logger.error(f"Failed to load data from {run_path}: {e}")
-        return None
-
 
 def load_all_var_files(run_path: Path) -> list[dict] | None:
     """Loads and processes all VAR files from a simulation run."""
@@ -181,29 +111,6 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         logger.error(f"Failed to load VAR files from {run_path}: {e}")
         return None
 
-def process_run_visualization(run_path: Path, report_dir: Path, run_name: str, 
-                             var_selection: str = None) -> dict | None:
-    """Processes a single run for visualization."""
-    logger.info(f"--- Visualizing run: {run_name} ---")
-    
-    sim_data = load_simulation_data(run_path, var_selection)
-    if not sim_data: return None
-
-    analytical_data = get_analytical_solution(sim_data['params'], sim_data['x'], sim_data['t'])
-    if not analytical_data: return None
-
-    run_report_dir = report_dir / run_name
-    run_report_dir.mkdir(parents=True, exist_ok=True)
-
-    np.savez_compressed(run_report_dir / "simulation_data.npz", 
-                       **{k: v for k, v in sim_data.items() if k not in ['params', 'var_file']})
-    np.savez_compressed(run_report_dir / "analytical_data.npz", **analytical_data)
-    
-    plot_simulation_vs_analytical(sim_data, analytical_data, run_report_dir, run_name)
-    
-    return compare_simulation_to_analytical(sim_data, analytical_data)
-
-
 def process_run_analysis(run_path: Path, run_name: str, branch_name: str, 
                         error_method: str = 'absolute') -> tuple[dict, dict, dict, list, list] | None:
     """Processes a single run for comprehensive error analysis across all VAR files.
@@ -216,7 +123,7 @@ def process_run_analysis(run_path: Path, run_name: str, branch_name: str,
     
     Returns:
         Tuple of (std_devs, abs_devs, spatial_errors, all_sim_data, all_analytical_data) or None if failed.
-        The loaded data is returned to enable caching and reuse for collage generation.
+        The loaded data is returned to enable caching and reuse for video generation.
     """
     logger.info(f"--- Analyzing run: {run_name} (branch: {branch_name}) ---")
     
@@ -259,57 +166,173 @@ def process_run_analysis(run_path: Path, run_name: str, branch_name: str,
     # Return loaded data along with metrics for caching/reuse
     return std_devs, abs_devs, spatial_errors, all_sim_data, all_analytical_data
 
-def visualize_suite(experiment_name: str, specific_runs: list = None, var_selection: str = None):
-    """Visualize an experiment suite (formerly analyze_suite)."""
-    logger.info(f"--- STARTING VISUALIZATION for experiment: '{experiment_name}' ---")
-    
-    plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
-    with open(plan_file, 'r') as f: plan = yaml.safe_load(f)
-    
-    hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
-    manifest_file = DIRS.runs / experiment_name / FILES.manifest
-    report_dir = DIRS.root / "reports" / experiment_name
-    report_dir.mkdir(parents=True, exist_ok=True)
 
-    with open(manifest_file, 'r') as f: run_names = [line.strip() for line in f if line.strip()]
+def create_overlay_error_evolution_video(
+    spatial_errors_list: List[Tuple[str, Dict]], 
+    output_path: Path, 
+    output_name: str,
+    fps: int = 2, 
+    unit_length: float = 1.0
+):
+    """
+    Creates an overlaid animated GIF showing spatial error evolution for multiple runs.
     
-    # Filter runs if specific ones requested
-    if specific_runs:
-        run_names = [r for r in run_names if r in specific_runs]
-        logger.info(f"Visualizing specific runs: {run_names}")
-
-    all_run_metrics = {}
-    for run_name in run_names:
-        metrics = process_run_visualization(hpc_run_base_dir / run_name, report_dir, run_name, var_selection)
-        if metrics:
-            all_run_metrics[run_name] = metrics
+    Args:
+        spatial_errors_list: List of tuples (run_name, spatial_errors_dict)
+        output_path: Directory to save the animation
+        output_name: Name for the output file
+        fps: Frames per second
+        unit_length: Unit conversion factor for length
+    """
+    import matplotlib.pyplot as plt
+    import matplotlib.animation as animation
     
-    if all_run_metrics:
-        log_summary, markdown_table = format_comparison_table(all_run_metrics)
-        logger.info(log_summary)
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    # Validate unit_length
+    if not np.isfinite(unit_length) or unit_length > 1e20 or unit_length == 0:
+        logger.warning(f"Invalid unit_length value ({unit_length}). Using 1.0 instead.")
+        unit_length = 1.0
+    
+    variables = ['rho', 'ux', 'pp', 'ee']
+    var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
+    
+    fig, axes = plt.subplots(2, 2, figsize=(18, 14))
+    axes = axes.flatten()
+    
+    # Get max number of timesteps across all runs
+    max_timesteps = max(
+        len(spatial_errors['rho']['errors_per_timestep'])
+        for _, spatial_errors in spatial_errors_list
+        if 'rho' in spatial_errors
+    )
+    
+    error_method = spatial_errors_list[0][1][list(spatial_errors_list[0][1].keys())[0]]['error_method']
+    
+    # Initialize plot elements
+    lines = {var: [] for var in variables}
+    
+    for idx, var in enumerate(variables):
+        ax = axes[idx]
         
-        # Save the consolidated markdown table for Quarto
-        comparison_summary_path = report_dir / "comparison_summary.md"
-        with open(comparison_summary_path, "w") as f:
-            f.write(markdown_table)
-        logger.success(f"Saved comparison summary to {comparison_summary_path}")
+        # Get x coordinates from first run (should be same for all)
+        x_raw = spatial_errors_list[0][1][var]['x']
+        try:
+            x_coords = x_raw * unit_length
+            if not np.all(np.isfinite(x_coords)):
+                x_coords = x_raw
+                unit_length = 1.0
+        except (OverflowError, RuntimeWarning):
+            x_coords = x_raw
+            unit_length = 1.0
+        
+        # Create line for each run
+        for run_idx, (run_name, spatial_errors) in enumerate(spatial_errors_list):
+            if var in spatial_errors:
+                color = colors[run_idx % len(colors)]
+                line, = ax.plot([], [], '-', linewidth=2.5, color=color, 
+                              label=run_name, alpha=0.8)
+                lines[var].append((line, run_name, spatial_errors))
+        
+        x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
+        ax.set_xlabel(x_label, fontsize=11)
+        ax.set_ylabel(f'Error in {var_labels[idx]}', fontsize=11)
+        ax.set_title(f'{var_labels[idx]} Spatial Error Comparison', fontsize=12)
+        ax.legend(fontsize=9, loc='best')
+        ax.grid(True, alpha=0.3)
+        
+        # Set axis limits
+        if np.all(np.isfinite(x_coords)):
+            ax.set_xlim(x_coords.min(), x_coords.max())
+        
+        # Calculate y limits across all runs
+        all_errors = []
+        for _, _, spatial_errors in lines[var]:
+            all_errors.extend(spatial_errors[var]['errors_per_timestep'])
+        if all_errors:
+            all_errors_concat = np.concatenate(all_errors)
+            y_min = all_errors_concat.min()
+            y_max = all_errors_concat.max()
+            y_range = y_max - y_min
+            ax.set_ylim(y_min - 0.1*y_range, y_max + 0.1*y_range)
     
-    generate_quarto_report(experiment_name, report_dir, run_names)
+    title = fig.suptitle('', fontsize=16, fontweight='bold')
     
-    logger.success(f"Visualization for '{experiment_name}' finished successfully.")
+    def init():
+        """Initialize animation"""
+        for var in variables:
+            for line, _, _ in lines[var]:
+                line.set_data([], [])
+        title.set_text(f'Spatial Error Comparison ({error_method})\n{output_name}\nVAR 0/{max_timesteps}')
+        return [line for var in variables for line, _, _ in lines[var]] + [title]
+    
+    def animate(frame):
+        """Animation function"""
+        for var in variables:
+            for line, run_name, spatial_errors in lines[var]:
+                if frame < len(spatial_errors[var]['errors_per_timestep']):
+                    x_raw = spatial_errors[var]['x']
+                    try:
+                        x_coords = x_raw * unit_length
+                        if not np.all(np.isfinite(x_coords)):
+                            x_coords = x_raw
+                    except (OverflowError, RuntimeWarning):
+                        x_coords = x_raw
+                    
+                    errors = spatial_errors[var]['errors_per_timestep'][frame]
+                    line.set_data(x_coords, errors)
+                else:
+                    line.set_data([], [])
+        
+        # Get timestep info from first run
+        first_spatial_errors = spatial_errors_list[0][1]
+        var_file = first_spatial_errors['rho']['var_files'][frame]
+        timestep = first_spatial_errors['rho']['timesteps'][frame]
+        
+        title.set_text(f'Spatial Error Comparison ({error_method})\n{output_name}\n{var_file} (t={timestep:.4e} s) - VAR {frame+1}/{max_timesteps}')
+        
+        return [line for var in variables for line, _, _ in lines[var]] + [title]
+    
+    # Create animation
+    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
+                                  interval=1000//fps, blit=True, repeat=True)
+    
+    # Save animation as GIF
+    output_file = output_path / f"{output_name}_error_evolution.gif"
+    try:
+        writer = animation.PillowWriter(fps=fps, metadata=dict(artist='Pencil Platform'))
+        anim.save(output_file, writer=writer)
+        logger.success(f"Saved overlay error evolution to {output_file}")
+    except Exception as e:
+        logger.error(f"Failed to save overlay animation: {e}")
+    finally:
+        plt.close()
 
 
-def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absolute'):
-    """Comprehensive error analysis across all VAR files for an experiment suite.
+def visualize_suite(experiment_name: str, specific_runs: list = None, var_selection: str = None):
+    """Simplified visualization function - redirects to video-only analysis."""
+    logger.warning("The --viz flag is deprecated. Use --analyze for video-only analysis instead.")
+    logger.info("Redirecting to video-only analysis...")
+    analyze_suite_videos_only(experiment_name)
+
+
+def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolute'):
+    """Video-only analysis: Creates individual and overlay error evolution videos.
+    
+    Workflow:
+    1. Load all VAR files and calculate errors (cached)
+    2. Create individual error evolution videos
+    3. Find best performer in each branch → create overlay videos
+    4. Find top 3 best performers overall → create overlay video
     
     Args:
         experiment_name: Name of the experiment suite
-        error_method: Error calculation method for spatial errors 
-                     ('absolute', 'relative', 'difference', 'squared')
-    
-    OPTIMIZED: VAR files are loaded once and cached for reuse in all visualizations.
+        error_method: Error calculation method for spatial errors
     """
-    logger.info(f"--- STARTING COMPREHENSIVE ERROR ANALYSIS for experiment: '{experiment_name}' ---")
+    logger.info(f"=" * 80)
+    logger.info(f"STARTING VIDEO-ONLY ANALYSIS: '{experiment_name}'")
+    logger.info(f"=" * 80)
     
     plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
     with open(plan_file, 'r') as f: 
@@ -318,22 +341,20 @@ def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absol
     hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
     manifest_file = DIRS.runs / experiment_name / FILES.manifest
     analysis_dir = DIRS.root / "analysis" / experiment_name
-    analysis_dir.mkdir(parents=True, exist_ok=True)
+    video_dir = analysis_dir / "videos" / "error_evolution"
+    video_dir.mkdir(parents=True, exist_ok=True)
 
     with open(manifest_file, 'r') as f: 
         run_names = [line.strip() for line in f if line.strip()]
     
     total_runs = len(run_names)
-    logger.info(f"Total experiments to analyze: {total_runs}")
+    logger.info(f"Total experiments to process: {total_runs}")
     
-    # Initialize error analyzer
-    analyzer = ExperimentErrorAnalyzer(analysis_dir)
-    
-    # Extract branch information from run names (based on naming convention)
+    # Extract branch information
     branches = plan.get('branches', [])
     branch_names = [b['name'] for b in branches] if branches else ['default']
     
-    # Count runs per branch for progress tracking
+    # Organize runs by branch
     runs_per_branch = {branch: [] for branch in branch_names}
     for run_name in run_names:
         for branch_name in branch_names:
@@ -343,15 +364,16 @@ def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absol
         else:
             runs_per_branch['default'].append(run_name)
     
-    # OPTIMIZATION: Cache all loaded VAR data to avoid redundant file loading
+    # ============================================================
+    # PHASE 1: Load data and create individual videos
+    # ============================================================
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 1: Loading data and creating individual videos")
     logger.info("=" * 80)
-    logger.info("PHASE 1: Loading and analyzing all VAR files (caching for reuse)")
-    logger.info("=" * 80)
-    loaded_data_cache = {}  # Structure: {run_name: {'sim_data': [...], 'analytical_data': [...]}}
-    advanced_analysis_results = {}  # Store advanced analysis results for best performer selection
     
-    # Process each run and cache loaded data with progress tracking
+    loaded_data_cache = {}
     runs_processed = 0
+    
     for branch_name, branch_runs in runs_per_branch.items():
         if not branch_runs:
             continue
@@ -361,34 +383,18 @@ def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absol
         
         for branch_idx, run_name in enumerate(branch_runs, 1):
             runs_processed += 1
-            
-            # Progress indicators
-            branch_pct = (branch_idx / branch_total) * 100
             overall_pct = (runs_processed / total_runs) * 100
+            branch_pct = (branch_idx / branch_total) * 100
             
             logger.info(f"  ├─ [{runs_processed}/{total_runs}] ({overall_pct:.1f}%) | "
                        f"Branch: [{branch_idx}/{branch_total}] ({branch_pct:.1f}%) | "
                        f"Run: {run_name}")
+            
             result = process_run_analysis(hpc_run_base_dir / run_name, run_name, branch_name, error_method)
             if result:
                 std_devs, abs_devs, spatial_errors, all_sim_data, all_analytical_data = result
                 
-                # Add error metrics to analyzer
-                analyzer.add_experiment_data(experiment_name, run_name, branch_name, std_devs, abs_devs)
-                
-                # Perform advanced analysis (Task 1, 2, 3 from directive)
-                advanced_analysis_dir = analysis_dir / "advanced_analysis" / "individual"
-                try:
-                    adv_results = perform_comprehensive_analysis(
-                        all_sim_data, all_analytical_data, 
-                        advanced_analysis_dir, run_name
-                    )
-                    advanced_analysis_results[run_name] = adv_results
-                    logger.info(f"     ├─ ✓ Advanced analysis complete (error norms, Hovmöller, conservation)")
-                except Exception as e:
-                    logger.warning(f"     ├─ ✗ Advanced analysis failed: {e}")
-                
-                # Cache loaded data for reuse (including spatial errors)
+                # Cache data
                 loaded_data_cache[run_name] = {
                     'sim_data': all_sim_data,
                     'analytical_data': all_analytical_data,
@@ -397,226 +403,127 @@ def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absol
                     'spatial_errors': spatial_errors
                 }
                 
+                # Create individual error evolution video
+                unit_length = 1.0
+                if all_sim_data and 'params' in all_sim_data[0]:
+                    params = all_sim_data[0]['params']
+                    if hasattr(params, 'unit_length'):
+                        unit_length = params.unit_length * 3.086e21
+                
+                logger.info(f"     ├─ Creating individual error evolution video...")
+                create_error_evolution_video(
+                    spatial_errors, video_dir, run_name, fps=2, unit_length=unit_length
+                )
                 logger.info(f"     └─ ✓ Cached {len(all_sim_data)} VAR files")
             else:
                 logger.warning(f"     └─ ✗ Failed to process run")
     
-    # Save intermediate data
+    # ============================================================
+    # PHASE 2: Find best performers and create overlay videos
+    # ============================================================
     logger.info("\n" + "=" * 80)
-    logger.info("PHASE 2: Generating visualizations")
+    logger.info("PHASE 2: Creating overlay videos")
     logger.info("=" * 80)
-    analyzer.save_intermediate_data(experiment_name)
     
-    # Count total visualization tasks
-    total_individual_plots = sum(len(runs) for runs in analyzer.experiment_data[experiment_name].values())
-    total_viz_tasks = (
-        total_individual_plots +  # Individual plots
-        4 +  # Branch comparison plots (4 variables)
-        1 +  # Best performers comparison
-        len(loaded_data_cache) * 3 +  # Individual collages + 2 videos per run
-        len(runs_per_branch) * 4 +  # Branch collages (4 vars per branch)
-        4  # Best performers collages (4 vars)
-    )
-    
-    viz_completed = 0
-    
-    # 1. Individual experiment plots
-    logger.info(f"\n📊 Creating individual experiment plots ({total_individual_plots} plots)...")
-    for branch_name, runs in analyzer.experiment_data[experiment_name].items():
-        for run_name in runs.keys():
-            viz_completed += 1
-            viz_pct = (viz_completed / total_viz_tasks) * 100
-            logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Individual plot: {run_name}")
-            
-            analyzer.plot_individual_experiment_std(
-                experiment_name, branch_name, run_name, 
-                analysis_dir / "individual"
-            )
-    
-    # 2. Branch comparison plots
-    logger.info(f"\n📊 Creating branch comparison plots (4 variables)...")
-    for var in ['rho', 'ux', 'pp', 'ee']:
-        viz_completed += 1
-        viz_pct = (viz_completed / total_viz_tasks) * 100
-        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Branch comparison: {var}")
-    
-    analyzer.plot_branch_comparison(experiment_name, analysis_dir / "branch_comparison")
-    
-    # 3. Best performers comparison
-    viz_completed += 1
-    viz_pct = (viz_completed / total_viz_tasks) * 100
-    logger.info(f"\n📊 [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Creating best performers comparison...")
-    analyzer.plot_best_performers_comparison(analysis_dir / "best_performers")
-    
-    # 4. Generate VAR evolution collages and videos (USING CACHED DATA - NO RELOADING)
-    logger.info(f"\n🎬 Creating VAR evolution collages and videos ({len(loaded_data_cache)} runs)...")
-    collage_dir = analysis_dir / "var_evolution"
-    video_dir = analysis_dir / "videos"
-    collage_dir.mkdir(parents=True, exist_ok=True)
-    video_dir.mkdir(parents=True, exist_ok=True)
-    
-    # Organize cached data by branch for collages
-    branch_collage_data_by_branch = {}
-    for idx, (run_name, cached) in enumerate(loaded_data_cache.items(), 1):
-        branch_name = cached['branch']
-        if branch_name not in branch_collage_data_by_branch:
-            branch_collage_data_by_branch[branch_name] = {}
+    # Calculate average error for each run (using mean of all timesteps and variables)
+    run_scores = {}
+    for run_name, cached in loaded_data_cache.items():
+        spatial_errors = cached['spatial_errors']
         
-        # Individual run collage (using cached data)
-        viz_completed += 1
-        viz_pct = (viz_completed / total_viz_tasks) * 100
-        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Collage: {run_name}")
-        
-        create_var_evolution_collage(
-            cached['sim_data'], cached['analytical_data'], 
-            collage_dir / "individual", run_name
-        )
-        
-        # Individual run VAR evolution video
-        viz_completed += 1
-        viz_pct = (viz_completed / total_viz_tasks) * 100
-        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) VAR video: {run_name}")
-        
-        create_var_evolution_video(
-            cached['sim_data'], cached['analytical_data'],
-            video_dir / "var_evolution", run_name, fps=2
-        )
-        
-        # Individual run error evolution video (using spatial errors)
-        viz_completed += 1
-        viz_pct = (viz_completed / total_viz_tasks) * 100
-        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Error video: {run_name}")
-        
-        # Get unit_length from params for kpc conversion
-        unit_length = 1.0
-        if cached['sim_data'] and 'params' in cached['sim_data'][0]:
-            params = cached['sim_data'][0]['params']
-            if hasattr(params, 'unit_length'):
-                unit_length = params.unit_length * 3.086e21  # Convert to kpc
-        
-        create_error_evolution_video(
-            cached['spatial_errors'], video_dir / "error_evolution", run_name, fps=2, unit_length=unit_length
-        )
-        
-        # Store for branch collage
-        branch_collage_data_by_branch[branch_name][run_name] = {
-            'sim_data_list': cached['sim_data'],
-            'analytical_data_list': cached['analytical_data']
-        }
-    
-    # Branch-level collages for each variable (using cached data)
-    logger.info(f"\n🎬 Creating branch-level collages ({len(branch_collage_data_by_branch)} branches × 4 vars)...")
-    for branch_name, branch_collage_data in branch_collage_data_by_branch.items():
+        # Calculate average L2 error across all variables and timesteps
+        total_error = 0
+        count = 0
         for var in ['rho', 'ux', 'pp', 'ee']:
-            viz_completed += 1
-            viz_pct = (viz_completed / total_viz_tasks) * 100
-            logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Branch collage: {branch_name}/{var}")
+            if var in spatial_errors:
+                for errors in spatial_errors[var]['errors_per_timestep']:
+                    total_error += np.sqrt(np.mean(errors**2))  # L2 norm
+                    count += 1
+        
+        avg_error = total_error / count if count > 0 else float('inf')
+        run_scores[run_name] = avg_error
+        logger.info(f"  {run_name}: avg L2 error = {avg_error:.6e}")
+    
+    # Find best performer in each branch
+    logger.info(f"\n🏆 Finding best performers in each branch...")
+    branch_best_performers = {}
+    for branch_name, branch_runs in runs_per_branch.items():
+        if not branch_runs:
+            continue
+        
+        branch_scores = {run: run_scores[run] for run in branch_runs if run in run_scores}
+        if branch_scores:
+            best_run = min(branch_scores, key=branch_scores.get)
+            branch_best_performers[branch_name] = best_run
+            logger.info(f"  ├─ {branch_name}: {best_run} (L2={branch_scores[best_run]:.6e})")
+    
+    # Create overlay videos for each branch (all runs in branch)
+    logger.info(f"\n🎬 Creating branch overlay videos...")
+    for branch_name, branch_runs in runs_per_branch.items():
+        if not branch_runs or len(branch_runs) < 2:
+            continue
+        
+        logger.info(f"  ├─ Branch: {branch_name} ({len(branch_runs)} runs)")
+        
+        spatial_errors_list = []
+        for run_name in branch_runs:
+            if run_name in loaded_data_cache:
+                cached = loaded_data_cache[run_name]
+                spatial_errors_list.append((run_name, cached['spatial_errors']))
+        
+        if spatial_errors_list:
+            # Get unit_length from first run
+            unit_length = 1.0
+            first_run_data = loaded_data_cache[branch_runs[0]]
+            if first_run_data['sim_data'] and 'params' in first_run_data['sim_data'][0]:
+                params = first_run_data['sim_data'][0]['params']
+                if hasattr(params, 'unit_length'):
+                    unit_length = params.unit_length * 3.086e21
             
-            create_branch_var_evolution_collage(
-                branch_collage_data, collage_dir / "branch", 
-                experiment_name, branch_name, var
+            output_name = f"{experiment_name}_{branch_name}_overlay"
+            create_overlay_error_evolution_video(
+                spatial_errors_list, video_dir, output_name, fps=2, unit_length=unit_length
             )
+            logger.info(f"     └─ ✓ Created overlay for {branch_name}")
     
-    # 5. Best performers collages (USING CACHED DATA - NO RELOADING)
-    logger.info(f"\n🏆 Creating best performers collages (4 variables)...")
-    branch_best = analyzer.compare_branch_best_performers()
-    best_performers_collage_data = {}
+    # Find top 3 best performers overall
+    logger.info(f"\n🏆 Finding top 3 best performers overall...")
+    sorted_runs = sorted(run_scores.items(), key=lambda x: x[1])
+    top_3_runs = [run for run, score in sorted_runs[:3]]
     
-    for exp_name, branches_data in branch_best.items():
-        for branch_name, best_info in branches_data.items():
-            best_run = best_info['run']
-            
-            # Use cached data instead of reloading
-            if best_run in loaded_data_cache:
-                cached = loaded_data_cache[best_run]
-                best_performers_collage_data[f"{exp_name}/{branch_name}"] = {
-                    'sim_data_list': cached['sim_data'],
-                    'analytical_data_list': cached['analytical_data'],
-                    'run_name': best_run
-                }
-            else:
-                logger.warning(f"Cached data not found for best performer: {best_run}")
+    for idx, (run, score) in enumerate(sorted_runs[:3], 1):
+        logger.info(f"  ├─ #{idx}: {run} (L2={score:.6e})")
     
-    for var in ['rho', 'ux', 'pp', 'ee']:
-        viz_completed += 1
-        viz_pct = (viz_completed / total_viz_tasks) * 100
-        logger.info(f"  ├─ [{viz_completed}/{total_viz_tasks}] ({viz_pct:.1f}%) Best performers: {var}")
+    # Create overlay video for top 3
+    logger.info(f"\n🎬 Creating top 3 overlay video...")
+    top_3_spatial_errors = []
+    for run_name in top_3_runs:
+        if run_name in loaded_data_cache:
+            cached = loaded_data_cache[run_name]
+            top_3_spatial_errors.append((run_name, cached['spatial_errors']))
+    
+    if top_3_spatial_errors:
+        # Get unit_length from first run
+        unit_length = 1.0
+        first_run_data = loaded_data_cache[top_3_runs[0]]
+        if first_run_data['sim_data'] and 'params' in first_run_data['sim_data'][0]:
+            params = first_run_data['sim_data'][0]['params']
+            if hasattr(params, 'unit_length'):
+                unit_length = params.unit_length * 3.086e21
         
-        create_best_performers_var_evolution_collage(
-            best_performers_collage_data, collage_dir / "best_performers", var
+        output_name = f"{experiment_name}_top3_best_performers_overlay"
+        create_overlay_error_evolution_video(
+            top_3_spatial_errors, video_dir, output_name, fps=2, unit_length=unit_length
         )
+        logger.info(f"     └─ ✓ Created top 3 overlay video")
     
-    # 6. Generate summary report
+    # ============================================================
+    # SUMMARY
+    # ============================================================
     logger.info("\n" + "=" * 80)
-    logger.info("PHASE 3: Generating summary report")
+    logger.success(f"✓ VIDEO-ONLY ANALYSIS COMPLETED")
+    logger.success(f"✓ Results saved to: {video_dir}")
+    logger.info(f"📊 Individual videos: {len(loaded_data_cache)}")
+    logger.info(f"📊 Branch overlay videos: {len([b for b in runs_per_branch.values() if len(b) >= 2])}")
+    logger.info(f"📊 Top 3 overlay video: 1")
+    logger.info(f"🎬 Total videos created: {len(loaded_data_cache) + len([b for b in runs_per_branch.values() if len(b) >= 2]) + 1}")
     logger.info("=" * 80)
-    analyzer.generate_summary_report(analysis_dir)
-    
-    # 7. Advanced analysis summary (based on error norms)
-    if advanced_analysis_results:
-        logger.info("\n" + "=" * 80)
-        logger.info("PHASE 4: Advanced Analysis Summary (Error Norms)")
-        logger.info("=" * 80)
-        
-        # Build branch mapping for advanced analysis
-        branch_mapping = {run_name: cached['branch'] for run_name, cached in loaded_data_cache.items()}
-        
-        # Find overall best performer
-        best_run, best_score = find_best_performer_by_error_norms(advanced_analysis_results, metric='L2')
-        logger.info(f"\n🏆 Overall Best Performer (L2 norm): {best_run} (score: {best_score:.6e})")
-        
-        # Find best performers per branch
-        branch_best_advanced = compare_branch_performers_by_error_norms(
-            advanced_analysis_results, branch_mapping, metric='L2'
-        )
-        
-        logger.info("\n📊 Best Performers by Branch (L2 norm):")
-        for branch_name, (run_name, score) in branch_best_advanced.items():
-            logger.info(f"  ├─ {branch_name}: {run_name} (score: {score:.6e})")
-        
-        # Save advanced analysis summary to file
-        advanced_summary_file = analysis_dir / "advanced_analysis_summary.md"
-        with open(advanced_summary_file, 'w') as f:
-            f.write("# Advanced Analysis Summary (Error Norms)\n\n")
-            f.write("## Overall Best Performer (L2 Error Norm)\n\n")
-            f.write(f"**Run**: {best_run}\n\n")
-            f.write(f"**Average L2 Error**: {best_score:.6e}\n\n")
-            
-            f.write("## Best Performers by Branch (L2 Error Norm)\n\n")
-            for branch_name, (run_name, score) in branch_best_advanced.items():
-                f.write(f"- **{branch_name}**: {run_name} (score: {score:.6e})\n")
-            
-            f.write("\n## Analysis Details\n\n")
-            f.write("The advanced analysis includes:\n\n")
-            f.write("1. **Error Norm Analysis (L1, L2, L∞)**: Quantifies global error evolution over time\n")
-            f.write("2. **Hovmöller Diagrams**: Visualizes space-time evolution of numerical/analytical solutions and errors\n")
-            f.write("3. **Conservation Analysis**: Verifies mass, momentum, and energy conservation\n\n")
-            f.write(f"All plots are located in: `analysis/{experiment_name}/advanced_analysis/individual/`\n")
-        
-        logger.success(f"Saved advanced analysis summary to {advanced_summary_file}")
-    
-    logger.info("\n" + "=" * 80)
-    logger.success(f"✓ Comprehensive analysis completed: 100% ({total_viz_tasks}/{total_viz_tasks} tasks)")
-    logger.success(f"✓ Results saved to: {analysis_dir}")
-    logger.info(f"📊 Performance: Loaded {len(loaded_data_cache)} runs with cached VAR data (no redundant file loading)")
-    logger.info(f"🎬 Video section: All VAR and error evolution videos generated successfully")
-    logger.info("=" * 80)
-
-def generate_quarto_report(experiment_name: str, report_dir: Path, run_names: list):
-    """Renders the Quarto report template."""
-    logger.info("--- Generating Quarto Summary Report ---")
-    
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(DIRS.templates))
-    template = env.get_template("report.qmd.j2")
-    
-    rendered_content = template.render(
-        experiment_name=experiment_name,
-        run_names=run_names
-    )
-    
-    report_path = report_dir / "analysis_report.qmd"
-    with open(report_path, 'w') as f:
-        f.write(rendered_content)
-        
-    logger.success(f"Quarto report template generated at '{report_path}'")
-    logger.info(f"To render the final report, run: quarto render {report_path}")
