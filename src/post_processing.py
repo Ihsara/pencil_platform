@@ -421,7 +421,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                     if hasattr(params, 'unit_length'):
                         unit_length = params.unit_length * 3.086e21
                 
-                logger.info(f"     ├─ Creating individual error evolution video...")
+                logger.info(f"     ├─ Creating var evolution video...")
+                create_var_evolution_video(
+                    all_sim_data, all_analytical_data, video_dir, run_name, fps=2
+                )
+                
+                logger.info(f"     ├─ Creating error evolution video...")
                 create_error_evolution_video(
                     spatial_errors, video_dir, run_name, fps=2, unit_length=unit_length
                 )
