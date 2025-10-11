@@ -9,6 +9,86 @@ import json
 from typing import Dict, List, Tuple, Optional
 import seaborn as sns
 
+from .error_metrics import METRIC_REGISTRY, calculate_error, calculate_all_errors
+
+
+def calculate_error_norms(sim_data_list: List[dict], analytical_data_list: List[dict],
+                         variables: List[str] = ['rho', 'ux', 'pp', 'ee'],
+                         metrics: List[str] = None) -> Dict:
+    """
+    Calculate L1, L2, and other error norms between numerical and analytical solutions.
+    
+    This function uses the modular error metric system to calculate various error norms
+    as described in Gent et al. (2018) for convergence analysis.
+    
+    Args:
+        sim_data_list: List of simulation data dictionaries from all VAR files
+        analytical_data_list: List of corresponding analytical solutions
+        variables: List of variable names to analyze
+        metrics: List of metric names to calculate (default: ['l1', 'l2'])
+        
+    Returns:
+        Dictionary containing error norms for each variable across all timesteps
+        Structure:
+        {
+            'var_name': {
+                'l1': {
+                    'per_timestep': [...],
+                    'mean': float,
+                    'max': float,
+                    'min': float
+                },
+                'l2': {...},
+                ...
+            }
+        }
+        
+    Reference:
+        Gent et al. (2018), Section 3, Equation (23) for L1 norm
+    """
+    if metrics is None:
+        metrics = ['l1', 'l2']
+    
+    # Validation
+    if len(sim_data_list) != len(analytical_data_list):
+        logger.error(f"List length mismatch: {len(sim_data_list)} sim vs {len(analytical_data_list)} analytical")
+        return {}
+    
+    logger.debug(f"Calculating error norms ({', '.join(metrics)}) for {len(sim_data_list)} timesteps")
+    
+    error_norms = {}
+    
+    for var in variables:
+        error_norms[var] = {}
+        
+        for metric in metrics:
+            errors_per_timestep = []
+            
+            for sim_data, analytical_data in zip(sim_data_list, analytical_data_list):
+                if var in sim_data and var in analytical_data:
+                    try:
+                        error_val = calculate_error(sim_data[var], analytical_data[var], metric=metric)
+                        errors_per_timestep.append(error_val)
+                    except Exception as e:
+                        logger.warning(f"Failed to calculate {metric} for {var}: {e}")
+                        errors_per_timestep.append(np.nan)
+            
+            if errors_per_timestep:
+                valid_errors = [e for e in errors_per_timestep if np.isfinite(e)]
+                
+                error_norms[var][metric] = {
+                    'per_timestep': errors_per_timestep,
+                    'mean': np.mean(valid_errors) if valid_errors else np.nan,
+                    'max': np.max(valid_errors) if valid_errors else np.nan,
+                    'min': np.min(valid_errors) if valid_errors else np.nan,
+                    'std': np.std(valid_errors) if valid_errors else np.nan,
+                    'timesteps': [sim_data_list[i]['t'] for i in range(len(errors_per_timestep))],
+                    'var_files': [sim_data_list[i].get('var_file', f'VAR{i}') for i in range(len(errors_per_timestep))]
+                }
+    
+    return error_norms
+
+
 def calculate_spatial_errors(sim_data_list: List[dict], analytical_data_list: List[dict],
                             variables: List[str] = ['rho', 'ux', 'pp', 'ee'],
                             error_method: str = 'absolute') -> Dict:

@@ -7,7 +7,7 @@ from loguru import logger
 
 # Import logic from the src directory
 from src.suite_generator import run_suite
-from src.post_processing import visualize_suite, analyze_suite_videos_only
+from src.post_processing import visualize_suite, analyze_suite_videos_only, analyze_suite_with_error_norms
 from src.job_manager import submit_suite, check_suite_status, wait_for_completion
 from src.constants import DIRS, FILES
 
@@ -35,6 +35,8 @@ def main():
                        help="Enable test mode. Generates a limited number of runs without submitting.")
     parser.add_argument("--analyze", action="store_true", 
                        help="Run video-only analysis: creates individual error evolution videos and overlay comparisons for branches and top performers.")
+    parser.add_argument("--error-norms", action="store_true",
+                       help="Run L1/L2 error norm analysis: calculates L1, L2, L∞ metrics with combined scoring to find best parameters. Results saved to 'error_norms' subfolder.")
     parser.add_argument("--viz", nargs='*', default=None,
                        help="Visualize experiment results. Usage: --viz (all runs), --viz run1 run2 (specific runs), --viz ? (interactive)")
     parser.add_argument("--var", type=str, default=None,
@@ -91,6 +93,9 @@ def main():
             else:
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
+        elif args.error_norms:
+            logger.info("--- L1/L2 ERROR NORM ANALYSIS MODE ---")
+            analyze_suite_with_error_norms(experiment_name)
         elif args.analyze:
             logger.info("--- VIDEO-ONLY ANALYSIS MODE ---")
             analyze_suite_videos_only(experiment_name)
