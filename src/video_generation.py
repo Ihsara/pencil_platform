@@ -11,7 +11,7 @@ from typing import Dict, List
 def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: List[dict],
                                output_path: Path, run_name: str,
                                variables: List[str] = ['rho', 'ux', 'pp', 'ee'],
-                               fps: int = 2):
+                               fps: int = 2, save_frames: bool = False):
     """
     Creates an animated GIF showing evolution of variables across all VAR files using matplotlib.
     
@@ -22,6 +22,7 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
         run_name: Name of the run for title
         variables: List of variables to plot
         fps: Frames per second for the animation
+        save_frames: Whether to save individual PNG frames (default: False to save resources)
     """
     output_path.mkdir(parents=True, exist_ok=True)
     
@@ -134,9 +135,12 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_vars,
                                   interval=1000//fps, blit=True, repeat=True)
     
-    # Always create individual frames first (as part of normal workflow)
-    logger.info("Creating individual frames...")
-    create_var_evolution_frames(sim_data_list, analytical_data_list, output_path, run_name, variables)
+    # Optionally create individual frames (disabled by default to save resources)
+    if save_frames:
+        logger.info("Creating individual frames...")
+        create_var_evolution_frames(sim_data_list, analytical_data_list, output_path, run_name, variables)
+    else:
+        logger.debug("Skipping individual frame generation (save_frames=False)")
     
     # Save animation as GIF using PillowWriter
     output_file = output_path / f"{run_name}_var_evolution.gif"
@@ -232,7 +236,7 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
 
 
 def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_name: str, 
-                                fps: int = 2, unit_length: float = 1.0):
+                                fps: int = 2, unit_length: float = 1.0, save_frames: bool = False):
     """
     Creates an animated GIF showing spatial error evolution across VAR files using matplotlib.
     Shows x position (kpc) vs error at each point.
@@ -243,6 +247,7 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         run_name: Name of the run
         fps: Frames per second
         unit_length: Unit conversion factor for length (e.g., to kpc)
+        save_frames: Whether to save individual PNG frames (default: False to save disk space and time)
     """
     output_path.mkdir(parents=True, exist_ok=True)
     
@@ -315,14 +320,15 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     stats_text = fig.text(0.08, 0.02, '', fontsize=9, verticalalignment='bottom', family='monospace',
                          bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8, pad=0.5))
     
-    title = fig.suptitle('', fontsize=14, fontweight='bold', y=0.97)
+    # Improved title with clear formatting
+    title = fig.suptitle(f'Spatial Error Evolution ({error_method.capitalize()})\n{run_name}', 
+                        fontsize=14, fontweight='bold', y=0.97)
     
     def init():
         """Initialize animation"""
         for var, _ in valid_vars:
             lines[var].set_data([], [])
         stats_text.set_text('')
-        title.set_text(f'Spatial Error Evolution ({error_method}) - {run_name}')
         return list(lines.values()) + [stats_text, title]
     
     def animate(frame):
@@ -360,9 +366,12 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
                                   interval=1000//fps, blit=True, repeat=True)
     
-    # Always create individual frames first (as part of normal workflow)
-    logger.info("Creating individual frames...")
-    create_error_evolution_frames(spatial_errors, output_path, run_name, unit_length)
+    # Optionally create individual frames (disabled by default to save resources)
+    if save_frames:
+        logger.info("Creating individual frames...")
+        create_error_evolution_frames(spatial_errors, output_path, run_name, unit_length)
+    else:
+        logger.debug("Skipping individual frame generation (save_frames=False)")
     
     # Save animation as GIF using PillowWriter
     output_file = output_path / f"{run_name}_error_evolution.gif"
@@ -416,7 +425,7 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
         gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.94, bottom=0.12, hspace=0.25, wspace=0.25)
         axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
         
-        fig.suptitle(f'Spatial Error Evolution ({error_method}) - {run_name}', 
+        fig.suptitle(f'Spatial Error Evolution ({error_method.capitalize()})\n{run_name}', 
                      fontsize=14, fontweight='bold', y=0.97)
         
         stats_lines = []
