@@ -26,10 +26,10 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     output_path.mkdir(parents=True, exist_ok=True)
     
     var_labels = {
-        'rho': r'$\rho$ [g cm$^{-3}$]',
-        'ux': r'$u_x$ [km s$^{-1}$]',
-        'pp': r'$p$ [dyn cm$^{-2}$]',
-        'ee': r'$e$ [km$^2$ s$^{-2}$]'
+        'rho': r'Density $\rho$ [g cm$^{-3}$]',
+        'ux': r'Velocity $u_x$ [km s$^{-1}$]',
+        'pp': r'Pressure $p$ [dyn cm$^{-2}$]',
+        'ee': r'Energy $e$ [km$^2$ s$^{-2}$]'
     }
     
     var_scales = {
@@ -52,27 +52,26 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     else:
         unit_dict = {var: 1.0 for var in variables}
     
-    # Create figure
-    fig, axes = plt.subplots(2, 2, figsize=(16, 14))
-    axes = axes.flatten()
+    # Create figure with space for legend
+    fig = plt.figure(figsize=(17, 13))
+    gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.93, bottom=0.12, hspace=0.25, wspace=0.25)
+    axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
     
     # Initialize lines for each variable
     lines = {}
     analytical_lines = {}
-    text_annotations = {}
     
     for idx, var in enumerate(variables):
         ax = axes[idx]
         
         # Create line objects
-        lines[var], = ax.plot([], [], 'b-', linewidth=2, label='Numerical', alpha=0.8)
-        analytical_lines[var], = ax.plot([], [], 'r--', linewidth=2.5, label='Analytical', alpha=0.9)
+        lines[var], = ax.plot([], [], 'b-', linewidth=2, alpha=0.8)
+        analytical_lines[var], = ax.plot([], [], 'r--', linewidth=2.5, alpha=0.9)
         
         ax.set_xlabel('Position (x) [kpc]', fontsize=11)
         ax.set_ylabel(var_labels.get(var, var), fontsize=11)
         ax.set_yscale(var_scales.get(var, 'linear'))
-        ax.set_title(f'{var.upper()} Evolution', fontsize=12)
-        ax.legend(fontsize=10, loc='best')
+        ax.set_title(f'{var.upper()}', fontsize=12, fontweight='bold')
         ax.grid(True, alpha=0.3)
         
         # Set axis limits based on data range
@@ -94,23 +93,27 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
                     y_min = all_vals.min() - 0.1 * y_range
                     y_max = all_vals.max() + 0.1 * y_range
                 ax.set_ylim(y_min, y_max)
-        
-        # Add text annotation for timestep info
-        text_annotations[var] = ax.text(0.02, 0.98, '', transform=ax.transAxes,
-                                       verticalalignment='top', fontsize=10,
-                                       bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    
+    # Single legend placed at bottom center
+    fig.legend([lines[variables[0]], analytical_lines[variables[0]]], 
+              ['Numerical', 'Analytical'], 
+              loc='lower center', ncol=2, fontsize=11, frameon=True,
+              bbox_to_anchor=(0.5, 0.02))
+    
+    # Info text at bottom left
+    info_text = fig.text(0.08, 0.05, '', fontsize=10, verticalalignment='bottom')
     
     # Main title
-    title = fig.suptitle('', fontsize=16, fontweight='bold')
+    title = fig.suptitle('', fontsize=14, fontweight='bold', y=0.97)
     
     def init():
         """Initialize animation"""
         for var in variables:
             lines[var].set_data([], [])
             analytical_lines[var].set_data([], [])
-            text_annotations[var].set_text('')
-        title.set_text(f'Variable Evolution\n{run_name}\nVAR 0/{n_vars}')
-        return list(lines.values()) + list(analytical_lines.values()) + list(text_annotations.values()) + [title]
+        info_text.set_text('')
+        title.set_text(f'Variable Evolution - {run_name}')
+        return list(lines.values()) + list(analytical_lines.values()) + [info_text, title]
     
     def animate(frame):
         """Animation function"""
@@ -121,15 +124,11 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
             if var in sim_data and var in analytical_data:
                 lines[var].set_data(sim_data['x'], sim_data[var] * unit_dict[var])
                 analytical_lines[var].set_data(analytical_data['x'], analytical_data[var] * unit_dict[var])
-                
-                var_file_name = sim_data.get('var_file', f'VAR{frame}')
-                text_annotations[var].set_text(
-                    f'{var_file_name}\nt = {sim_data["t"]:.4e} s'
-                )
         
-        title.set_text(f'Variable Evolution\n{run_name}\nVAR {frame+1}/{n_vars}')
+        var_file_name = sim_data.get('var_file', f'VAR{frame}')
+        info_text.set_text(f'{var_file_name} | t = {sim_data["t"]:.4e} s | Frame {frame+1}/{n_vars}')
         
-        return list(lines.values()) + list(analytical_lines.values()) + list(text_annotations.values()) + [title]
+        return list(lines.values()) + list(analytical_lines.values()) + [info_text, title]
     
     # Create animation
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_vars,
@@ -168,10 +167,10 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
     frames_dir.mkdir(parents=True, exist_ok=True)
     
     var_labels = {
-        'rho': r'$\rho$ [g cm$^{-3}$]',
-        'ux': r'$u_x$ [km s$^{-1}$]',
-        'pp': r'$p$ [dyn cm$^{-2}$]',
-        'ee': r'$e$ [km$^2$ s$^{-2}$]'
+        'rho': r'Density $\rho$ [g cm$^{-3}$]',
+        'ux': r'Velocity $u_x$ [km s$^{-1}$]',
+        'pp': r'Pressure $p$ [dyn cm$^{-2}$]',
+        'ee': r'Energy $e$ [km$^2$ s$^{-2}$]'
     }
     
     var_scales = {
@@ -197,28 +196,34 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
     logger.info(f"Creating {n_vars} individual frames...")
     
     for frame_idx, (sim_data, analytical_data) in enumerate(zip(sim_data_list, analytical_data_list)):
-        fig, axes = plt.subplots(2, 2, figsize=(16, 14))
-        fig.suptitle(f'Variable Evolution\n{run_name}\nVAR {frame_idx+1}/{n_vars} (t={sim_data["t"]:.4e})', 
-                     fontsize=16, fontweight='bold')
-        axes = axes.flatten()
+        fig = plt.figure(figsize=(17, 13))
+        gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.93, bottom=0.12, hspace=0.25, wspace=0.25)
+        axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+        
+        var_file_name = sim_data.get('var_file', f'VAR{frame_idx}')
+        fig.suptitle(f'Variable Evolution - {run_name}', fontsize=14, fontweight='bold', y=0.97)
+        fig.text(0.08, 0.05, f'{var_file_name} | t = {sim_data["t"]:.4e} s | Frame {frame_idx+1}/{n_vars}', 
+                fontsize=10, verticalalignment='bottom')
         
         for idx, var in enumerate(variables):
             ax = axes[idx]
             
             if var in sim_data and var in analytical_data:
                 ax.plot(sim_data['x'], sim_data[var] * unit_dict[var], 
-                       'b-', linewidth=2, label='Numerical', alpha=0.8)
+                       'b-', linewidth=2, alpha=0.8)
                 ax.plot(analytical_data['x'], analytical_data[var] * unit_dict[var], 
-                       'r--', linewidth=2.5, label='Analytical', alpha=0.9)
+                       'r--', linewidth=2.5, alpha=0.9)
                 
                 ax.set_xlabel('Position (x) [kpc]', fontsize=11)
                 ax.set_ylabel(var_labels.get(var, var), fontsize=11)
                 ax.set_yscale(var_scales.get(var, 'linear'))
-                ax.set_title(f'{var.upper()} - {sim_data.get("var_file", f"VAR{frame_idx}")}', fontsize=12)
-                ax.legend(fontsize=10, loc='best')
+                ax.set_title(f'{var.upper()}', fontsize=12, fontweight='bold')
                 ax.grid(True, alpha=0.3)
         
-        plt.tight_layout()
+        # Single legend at bottom center
+        fig.legend(['Numerical', 'Analytical'], loc='lower center', ncol=2, fontsize=11, 
+                  frameon=True, bbox_to_anchor=(0.5, 0.02))
+        
         frame_file = frames_dir / f"frame_{frame_idx:04d}.png"
         plt.savefig(frame_file, dpi=100, bbox_inches='tight')
         plt.close()
@@ -256,8 +261,10 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         logger.warning("No valid variables with spatial error data")
         return
     
-    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-    axes = axes.flatten()
+    # Create figure with space for info
+    fig = plt.figure(figsize=(17, 11))
+    gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.94, bottom=0.12, hspace=0.25, wspace=0.25)
+    axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
     
     # Get max number of timesteps and x coordinates
     max_timesteps = max(len(spatial_errors[var]['errors_per_timestep']) for var, _ in valid_vars)
@@ -265,7 +272,6 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     
     # Initialize plot elements
     lines = {}
-    annotations = {}
     
     for idx, (var, label) in enumerate(valid_vars):
         ax = axes[idx]
@@ -291,7 +297,7 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
         ax.set_xlabel(x_label, fontsize=11)
         ax.set_ylabel(f'Error in {label}', fontsize=11)
-        ax.set_title(f'{label} Spatial Error Evolution', fontsize=12)
+        ax.set_title(f'{label}', fontsize=12, fontweight='bold')
         
         if np.all(np.isfinite(x_coords)):
             ax.set_xlim(x_coords.min(), x_coords.max())
@@ -304,24 +310,25 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         ax.set_ylim(y_min - 0.1*y_range, y_max + 0.1*y_range)
         
         ax.grid(True, alpha=0.3)
-        
-        # Annotation for statistics
-        annotations[var] = ax.text(0.02, 0.98, '', transform=ax.transAxes,
-                                   verticalalignment='top', fontsize=9,
-                                   bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
     
-    title = fig.suptitle('', fontsize=16, fontweight='bold')
+    # Single statistics box at bottom
+    stats_text = fig.text(0.08, 0.02, '', fontsize=9, verticalalignment='bottom', family='monospace',
+                         bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8, pad=0.5))
+    
+    title = fig.suptitle('', fontsize=14, fontweight='bold', y=0.97)
     
     def init():
         """Initialize animation"""
         for var, _ in valid_vars:
             lines[var].set_data([], [])
-            annotations[var].set_text('')
-        title.set_text(f'Spatial Error Evolution ({error_method})\n{run_name}\nVAR 0/{max_timesteps}')
-        return list(lines.values()) + list(annotations.values()) + [title]
+        stats_text.set_text('')
+        title.set_text(f'Spatial Error Evolution ({error_method}) - {run_name}')
+        return list(lines.values()) + [stats_text, title]
     
     def animate(frame):
         """Animation function"""
+        stats_lines = []
+        
         for var, label in valid_vars:
             if var in spatial_errors:
                 # Safely convert x coordinates
@@ -334,28 +341,20 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
                     x_coords = x_raw
                 
                 errors = spatial_errors[var]['errors_per_timestep'][frame]
-                var_file = spatial_errors[var]['var_files'][frame]
-                timestep = spatial_errors[var]['timesteps'][frame]
-                
                 lines[var].set_data(x_coords, errors)
                 
-                # Calculate statistics for annotation
+                # Collect statistics
                 mean_err = np.mean(errors)
                 max_err = np.max(errors)
-                min_err = np.min(errors)
-                std_err = np.std(errors)
-                
-                annotations[var].set_text(
-                    f'{var_file}\nt = {timestep:.4e} s\n'
-                    f'Mean: {mean_err:.4e}\n'
-                    f'Max: {max_err:.4e}\n'
-                    f'Min: {min_err:.4e}\n'
-                    f'Std: {std_err:.4e}'
-                )
+                stats_lines.append(f'{label}: Mean={mean_err:.3e}, Max={max_err:.3e}')
         
-        title.set_text(f'Spatial Error Evolution ({error_method})\n{run_name}\nVAR {frame+1}/{max_timesteps}')
+        var_file = spatial_errors[list(spatial_errors.keys())[0]]['var_files'][frame]
+        timestep = spatial_errors[list(spatial_errors.keys())[0]]['timesteps'][frame]
         
-        return list(lines.values()) + list(annotations.values()) + [title]
+        stats_text.set_text(f'{var_file} | t={timestep:.4e} s | Frame {frame+1}/{max_timesteps}\n' + 
+                           '  |  '.join(stats_lines))
+        
+        return list(lines.values()) + [stats_text, title]
     
     # Create animation
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
@@ -413,10 +412,14 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
     logger.info(f"Creating {max_timesteps} spatial error evolution frames...")
     
     for frame in range(max_timesteps):
-        fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-        fig.suptitle(f'Spatial Error Evolution ({error_method})\n{run_name}\nVAR {frame+1}/{max_timesteps}', 
-                     fontsize=16, fontweight='bold')
-        axes = axes.flatten()
+        fig = plt.figure(figsize=(17, 11))
+        gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.94, bottom=0.12, hspace=0.25, wspace=0.25)
+        axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+        
+        fig.suptitle(f'Spatial Error Evolution ({error_method}) - {run_name}', 
+                     fontsize=14, fontweight='bold', y=0.97)
+        
+        stats_lines = []
         
         for idx, (var, label) in enumerate(valid_vars):
             ax = axes[idx]
@@ -441,27 +444,16 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
                 # Plot spatial error distribution
                 ax.plot(x_coords, errors, '-', linewidth=2, color='#1f77b4', alpha=0.8)
                 
-                # Calculate statistics for annotation
+                # Calculate statistics
                 mean_err = np.mean(errors)
                 max_err = np.max(errors)
-                min_err = np.min(errors)
-                std_err = np.std(errors)
-                
-                # Add text annotation
-                ax.text(0.02, 0.98, 
-                       f'{var_file}\nt = {timestep:.4e} s\n'
-                       f'Mean: {mean_err:.4e}\n'
-                       f'Max: {max_err:.4e}\n'
-                       f'Min: {min_err:.4e}\n'
-                       f'Std: {std_err:.4e}',
-                       transform=ax.transAxes, verticalalignment='top', fontsize=9,
-                       bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+                stats_lines.append(f'{label}: Mean={mean_err:.3e}, Max={max_err:.3e}')
                 
                 # Determine appropriate x-axis label
                 x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
                 ax.set_xlabel(x_label, fontsize=11)
                 ax.set_ylabel(f'Error in {label}', fontsize=11)
-                ax.set_title(f'{label} Spatial Error', fontsize=12)
+                ax.set_title(f'{label}', fontsize=12, fontweight='bold')
                 
                 # Set limits safely
                 if np.all(np.isfinite(x_coords)):
@@ -478,7 +470,11 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
                 
                 ax.grid(True, alpha=0.3)
         
-        plt.tight_layout()
+        # Single statistics box at bottom
+        fig.text(0.08, 0.02, f'{var_file} | t={timestep:.4e} s | Frame {frame+1}/{max_timesteps}\n' + 
+                '  |  '.join(stats_lines), fontsize=9, verticalalignment='bottom', family='monospace',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8, pad=0.5))
+        
         frame_file = frames_dir / f"frame_{frame:04d}.png"
         plt.savefig(frame_file, dpi=100, bbox_inches='tight')
         plt.close()
