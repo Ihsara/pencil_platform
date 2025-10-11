@@ -7,6 +7,8 @@ from pathlib import Path
 from loguru import logger
 from typing import Dict, List
 
+from .experiment_name_decoder import format_experiment_title, format_short_experiment_name
+
 
 def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: List[dict],
                                output_path: Path, run_name: str,
@@ -104,8 +106,9 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     # Info text at bottom left
     info_text = fig.text(0.08, 0.05, '', fontsize=10, verticalalignment='bottom')
     
-    # Main title
-    title = fig.suptitle('', fontsize=14, fontweight='bold', y=0.97)
+    # Main title with decoded experiment name
+    formatted_title = format_experiment_title(run_name)
+    title = fig.suptitle('', fontsize=13, fontweight='bold', y=0.97)
     
     def init():
         """Initialize animation"""
@@ -113,7 +116,7 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
             lines[var].set_data([], [])
             analytical_lines[var].set_data([], [])
         info_text.set_text('')
-        title.set_text(f'Variable Evolution - {run_name}')
+        title.set_text(f'Variable Evolution\n{formatted_title}\nVAR 0 / {n_vars}')
         return list(lines.values()) + list(analytical_lines.values()) + [info_text, title]
     
     def animate(frame):
@@ -127,7 +130,10 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
                 analytical_lines[var].set_data(analytical_data['x'], analytical_data[var] * unit_dict[var])
         
         var_file_name = sim_data.get('var_file', f'VAR{frame}')
-        info_text.set_text(f'{var_file_name} | t = {sim_data["t"]:.4e} s | Frame {frame+1}/{n_vars}')
+        info_text.set_text(f'{var_file_name} | t = {sim_data["t"]:.4e} s')
+        
+        # Update title with current VAR number
+        title.set_text(f'Variable Evolution\n{formatted_title}\nVAR {frame} / {n_vars}')
         
         return list(lines.values()) + list(analytical_lines.values()) + [info_text, title]
     
@@ -320,15 +326,16 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     stats_text = fig.text(0.08, 0.02, '', fontsize=9, verticalalignment='bottom', family='monospace',
                          bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8, pad=0.5))
     
-    # Improved title with clear formatting
-    title = fig.suptitle(f'Spatial Error Evolution ({error_method.capitalize()})\n{run_name}', 
-                        fontsize=14, fontweight='bold', y=0.97)
+    # Improved title with clear formatting and decoded experiment name
+    formatted_title = format_experiment_title(run_name)
+    title = fig.suptitle('', fontsize=13, fontweight='bold', y=0.97)
     
     def init():
         """Initialize animation"""
         for var, _ in valid_vars:
             lines[var].set_data([], [])
         stats_text.set_text('')
+        title.set_text(f'Spatial Error Evolution ({error_method.capitalize()})\n{formatted_title}\nVAR 0 / {max_timesteps}')
         return list(lines.values()) + [stats_text, title]
     
     def animate(frame):
@@ -357,8 +364,11 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         var_file = spatial_errors[list(spatial_errors.keys())[0]]['var_files'][frame]
         timestep = spatial_errors[list(spatial_errors.keys())[0]]['timesteps'][frame]
         
-        stats_text.set_text(f'{var_file} | t={timestep:.4e} s | Frame {frame+1}/{max_timesteps}\n' + 
+        stats_text.set_text(f'{var_file} | t={timestep:.4e} s\n' + 
                            '  |  '.join(stats_lines))
+        
+        # Update title with current VAR number
+        title.set_text(f'Spatial Error Evolution ({error_method.capitalize()})\n{formatted_title}\nVAR {frame} / {max_timesteps}')
         
         return list(lines.values()) + [stats_text, title]
     

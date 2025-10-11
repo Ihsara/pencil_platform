@@ -352,8 +352,15 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
     manifest_file = DIRS.runs / experiment_name / FILES.manifest
     analysis_dir = DIRS.root / "analysis" / experiment_name
-    video_dir = analysis_dir / "videos" / "error_evolution"
-    video_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create new directory structure
+    var_evolution_dir = analysis_dir / "var_evolution"
+    error_evolution_dir = analysis_dir / "error_evolution"
+    var_frames_dir = analysis_dir / "var_frames"
+    
+    var_evolution_dir.mkdir(parents=True, exist_ok=True)
+    error_evolution_dir.mkdir(parents=True, exist_ok=True)
+    var_frames_dir.mkdir(parents=True, exist_ok=True)
 
     with open(manifest_file, 'r') as f: 
         run_names = [line.strip() for line in f if line.strip()]
@@ -423,12 +430,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 
                 logger.info(f"     ├─ Creating var evolution video...")
                 create_var_evolution_video(
-                    all_sim_data, all_analytical_data, video_dir, run_name, fps=2
+                    all_sim_data, all_analytical_data, var_evolution_dir, run_name, fps=2
                 )
                 
                 logger.info(f"     ├─ Creating error evolution video...")
                 create_error_evolution_video(
-                    spatial_errors, video_dir, run_name, fps=2, unit_length=unit_length
+                    spatial_errors, error_evolution_dir, run_name, fps=2, unit_length=unit_length
                 )
                 logger.info(f"     └─ ✓ Cached {len(all_sim_data)} VAR files")
             else:
@@ -497,7 +504,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             
             output_name = f"{experiment_name}_{branch_name}_overlay"
             create_overlay_error_evolution_video(
-                spatial_errors_list, video_dir, output_name, fps=2, unit_length=unit_length
+                spatial_errors_list, error_evolution_dir, output_name, fps=2, unit_length=unit_length
             )
             logger.info(f"     └─ ✓ Created overlay for {branch_name}")
     
@@ -528,7 +535,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
         
         output_name = f"{experiment_name}_top3_best_performers_overlay"
         create_overlay_error_evolution_video(
-            top_3_spatial_errors, video_dir, output_name, fps=2, unit_length=unit_length
+            top_3_spatial_errors, error_evolution_dir, output_name, fps=2, unit_length=unit_length
         )
         logger.info(f"     └─ ✓ Created top 3 overlay video")
     
@@ -644,7 +651,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     logger.info("=" * 80)
     
     generate_final_rich_report(
-        experiment_name, video_dir, error_norms_dir, 
+        experiment_name, error_evolution_dir, error_norms_dir, 
         len(loaded_data_cache), sorted_runs[:5], branch_best, 
         combined_scores, metrics
     )
