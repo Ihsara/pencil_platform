@@ -6,10 +6,10 @@ data:
     cdt: 0.01
     cdtv: 0.01
     cvsid: "9a97ecc83"
-    dsnap: 2.0e-4
+    dsnap: 2.0e-5
     dtmin: 1.0e-12
     dvid: 0.02
-    isave: 1000
+    isave: 10000
     tmax: 0.002
     it1: 1000
     itorder: 3
