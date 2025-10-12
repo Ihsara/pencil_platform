@@ -1,26 +1,233 @@
 # src/experiment_name_decoder.py
 
 import re
-from typing import Dict
+import yaml
+from pathlib import Path
+from typing import Dict, Optional
+from loguru import logger
+
+from .constants import DIRS
 
 
-def decode_experiment_name(experiment_name: str) -> Dict[str, str]:
+def _load_sweep_config(experiment_name: str) -> Optional[Dict]:
+    """
+    Load the sweep configuration for a given experiment.
+    
+    Args:
+        experiment_name: Name of the experiment (e.g., 'shocktube_phase1')
+    
+    Returns:
+        Dictionary containing sweep configuration, or None if not found
+    """
+    sweep_file = DIRS.config / experiment_name / "plan" / "sweep.yaml"
+    if not sweep_file.exists():
+        logger.warning(f"Sweep config not found: {sweep_file}")
+        return None
+    
+    try:
+        with open(sweep_file, 'r') as f:
+            return yaml.safe_load(f)
+    except Exception as e:
+        logger.error(f"Failed to load sweep config from {sweep_file}: {e}")
+        return None
+
+
+def _extract_template_variables(template: str) -> list:
+    """
+    Extract variable names from a Jinja2 template string.
+    
+    Args:
+        template: Jinja2 template string like "{{ output_prefix }}_{{ branch.name }}_nu{{ nu_shock | fs_safe }}"
+    
+    Returns:
+        List of variable names found in the template
+    """
+    # Match {{ variable }} or {{ variable | filter }}
+    pattern = r'\{\{\s*([a-zA-Z_][a-zA-Z0-9_.]*)\s*(?:\|[^}]*)?\}\}'
+    matches = re.findall(pattern, template)
+    return matches
+
+
+def _parse_template_structure(template: str) -> list:
+    """
+    Parse template into a list of (literal, variable) tuples for reconstruction.
+    
+    Args:
+        template: Jinja2 template string
+    
+    Returns:
+        List of tuples containing (literal_text, variable_name_or_none)
+    """
+    parts = []
+    pattern = r'\{\{\s*([a-zA-Z_][a-zA-Z0-9_.]*)\s*(?:\|[^}]*)?\}\}'
+    
+    last_end = 0
+    for match in re.finditer(pattern, template):
+        # Add literal text before the variable
+        if match.start() > last_end:
+            literal = template[last_end:match.start()]
+            if literal:
+                parts.append(('literal', literal))
+        
+        # Add the variable
+        var_name = match.group(1)
+        parts.append(('variable', var_name))
+        last_end = match.end()
+    
+    # Add any remaining literal text
+    if last_end < len(template):
+        literal = template[last_end:]
+        if literal:
+            parts.append(('literal', literal))
+    
+    return parts
+
+
+def _decode_from_template(experiment_name: str, template: str, sweep_config: Dict) -> Dict[str, str]:
+    """
+    Decode an experiment name using the template structure.
+    
+    Args:
+        experiment_name: The experiment name to decode
+        template: The run_name_template from sweep.yaml
+        sweep_config: Full sweep configuration
+    
+    Returns:
+        Dictionary of decoded parameters
+    """
+    decoded = {}
+    
+    # Parse template structure
+    template_parts = _parse_template_structure(template)
+    
+    # Get known values from sweep config to help with matching
+    known_values = {}
+    if 'output_prefix' in sweep_config:
+        known_values['output_prefix'] = sweep_config['output_prefix']
+    
+    # Get branch names from sweep config
+    branch_names = []
+    if 'branches' in sweep_config:
+        branch_names = [branch['name'] for branch in sweep_config['branches']]
+    
+    # Build regex pattern from template with intelligent matching
+    regex_parts = []
+    var_order = []
+    
+    for i, (part_type, content) in enumerate(template_parts):
+        if part_type == 'literal':
+            # Escape special regex characters in literals
+            regex_parts.append(re.escape(content))
+        else:  # variable
+            var_order.append(content)
+            
+            # Use known values for more precise matching
+            if content in known_values:
+                # Match exact known value
+                regex_parts.append(f'({re.escape(known_values[content])})')
+            elif content == 'branch.name':
+                # For branch names, match the longest possible string from known branches
+                if branch_names:
+                    # Create alternation pattern for branch names
+                    escaped_branches = [re.escape(name) for name in sorted(branch_names, key=len, reverse=True)]
+                    regex_parts.append(f"({'|'.join(escaped_branches)})")
+                else:
+                    # Fallback: match multiple words with underscores
+                    regex_parts.append(r'([a-zA-Z0-9_]+)')
+            else:
+                # For parameters with fs_safe filter (numeric values), match digits and 'p'
+                # Look ahead in template to see if next part is a separator
+                next_idx = i + 1
+                if next_idx < len(template_parts) and template_parts[next_idx][0] == 'literal':
+                    next_sep = template_parts[next_idx][1]
+                    if next_sep:
+                        # Match everything up to the next separator
+                        regex_parts.append(f'([^{re.escape(next_sep[0])}]+)')
+                    else:
+                        regex_parts.append(r'([a-zA-Z0-9p]+)')
+                else:
+                    # Last variable - match to end
+                    regex_parts.append(r'([a-zA-Z0-9p]+)')
+    
+    pattern = '^' + ''.join(regex_parts) + '$'
+    
+    try:
+        match = re.match(pattern, experiment_name)
+        if match:
+            for i, var_name in enumerate(var_order):
+                value = match.group(i + 1)
+                
+                # Handle fs_safe filter - convert 'p' back to '.'
+                # Check if this looks like a numeric value with 'p' separator
+                if re.match(r'^\d+p\d+$', value):
+                    value = value.replace('p', '.')
+                
+                # Store with simplified key name (remove _shock, etc.)
+                simple_key = var_name.replace('_shock', '').replace('_', '')
+                decoded[simple_key] = value
+                
+                # Also store original key
+                decoded[var_name] = value
+        else:
+            logger.warning(f"Experiment name '{experiment_name}' does not match template pattern. Pattern: {pattern}")
+    except Exception as e:
+        logger.error(f"Error decoding experiment name with template: {e}")
+    
+    # Add additional context from sweep config
+    if 'output_prefix' in sweep_config:
+        decoded['output_prefix'] = sweep_config['output_prefix']
+    
+    return decoded
+
+
+def decode_experiment_name(experiment_name: str, experiment_type: Optional[str] = None) -> Dict[str, str]:
     """
     Decode experiment name into human-readable components.
+    
+    This function dynamically determines how to parse the experiment name by:
+    1. Loading the sweep configuration to get the run_name_template
+    2. Using the template to extract parameters
+    3. Falling back to hardcoded patterns if config is not available
     
     Args:
         experiment_name: Raw experiment name like 
             'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+        experiment_type: Optional experiment type (e.g., 'shocktube_phase1').
+            If not provided, tries to infer from common patterns.
     
     Returns:
         Dictionary with decoded parameters
     
     Examples:
-        >>> decode_experiment_name('res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1')
-        {'res': '400', 'hyper3': 'None', 'massfix': 'True', 'gamma': 'default', 
-         'nu': '0.1', 'chi': '0.1', 'diffrho': '0.1'}
+        >>> decode_experiment_name('res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1', 'shocktube_phase1')
+        {'output_prefix': 'res400_nohyper', 'branch.name': 'massfix_default_gamma', ...}
     """
     decoded = {}
+    
+    # Try to infer experiment type if not provided
+    if experiment_type is None:
+        # Look for common experiment patterns in the name
+        if 'shocktube' in experiment_name.lower():
+            # Try to find which phase
+            for phase in ['phase1', 'phase2', 'phase3']:
+                potential_type = f'shocktube_{phase}'
+                if _load_sweep_config(potential_type):
+                    experiment_type = potential_type
+                    break
+            if experiment_type is None:
+                experiment_type = 'shocktube_phase1'  # default
+    
+    # Try to decode using sweep configuration
+    if experiment_type:
+        sweep_config = _load_sweep_config(experiment_type)
+        if sweep_config and 'run_name_template' in sweep_config:
+            template = sweep_config['run_name_template']
+            decoded = _decode_from_template(experiment_name, template, sweep_config)
+            if decoded:
+                return decoded
+    
+    # Fallback to legacy hardcoded parsing for backward compatibility
+    logger.debug(f"Using legacy hardcoded decoder for '{experiment_name}'")
     
     # Extract resolution
     res_match = re.search(r'res(\d+)', experiment_name)
@@ -69,49 +276,90 @@ def decode_experiment_name(experiment_name: str) -> Dict[str, str]:
     return decoded
 
 
-def format_experiment_title(experiment_name: str, max_line_length: int = 80) -> str:
+def get_parameter_labels(experiment_type: str) -> Dict[str, str]:
+    """
+    Get human-readable labels for parameters based on experiment type.
+    
+    Args:
+        experiment_type: Name of the experiment (e.g., 'shocktube_phase1')
+    
+    Returns:
+        Dictionary mapping parameter keys to display labels
+    """
+    # Default labels
+    default_labels = {
+        'res': 'Resolution',
+        'hyper3': 'Hyper3',
+        'massfix': 'Mass Fix',
+        'gamma': 'γ',
+        'nu': 'ν',
+        'nu_shock': 'ν',
+        'chi': 'χ',
+        'chi_shock': 'χ',
+        'diffrho': 'Diff ρ',
+        'diffrho_shock': 'Diff ρ',
+        'output_prefix': 'Config',
+        'branch.name': 'Branch',
+        'branch_name': 'Branch',
+    }
+    
+    # Could be extended to load custom labels from config if needed
+    sweep_config = _load_sweep_config(experiment_type)
+    if sweep_config and 'parameter_labels' in sweep_config:
+        default_labels.update(sweep_config['parameter_labels'])
+    
+    return default_labels
+
+
+def format_experiment_title(experiment_name: str, max_line_length: int = 80, 
+                           experiment_type: Optional[str] = None) -> str:
     """
     Format experiment name into a readable title with proper formatting.
     
     Args:
         experiment_name: Raw experiment name
         max_line_length: Maximum length per line before wrapping
+        experiment_type: Optional experiment type for proper decoding
     
     Returns:
         Formatted title string with parameters
     
     Example:
         >>> format_experiment_title('res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0')
-        'Resolution: 400 | Hyper3: None | Mass Fix: True\\nGamma: 1 | ν: 5.0 | χ: 5.0 | Diff ρ: 5.0'
+        'Resolution: 400 | Hyper3: None | Mass Fix: True\\nγ: 1 | ν: 5.0 | χ: 5.0 | Diff ρ: 5.0'
     """
-    decoded = decode_experiment_name(experiment_name)
+    decoded = decode_experiment_name(experiment_name, experiment_type)
     
     if not decoded:
         return experiment_name
     
+    # Get parameter labels
+    if experiment_type:
+        labels = get_parameter_labels(experiment_type)
+    else:
+        labels = get_parameter_labels('shocktube_phase1')  # default
+    
     # Build formatted string
     parts = []
     
-    if 'res' in decoded:
-        parts.append(f"Resolution: {decoded['res']}")
+    # Define order of display (customize as needed)
+    display_order = [
+        'res', 'hyper3', 'massfix', 'output_prefix', 'branch.name', 
+        'gamma', 'nu', 'nu_shock', 'chi', 'chi_shock', 'diffrho', 'diffrho_shock'
+    ]
     
-    if 'hyper3' in decoded:
-        parts.append(f"Hyper3: {decoded['hyper3']}")
-    
-    if 'massfix' in decoded:
-        parts.append(f"Mass Fix: {decoded['massfix']}")
-    
-    if 'gamma' in decoded:
-        parts.append(f"γ: {decoded['gamma']}")
-    
-    if 'nu' in decoded:
-        parts.append(f"ν: {decoded['nu']}")
-    
-    if 'chi' in decoded:
-        parts.append(f"χ: {decoded['chi']}")
-    
-    if 'diffrho' in decoded:
-        parts.append(f"Diff ρ: {decoded['diffrho']}")
+    for key in display_order:
+        if key in decoded:
+            label = labels.get(key, key)
+            value = decoded[key]
+            
+            # Format boolean values
+            if value in ['True', 'true', 'yes', 'Yes']:
+                value = 'True'
+            elif value in ['False', 'false', 'no', 'No']:
+                value = 'False'
+            
+            parts.append(f"{label}: {value}")
     
     # Join parts with | separator, wrapping if too long
     line1_parts = []
@@ -132,12 +380,14 @@ def format_experiment_title(experiment_name: str, max_line_length: int = 80) -> 
         return " | ".join(line1_parts)
 
 
-def format_short_experiment_name(experiment_name: str) -> str:
+def format_short_experiment_name(experiment_name: str, 
+                                 experiment_type: Optional[str] = None) -> str:
     """
     Create a short, compact experiment name for legends and labels.
     
     Args:
         experiment_name: Raw experiment name
+        experiment_type: Optional experiment type for proper decoding
     
     Returns:
         Compact formatted name
@@ -146,33 +396,35 @@ def format_short_experiment_name(experiment_name: str) -> str:
         >>> format_short_experiment_name('res400_nohyper_massfix_gamma_is_1_nu5p0')
         'R400_H:None_MF:T_γ:1_ν:5.0'
     """
-    decoded = decode_experiment_name(experiment_name)
+    decoded = decode_experiment_name(experiment_name, experiment_type)
     
     if not decoded:
         return experiment_name[:30] + "..." if len(experiment_name) > 30 else experiment_name
     
     parts = []
     
-    if 'res' in decoded:
-        parts.append(f"R{decoded['res']}")
+    # Abbreviated labels
+    abbrev_map = {
+        'res': 'R',
+        'hyper3': 'H',
+        'massfix': 'MF',
+        'gamma': 'γ',
+        'nu': 'ν',
+        'nu_shock': 'ν',
+        'chi': 'χ',
+        'chi_shock': 'χ',
+        'diffrho': 'Dρ',
+        'diffrho_shock': 'Dρ',
+    }
     
-    if 'hyper3' in decoded:
-        parts.append(f"H:{decoded['hyper3']}")
-    
-    if 'massfix' in decoded:
-        mf = 'T' if decoded['massfix'] == 'True' else 'F'
-        parts.append(f"MF:{mf}")
-    
-    if 'gamma' in decoded:
-        parts.append(f"γ:{decoded['gamma']}")
-    
-    if 'nu' in decoded:
-        parts.append(f"ν:{decoded['nu']}")
-    
-    if 'chi' in decoded:
-        parts.append(f"χ:{decoded['chi']}")
-    
-    if 'diffrho' in decoded:
-        parts.append(f"Dρ:{decoded['diffrho']}")
+    for key, abbrev in abbrev_map.items():
+        if key in decoded:
+            value = decoded[key]
+            
+            # Special handling for massfix
+            if key == 'massfix':
+                value = 'T' if value == 'True' else 'F'
+            
+            parts.append(f"{abbrev}:{value}")
     
     return "_".join(parts)
