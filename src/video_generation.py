@@ -169,11 +169,12 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
     Args:
         sim_data_list: List of simulation data from all VAR files
         analytical_data_list: List of analytical solutions for all VAR files
-        output_path: Directory to save the frames
+        output_path: Directory to save the frames (should be var_frames base directory)
         run_name: Name of the run for title
         variables: List of variables to plot
     """
-    frames_dir = output_path / f"{run_name}_frames"
+    # Save frames in var_frames/{run_name}/ directory
+    frames_dir = output_path.parent / "var_frames" / run_name
     frames_dir.mkdir(parents=True, exist_ok=True)
     
     var_labels = {
@@ -402,11 +403,12 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
     
     Args:
         spatial_errors: Dictionary containing spatial error data from calculate_spatial_errors()
-        output_path: Directory to save the frames
+        output_path: Directory to save the frames (should be error_evolution base directory)
         run_name: Name of the run
         unit_length: Unit conversion factor for length (e.g., to kpc)
     """
-    frames_dir = output_path / f"{run_name}_error_frames"
+    # Save frames in error_frames/{run_name}/ directory
+    frames_dir = output_path.parent / "error_frames" / run_name
     frames_dir.mkdir(parents=True, exist_ok=True)
     
     variables = ['rho', 'ux', 'pp', 'ee']

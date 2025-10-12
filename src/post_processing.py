@@ -363,10 +363,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     var_evolution_dir = analysis_dir / "var_evolution"
     error_evolution_dir = analysis_dir / "error_evolution"
     var_frames_dir = analysis_dir / "var_frames"
+    error_frames_dir = analysis_dir / "error_frames"
     
     var_evolution_dir.mkdir(parents=True, exist_ok=True)
     error_evolution_dir.mkdir(parents=True, exist_ok=True)
     var_frames_dir.mkdir(parents=True, exist_ok=True)
+    error_frames_dir.mkdir(parents=True, exist_ok=True)
 
     with open(manifest_file, 'r') as f: 
         run_names = [line.strip() for line in f if line.strip()]
@@ -434,14 +436,14 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                     if hasattr(params, 'unit_length'):
                         unit_length = params.unit_length  # Already in cm
                 
-                logger.info(f"     ├─ Creating var evolution video...")
+                logger.info(f"     ├─ Creating var evolution video and frames...")
                 create_var_evolution_video(
-                    all_sim_data, all_analytical_data, var_evolution_dir, run_name, fps=2
+                    all_sim_data, all_analytical_data, var_evolution_dir, run_name, fps=2, save_frames=True
                 )
                 
-                logger.info(f"     ├─ Creating error evolution video...")
+                logger.info(f"     ├─ Creating error evolution video and frames...")
                 create_error_evolution_video(
-                    spatial_errors, error_evolution_dir, run_name, fps=2, unit_length=unit_length
+                    spatial_errors, error_evolution_dir, run_name, fps=2, unit_length=unit_length, save_frames=True
                 )
                 logger.info(f"     └─ ✓ Cached {len(all_sim_data)} VAR files")
             else:
