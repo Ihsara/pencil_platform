@@ -66,7 +66,9 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         
         data_dir = run_path / "data"
         proc_dir = data_dir / "proc0" if (data_dir / "proc0").is_dir() else data_dir
-        var_files = sorted(proc_dir.glob("VAR*"))
+        
+        # Sort VAR files numerically by extracting the number from filename
+        var_files = sorted(proc_dir.glob("VAR*"), key=lambda p: int(p.stem.replace('VAR', '')))
         
         if not var_files:
             logger.warning(f"No VAR files found in {proc_dir}")
