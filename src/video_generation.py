@@ -55,9 +55,11 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     else:
         unit_dict = {var: 1.0 for var in variables}
     
-    # Create figure with space for legend
-    fig = plt.figure(figsize=(17, 13))
-    gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.93, bottom=0.12, hspace=0.25, wspace=0.25)
+    # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
+    fig = plt.figure(figsize=(14, 16))
+    gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.94, bottom=0.08, 
+                          hspace=0.30, wspace=0.30, height_ratios=[1, 1, 0.15])
+    # Create subplots in first 2 rows only
     axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
     
     # Initialize lines for each variable
@@ -97,14 +99,16 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
                     y_max = all_vals.max() + 0.1 * y_range
                 ax.set_ylim(y_min, y_max)
     
-    # Single legend placed at bottom center
-    fig.legend([lines[variables[0]], analytical_lines[variables[0]]], 
-              ['Numerical', 'Analytical'], 
-              loc='lower center', ncol=2, fontsize=11, frameon=True,
-              bbox_to_anchor=(0.5, 0.02))
+    # Joint legend in the last row (row 3, spans both columns)
+    legend_ax = fig.add_subplot(gs[2, :])
+    legend_ax.axis('off')
+    legend_ax.legend([lines[variables[0]], analytical_lines[variables[0]]], 
+                     ['Numerical', 'Analytical'], 
+                     loc='center', ncol=2, fontsize=12, frameon=True)
     
-    # Info text at bottom left
-    info_text = fig.text(0.08, 0.05, '', fontsize=10, verticalalignment='bottom')
+    # Info text in legend row
+    info_text = fig.text(0.5, 0.03, '', fontsize=10, horizontalalignment='center',
+                        verticalalignment='bottom')
     
     # Main title with decoded experiment name
     formatted_title = format_experiment_title(run_name, max_line_length=60)
@@ -129,11 +133,18 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
                 lines[var].set_data(sim_data['x'], sim_data[var] * unit_dict[var])
                 analytical_lines[var].set_data(analytical_data['x'], analytical_data[var] * unit_dict[var])
         
+        # Get VAR number correctly from var_file name or use frame index
         var_file_name = sim_data.get('var_file', f'VAR{frame}')
+        # Extract VAR number from filename (e.g., "VAR10" -> 10)
+        if 'VAR' in var_file_name:
+            var_num = var_file_name.replace('VAR', '')
+        else:
+            var_num = str(frame)
+        
         info_text.set_text(f'{var_file_name} | t = {sim_data["t"]:.4e} s')
         
-        # Update title with current VAR number
-        title.set_text(f'{formatted_title}\nVariable Evolution | VAR {frame}')
+        # Update title with correct VAR number
+        title.set_text(f'{formatted_title}\nVariable Evolution | VAR {var_num}')
         
         return list(lines.values()) + list(analytical_lines.values()) + [info_text, title]
     
@@ -207,14 +218,24 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
     logger.info(f"Creating {n_vars} individual frames...")
     
     for frame_idx, (sim_data, analytical_data) in enumerate(zip(sim_data_list, analytical_data_list)):
-        fig = plt.figure(figsize=(17, 13))
-        gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.93, bottom=0.12, hspace=0.25, wspace=0.25)
+        # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
+        fig = plt.figure(figsize=(14, 16))
+        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.94, bottom=0.08,
+                              hspace=0.30, wspace=0.30, height_ratios=[1, 1, 0.15])
+        # Create subplots in first 2 rows only
         axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
         
+        # Get VAR number correctly from var_file name
         var_file_name = sim_data.get('var_file', f'VAR{frame_idx}')
-        fig.suptitle(f'Variable Evolution - {run_name}', fontsize=14, fontweight='bold', y=0.97)
-        fig.text(0.08, 0.05, f'{var_file_name} | t = {sim_data["t"]:.4e} s | Frame {frame_idx+1}/{n_vars}', 
-                fontsize=10, verticalalignment='bottom')
+        if 'VAR' in var_file_name:
+            var_num = var_file_name.replace('VAR', '')
+        else:
+            var_num = str(frame_idx)
+        
+        fig.suptitle(f'Variable Evolution - {run_name}\nVAR {var_num}', 
+                     fontsize=14, fontweight='bold', y=0.97)
+        fig.text(0.5, 0.03, f'{var_file_name} | t = {sim_data["t"]:.4e} s | Frame {frame_idx+1}/{n_vars}', 
+                fontsize=10, horizontalalignment='center', verticalalignment='bottom')
         
         for idx, var in enumerate(variables):
             ax = axes[idx]
@@ -231,9 +252,11 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
                 ax.set_title(f'{var.upper()}', fontsize=12, fontweight='bold')
                 ax.grid(True, alpha=0.3)
         
-        # Single legend at bottom center
-        fig.legend(['Numerical', 'Analytical'], loc='lower center', ncol=2, fontsize=11, 
-                  frameon=True, bbox_to_anchor=(0.5, 0.02))
+        # Joint legend in the last row (row 3, spans both columns)
+        legend_ax = fig.add_subplot(gs[2, :])
+        legend_ax.axis('off')
+        legend_ax.legend(['Numerical', 'Analytical'], loc='center', ncol=2, 
+                        fontsize=12, frameon=True)
         
         frame_file = frames_dir / f"frame_{frame_idx:04d}.png"
         plt.savefig(frame_file, dpi=100, bbox_inches='tight')
@@ -273,9 +296,11 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         logger.warning("No valid variables with spatial error data")
         return
     
-    # Create figure with space for info
-    fig = plt.figure(figsize=(17, 11))
-    gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.94, bottom=0.12, hspace=0.25, wspace=0.25)
+    # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
+    fig = plt.figure(figsize=(14, 16))
+    gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.94, bottom=0.08,
+                          hspace=0.30, wspace=0.30, height_ratios=[1, 1, 0.15])
+    # Create subplots in first 2 rows only
     axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
     
     # Get max number of timesteps and x coordinates
@@ -323,8 +348,13 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         
         ax.grid(True, alpha=0.3)
     
-    # Single statistics box at bottom
-    stats_text = fig.text(0.08, 0.02, '', fontsize=9, verticalalignment='bottom', family='monospace',
+    # Create legend in the last row (row 3, spans both columns)
+    legend_ax = fig.add_subplot(gs[2, :])
+    legend_ax.axis('off')
+    
+    # Statistics box in legend row
+    stats_text = fig.text(0.5, 0.03, '', fontsize=9, horizontalalignment='center',
+                         verticalalignment='bottom', family='monospace',
                          bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8, pad=0.5))
     
     # Improved title with clear formatting and decoded experiment name
@@ -365,11 +395,17 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         var_file = spatial_errors[list(spatial_errors.keys())[0]]['var_files'][frame]
         timestep = spatial_errors[list(spatial_errors.keys())[0]]['timesteps'][frame]
         
+        # Extract VAR number from filename (e.g., "VAR10" -> 10)
+        if 'VAR' in var_file:
+            var_num = var_file.replace('VAR', '')
+        else:
+            var_num = str(frame)
+        
         stats_text.set_text(f'{var_file} | t={timestep:.4e} s\n' + 
                            '  |  '.join(stats_lines))
         
-        # Update title with current VAR number
-        title.set_text(f'{formatted_title}\nError Evolution ({error_method.capitalize()}) | VAR {frame}')
+        # Update title with correct VAR number
+        title.set_text(f'{formatted_title}\nError Evolution ({error_method.capitalize()}) | VAR {var_num}')
         
         return list(lines.values()) + [stats_text, title]
     
@@ -433,11 +469,21 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
     logger.info(f"Creating {max_timesteps} spatial error evolution frames...")
     
     for frame in range(max_timesteps):
-        fig = plt.figure(figsize=(17, 11))
-        gs = fig.add_gridspec(2, 2, left=0.08, right=0.98, top=0.94, bottom=0.12, hspace=0.25, wspace=0.25)
+        # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
+        fig = plt.figure(figsize=(14, 16))
+        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.94, bottom=0.08,
+                              hspace=0.30, wspace=0.30, height_ratios=[1, 1, 0.15])
+        # Create subplots in first 2 rows only
         axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
         
-        fig.suptitle(f'Spatial Error Evolution ({error_method.capitalize()})\n{run_name}', 
+        # Get VAR number correctly from var_file name
+        var_file = spatial_errors[list(spatial_errors.keys())[0]]['var_files'][frame]
+        if 'VAR' in var_file:
+            var_num = var_file.replace('VAR', '')
+        else:
+            var_num = str(frame)
+        
+        fig.suptitle(f'Spatial Error Evolution ({error_method.capitalize()})\n{run_name}\nVAR {var_num}', 
                      fontsize=14, fontweight='bold', y=0.97)
         
         stats_lines = []
@@ -459,7 +505,6 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
                     x_coords = x_raw
                 
                 errors = spatial_errors[var]['errors_per_timestep'][frame]
-                var_file = spatial_errors[var]['var_files'][frame]
                 timestep = spatial_errors[var]['timesteps'][frame]
                 
                 # Plot spatial error distribution
@@ -491,9 +536,14 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
                 
                 ax.grid(True, alpha=0.3)
         
-        # Single statistics box at bottom
-        fig.text(0.08, 0.02, f'{var_file} | t={timestep:.4e} s | Frame {frame+1}/{max_timesteps}\n' + 
-                '  |  '.join(stats_lines), fontsize=9, verticalalignment='bottom', family='monospace',
+        # Create legend in the last row (row 3, spans both columns)
+        legend_ax = fig.add_subplot(gs[2, :])
+        legend_ax.axis('off')
+        
+        # Statistics box in legend row
+        fig.text(0.5, 0.03, f'{var_file} | t={timestep:.4e} s | Frame {frame+1}/{max_timesteps}\n' + 
+                '  |  '.join(stats_lines), fontsize=9, horizontalalignment='center',
+                verticalalignment='bottom', family='monospace',
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8, pad=0.5))
         
         frame_file = frames_dir / f"frame_{frame:04d}.png"
