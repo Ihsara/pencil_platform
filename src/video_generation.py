@@ -577,3 +577,143 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
         plt.close()
     
     logger.success(f"Saved {max_timesteps} error evolution frames to {frames_dir}")
+
+
+def create_overlay_error_evolution_video(
+    spatial_errors_list: List[tuple], 
+    output_path: Path, 
+    output_name: str,
+    fps: int = 2, 
+    unit_length: float = 1.0
+):
+    """
+    Creates an overlaid animated GIF showing spatial error evolution for multiple runs.
+    
+    Args:
+        spatial_errors_list: List of tuples (run_name, spatial_errors_dict)
+        output_path: Directory to save the animation
+        output_name: Name for the output file
+        fps: Frames per second
+        unit_length: Unit conversion factor for length
+    """
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    # Validate unit_length
+    if not np.isfinite(unit_length) or unit_length > 1e20 or unit_length == 0:
+        logger.warning(f"Invalid unit_length value ({unit_length}). Using 1.0 instead.")
+        unit_length = 1.0
+    
+    variables = ['rho', 'ux', 'pp', 'ee']
+    var_labels = [r'$\rho$ [g cm$^{-3}$]', r'$u_x$ [km s$^{-1}$]', r'$p$ [dyn cm$^{-2}$]', r'$e$ [km$^2$ s$^{-2}$]']
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
+    
+    fig, axes = plt.subplots(2, 2, figsize=(18, 14))
+    axes = axes.flatten()
+    
+    # Get max number of timesteps across all runs
+    max_timesteps = max(
+        len(spatial_errors['rho']['errors_per_timestep'])
+        for _, spatial_errors in spatial_errors_list
+        if 'rho' in spatial_errors
+    )
+    
+    error_method = spatial_errors_list[0][1][list(spatial_errors_list[0][1].keys())[0]]['error_method']
+    
+    # Initialize plot elements
+    lines = {var: [] for var in variables}
+    
+    for idx, var in enumerate(variables):
+        ax = axes[idx]
+        
+        # Get x coordinates from first run (should be same for all)
+        x_raw = spatial_errors_list[0][1][var]['x']
+        try:
+            x_coords = x_raw * unit_length
+            if not np.all(np.isfinite(x_coords)):
+                x_coords = x_raw
+                unit_length = 1.0
+        except (OverflowError, RuntimeWarning):
+            x_coords = x_raw
+            unit_length = 1.0
+        
+        # Create line for each run
+        for run_idx, (run_name, spatial_errors) in enumerate(spatial_errors_list):
+            if var in spatial_errors:
+                color = colors[run_idx % len(colors)]
+                line, = ax.plot([], [], '-', linewidth=2.5, color=color, 
+                              label=run_name, alpha=0.8)
+                lines[var].append((line, run_name, spatial_errors))
+        
+        x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
+        ax.set_xlabel(x_label, fontsize=11)
+        ax.set_ylabel(f'Error in {var_labels[idx]}', fontsize=11)
+        ax.set_title(f'{var_labels[idx]} Spatial Error Comparison', fontsize=12)
+        ax.legend(fontsize=9, loc='best')
+        ax.grid(True, alpha=0.3)
+        
+        # Set axis limits
+        if np.all(np.isfinite(x_coords)):
+            ax.set_xlim(x_coords.min(), x_coords.max())
+        
+        # Calculate y limits across all runs
+        all_errors = []
+        for _, _, spatial_errors in lines[var]:
+            all_errors.extend(spatial_errors[var]['errors_per_timestep'])
+        if all_errors:
+            all_errors_concat = np.concatenate(all_errors)
+            y_min = all_errors_concat.min()
+            y_max = all_errors_concat.max()
+            y_range = y_max - y_min
+            ax.set_ylim(y_min - 0.1*y_range, y_max + 0.1*y_range)
+    
+    title = fig.suptitle('', fontsize=16, fontweight='bold')
+    
+    def init():
+        """Initialize animation"""
+        for var in variables:
+            for line, _, _ in lines[var]:
+                line.set_data([], [])
+        title.set_text(f'Spatial Error Comparison ({error_method})\n{output_name}\nVAR 0/{max_timesteps}')
+        return [line for var in variables for line, _, _ in lines[var]] + [title]
+    
+    def animate(frame):
+        """Animation function"""
+        for var in variables:
+            for line, run_name, spatial_errors in lines[var]:
+                if frame < len(spatial_errors[var]['errors_per_timestep']):
+                    x_raw = spatial_errors[var]['x']
+                    try:
+                        x_coords = x_raw * unit_length
+                        if not np.all(np.isfinite(x_coords)):
+                            x_coords = x_raw
+                    except (OverflowError, RuntimeWarning):
+                        x_coords = x_raw
+                    
+                    errors = spatial_errors[var]['errors_per_timestep'][frame]
+                    line.set_data(x_coords, errors)
+                else:
+                    line.set_data([], [])
+        
+        # Get timestep info from first run
+        first_spatial_errors = spatial_errors_list[0][1]
+        var_file = first_spatial_errors['rho']['var_files'][frame]
+        timestep = first_spatial_errors['rho']['timesteps'][frame]
+        
+        title.set_text(f'Spatial Error Comparison ({error_method})\n{output_name}\n{var_file} (t={timestep:.4e} s) - VAR {frame+1}/{max_timesteps}')
+        
+        return [line for var in variables for line, _, _ in lines[var]] + [title]
+    
+    # Create animation
+    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
+                                  interval=1000//fps, blit=True, repeat=True)
+    
+    # Save animation as GIF
+    output_file = output_path / f"{output_name}_error_evolution.gif"
+    try:
+        writer = animation.PillowWriter(fps=fps, metadata=dict(artist='Pencil Platform'))
+        anim.save(output_file, writer=writer)
+        logger.success(f"Saved overlay error evolution to {output_file}")
+    except Exception as e:
+        logger.error(f"Failed to save overlay animation: {e}")
+    finally:
+        plt.close()
