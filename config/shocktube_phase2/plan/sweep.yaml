@@ -4,6 +4,8 @@
 # This file defines the hyperdiffusion parameter sweep.
 # Phase 2 focuses on finding the best nu_hyper3 and chi_hyper3 values
 # while keeping shock parameters fixed at their optimal values from Phase 1.
+# 
+# Updated to run 3 scenarios based on top 3 L1 performers from Phase 1
 ---
 
 # --- HPC Execution Parameters ---
@@ -48,13 +50,7 @@ output_prefix: 'res400_hyper3'
 run_name_template: "{{ output_prefix }}_nu{{ nu_hyper3 | fs_safe }}_chi{{ chi_hyper3 | fs_safe }}_{{ branch.name }}"
 
 # --- Global Modifications ---
-# These modifications apply to ALL runs in this phase
-modifications:
-  run_in.yaml:
-    # Fix shock parameters at their optimal values from Phase 1
-    density_run_pars: { diffrho_shock: 1.0 }
-    viscosity_run_pars: { nu_shock: 1.0 }
-    entropy_run_pars: { chi_shock: 1.0 }
+# No global modifications - each branch defines its own parameters
 
 # --- Parameter Sweeps ---
 # Sweep hyperdiffusion parameters while keeping them equal (nu_hyper3 = chi_hyper3)
@@ -64,9 +60,43 @@ parameter_sweeps:
     values: [9.0e-15, 9.0e-14, 9.0e-13, 9.0e-12]
 
 # --- Branches ---
-# Test with lgamma_is_1 = false as specified
+# Three scenarios based on top 3 L1 performers from Phase 1
 branches:
-  - name: "gamma_default"
+  # Scenario 1: Best L1 performer (rank 1)
+  # nu=0.5, chi=0.5, diffrho=0.5, default_gamma
+  - name: "best_l1_rank1_nu0p5_default_gamma"
     settings:
       run_in.yaml:
-        density_run_pars: { lgamma_is_1: false }
+        density_run_pars: 
+          diffrho_shock: 0.5
+          lgamma_is_1: false
+        viscosity_run_pars: 
+          nu_shock: 0.5
+        entropy_run_pars: 
+          chi_shock: 0.5
+
+  # Scenario 2: Second best L1 performer (rank 2)
+  # nu=0.5, chi=0.5, diffrho=0.5, gamma_is_1
+  - name: "best_l1_rank2_nu0p5_gamma_is_1"
+    settings:
+      run_in.yaml:
+        density_run_pars: 
+          diffrho_shock: 0.5
+          lgamma_is_1: true
+        viscosity_run_pars: 
+          nu_shock: 0.5
+        entropy_run_pars: 
+          chi_shock: 0.5
+
+  # Scenario 3: Third best L1 performer (rank 3)
+  # nu=1.0, chi=1.0, diffrho=1.0, default_gamma
+  - name: "best_l1_rank3_nu1p0_default_gamma"
+    settings:
+      run_in.yaml:
+        density_run_pars: 
+          diffrho_shock: 1.0
+          lgamma_is_1: false
+        viscosity_run_pars: 
+          nu_shock: 1.0
+        entropy_run_pars: 
+          chi_shock: 1.0
