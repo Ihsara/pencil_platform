@@ -48,7 +48,7 @@ auto_postprocessing: true     # If true, display reminder to run --analyze and -
 # Available metrics: 'l1', 'l2', 'linf'
 # All specified metrics will be combined in error evolution videos and frames
 error_analysis:
-  metrics: ['l1', 'l2', 'linf']  # List of metrics to calculate and visualize
+  metrics: ['l1']  # List of metrics to calculate and visualize ['l1', 'l2', 'linf']
   combine_in_videos: true         # If true, show all metrics in the same frame/evolution
 
 # --- Experiment Generation Parameters ---
