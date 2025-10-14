@@ -57,7 +57,7 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     
     # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
     fig = plt.figure(figsize=(14, 16))
-    gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.92, bottom=0.08, 
+    gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08, 
                           hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
     # Create subplots in first 2 rows only
     axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
@@ -120,7 +120,7 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
             lines[var].set_data([], [])
             analytical_lines[var].set_data([], [])
         info_text.set_text('')
-        title.set_text(f'{formatted_title}\nVariable Evolution | VAR 0')
+        title.set_text(f'{formatted_title} - VAR 0')
         return list(lines.values()) + list(analytical_lines.values()) + [info_text, title]
     
     def animate(frame):
@@ -143,8 +143,8 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
         
         info_text.set_text(f'{var_file_name} | t = {sim_data["t"]:.4e} s')
         
-        # Update title with correct VAR number
-        title.set_text(f'{formatted_title}\nVariable Evolution | VAR {var_num}')
+        # Update title with correct VAR number appended to second line
+        title.set_text(f'{formatted_title} - VAR {var_num}')
         
         return list(lines.values()) + list(analytical_lines.values()) + [info_text, title]
     
@@ -220,7 +220,7 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
     for frame_idx, (sim_data, analytical_data) in enumerate(zip(sim_data_list, analytical_data_list)):
         # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
         fig = plt.figure(figsize=(14, 16))
-        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.92, bottom=0.08,
+        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08,
                               hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
         # Create subplots in first 2 rows only
         axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
@@ -234,9 +234,9 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
         
         # Decoded experiment title
         formatted_title = format_experiment_title(run_name, max_line_length=60)
-        fig.suptitle(f'{formatted_title}\nVariable Evolution | VAR {var_num}', 
+        fig.suptitle(f'{formatted_title} - VAR {var_num}', 
                      fontsize=13, fontweight='bold', y=0.96)
-        fig.text(0.5, 0.03, f'{var_file_name} | t = {sim_data["t"]:.4e} s | Frame {frame_idx+1}/{n_vars}', 
+        fig.text(0.5, 0.03, f'{var_file_name} - t = {sim_data["t"]:.4e} s - Frame {frame_idx+1}/{n_vars}', 
                 fontsize=10, horizontalalignment='center', verticalalignment='bottom')
         
         for idx, var in enumerate(variables):
@@ -306,7 +306,7 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     
     # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
     fig = plt.figure(figsize=(14, 16))
-    gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.92, bottom=0.08,
+    gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08,
                           hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
     # Create subplots in first 2 rows only
     axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
@@ -374,7 +374,7 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         for var, _ in valid_vars:
             lines[var].set_data([], [])
         stats_text.set_text('')
-        title.set_text(f'{formatted_title}\nError Evolution ({error_method.capitalize()}) | VAR 0')
+        title.set_text(f'{formatted_title} - VAR 0')
         return list(lines.values()) + [stats_text, title]
     
     def animate(frame):
@@ -412,8 +412,8 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         stats_text.set_text(f'{var_file} | t={timestep:.4e} s\n' + 
                            '  |  '.join(stats_lines))
         
-        # Update title with correct VAR number
-        title.set_text(f'{formatted_title}\nError Evolution ({error_method.capitalize()}) | VAR {var_num}')
+        # Update title with correct VAR number appended to second line
+        title.set_text(f'{formatted_title} - VAR {var_num}')
         
         return list(lines.values()) + [stats_text, title]
     
@@ -479,7 +479,7 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
     for frame in range(max_timesteps):
         # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
         fig = plt.figure(figsize=(14, 16))
-        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.92, bottom=0.08,
+        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08,
                               hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
         # Create subplots in first 2 rows only
         axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
@@ -493,7 +493,7 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
         
         # Decoded experiment title
         formatted_title = format_experiment_title(run_name, max_line_length=60)
-        fig.suptitle(f'{formatted_title}\nError Evolution ({error_method.capitalize()}) | VAR {var_num}', 
+        fig.suptitle(f'{formatted_title} - VAR {var_num}', 
                      fontsize=13, fontweight='bold', y=0.96)
         
         stats_lines = []

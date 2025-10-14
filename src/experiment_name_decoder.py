@@ -326,7 +326,7 @@ def format_experiment_title(experiment_name: str, max_line_length: int = 80,
     
     Example:
         >>> format_experiment_title('res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0')
-        'Resolution: 400 | Hyper3: None | Mass Fix: True\\nγ: 1 | ν: 5.0 | χ: 5.0 | Diff ρ: 5.0'
+        'Resolution: 400 - Hyper3: None - Mass Fix: True - γ: 1\\nν: 5.0 - χ: 5.0 - Diff ρ: 5.0'
     """
     decoded = decode_experiment_name(experiment_name, experiment_type)
     
@@ -339,16 +339,11 @@ def format_experiment_title(experiment_name: str, max_line_length: int = 80,
     else:
         labels = get_parameter_labels('shocktube_phase1')  # default
     
-    # Build formatted string
-    parts = []
+    # First line: resolution, hyper3, massfix, gamma (configuration parameters)
+    line1_keys = ['res', 'hyper3', 'massfix', 'gamma']
+    line1_parts = []
     
-    # Define order of display (customize as needed)
-    display_order = [
-        'res', 'hyper3', 'massfix', 'output_prefix', 'branch.name', 
-        'gamma', 'nu', 'nu_shock', 'chi', 'chi_shock', 'diffrho', 'diffrho_shock'
-    ]
-    
-    for key in display_order:
+    for key in line1_keys:
         if key in decoded:
             label = labels.get(key, key)
             value = decoded[key]
@@ -359,25 +354,25 @@ def format_experiment_title(experiment_name: str, max_line_length: int = 80,
             elif value in ['False', 'false', 'no', 'No']:
                 value = 'False'
             
-            parts.append(f"{label}: {value}")
+            line1_parts.append(f"{label}: {value}")
     
-    # Join parts with | separator, wrapping if too long
-    line1_parts = []
+    # Second line: nu, chi, diffrho (numerical parameters)
+    line2_keys = ['nu', 'nu_shock', 'chi', 'chi_shock', 'diffrho', 'diffrho_shock']
     line2_parts = []
-    current_length = 0
     
-    for part in parts:
-        part_length = len(part) + 3  # +3 for " | "
-        if current_length + part_length <= max_line_length:
-            line1_parts.append(part)
-            current_length += part_length
-        else:
-            line2_parts.append(part)
+    for key in line2_keys:
+        if key in decoded:
+            label = labels.get(key, key)
+            value = decoded[key]
+            line2_parts.append(f"{label}: {value}")
     
-    if line2_parts:
-        return " | ".join(line1_parts) + "\n" + " | ".join(line2_parts)
+    # Join parts with " - " separator
+    if line1_parts and line2_parts:
+        return " - ".join(line1_parts) + "\n" + " - ".join(line2_parts)
+    elif line1_parts:
+        return " - ".join(line1_parts)
     else:
-        return " | ".join(line1_parts)
+        return " - ".join(line2_parts) if line2_parts else experiment_name
 
 
 def format_short_experiment_name(experiment_name: str, 
