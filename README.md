@@ -149,16 +149,13 @@ snakemake --profile .config/slurm --config experiment_name=my_experiment
 ## Requirements
 
 - Python 3.13 or higher
+- FFmpeg (for video generation in analysis)
 - Required packages (automatically installed):
-  - pyyaml >= 6.0.2
-  - jinja2 >= 3.1.6
-  - loguru >= 0.7.3
-  - numpy >= 2.3.2
-  - pandas >= 2.3.2
-  - matplotlib >= 3.10.6
-  - h5py >= 3.14.0
-  - scipy >= 1.16.1
-  - And more (see `pyproject.toml`)
+  - **Core**: pyyaml, jinja2, loguru, numpy, pandas, scipy, h5py
+  - **Visualization**: matplotlib, seaborn, ffmpeg-python, rich
+  - **Fortran**: f90nml
+  - **Utilities**: flatdict, pexpect, tabulate
+  - See `pyproject.toml` for complete list with versions
 
 ## Project Structure
 
@@ -182,11 +179,15 @@ platform/
 python main.py [EXPERIMENT] [OPTIONS]
 
 Options:
-  --test [N]     Generate first N configurations for testing (default: 2)
-  --rebuild      Force rebuild of executables
-  --analyze      Run post-processing analysis
-  --check        Check HPC job status
-  --help         Show help message
+  --test [N]       Generate first N configurations for testing (default: 2)
+  --rebuild        Force rebuild of executables
+  --analyze        Create error evolution videos and comprehensive analysis
+  --error-norms    Calculate L1/L2/L∞ error norms with combined scoring
+  --wait           Wait for job completion (useful with --analyze)
+  --check          Check HPC job status
+  --viz [RUNS...]  Deprecated: use --analyze instead
+  --var SELECTION  Select VAR file for visualization (middle/random/last/first)
+  --help           Show help message
 ```
 
 See [CLI Reference](docs/cli-reference.md) for complete documentation.

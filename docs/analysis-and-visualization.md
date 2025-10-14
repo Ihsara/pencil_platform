@@ -1,416 +1,500 @@
 # Analysis and Visualization Guide
 
-This guide explains the comprehensive error analysis and visualization features for examining simulation results across all VAR files.
+This guide covers the comprehensive analysis and visualization capabilities of the Pencil Code Automated Experiment Manager.
 
 ## Overview
 
-The platform now supports two distinct post-processing modes:
+The platform provides powerful post-processing tools to analyze simulation results, identify optimal parameters, and visualize error evolution. Two main analysis modes are available:
 
-1. **Visualization Mode (`--viz`)**: Quick visualization of specific VAR files from experiments
-2. **Comprehensive Analysis Mode (`--analyze`)**: Deep error analysis across all VAR files with statistical comparisons
+1. **Comprehensive Video Analysis** (`--analyze`): Creates error evolution videos, overlay comparisons, and calculates error norms
+2. **Error Norms Analysis** (`--error-norms`): Focuses on L1/L2/L∞ error calculations without video generation
 
-## Command Structure
-
-### Basic Usage
+## Quick Start
 
 ```bash
-# Visualization mode (formerly --analyze)
-python main.py <experiment_name> --viz
-
-# Comprehensive error analysis (new)
-python main.py <experiment_name> --analyze
-
-# Check job status
-python main.py <experiment_name> --check
-```
-
-## Visualization Mode (`--viz`)
-
-Generates comparison plots for simulation vs analytical solutions using selected VAR files.
-
-### Usage Examples
-
-```bash
-# Visualize all runs (uses middle VAR file by default)
-python main.py shocktube_phase1 --viz
-
-# Visualize specific runs
-python main.py shocktube_phase1 --viz run1 run2 run3
-
-# Interactive mode - select runs interactively
-python main.py shocktube_phase1 --viz ?
-
-# Visualize with specific VAR file selection
-python main.py shocktube_phase1 --viz --var random
-python main.py shocktube_phase1 --viz --var last
-python main.py shocktube_phase1 --viz --var VAR5
-```
-
-### VAR File Selection Options
-
-The `--var` flag controls which VAR file to use for visualization:
-
-- `middle` (default): Selects the VAR file in the middle of the sequence
-- `random`: Randomly selects a VAR file
-- `last`: Uses the final VAR file
-- `first`: Uses the first VAR file
-- `VAR<N>`: Specify exact VAR file (e.g., `VAR5`, `VAR10`)
-
-### Output
-
-Visualization mode creates the following in `reports/<experiment_name>/`:
-
-- Individual plots for each variable (density, velocity, pressure, energy)
-- Comparison summary table (MSE metrics)
-- Quarto report template
-
-## Comprehensive Analysis Mode (`--analyze`)
-
-Performs deep error analysis across **all VAR files** for each run, generating:
-
-1. Standard deviation calculations across timesteps
-2. Absolute deviation metrics per VAR file
-3. Experiment-wide comparisons
-4. Branch comparisons
-5. Best performer identification
-6. **Enhanced VAR evolution collages with clear VAR file counting**
-7. **Animated videos showing VAR evolution over time** (NEW)
-8. **Animated videos showing error evolution with point tracking** (NEW)
-
-### Usage
-
-```bash
-# Run comprehensive analysis on an experiment
+# After simulations complete, run comprehensive analysis
 python main.py shocktube_phase1 --analyze
+
+# Or calculate error norms only
+python main.py shocktube_phase1 --error-norms
+
+# Automated workflow: submit, wait, then analyze
+python main.py shocktube_phase1 --wait --analyze
 ```
 
-### What Gets Analyzed
+## Comprehensive Video Analysis
 
-The analysis processes:
+### Command
 
-- **All VAR files** from each simulation run
-- **All runs** in the experiment
-- **All branches** defined in the sweep configuration
+```bash
+python main.py <experiment_name> --analyze
+```
 
-For each variable (ρ, u_x, p, e), it calculates:
+### What It Does
 
-- Standard deviation between numerical and analytical solutions
-- Mean, max, min, and std of standard deviations
-- Absolute deviations per timestep
-- Worst performing VAR files
+The comprehensive analysis performs the following workflow:
+
+**Phase 1: Individual Analysis**
+- Loads all VAR files from each simulation run
+- Calculates spatial errors against analytical solutions
+- Creates individual error evolution videos for each run
+- Generates video frames for detailed inspection
+
+**Phase 2: Comparative Analysis**
+- Identifies best performer in each branch
+- Creates overlay comparison videos for branches
+- Finds top 3 overall best performers
+- Generates top 3 overlay comparison video
+
+**Phase 3: Error Norm Calculations**
+- Calculates L1, L2, and L∞ error norms
+- Computes combined scores across all metrics
+- Ranks runs by performance
+
+**Phase 4: Visualization**
+- Creates comparison plots for all runs
+- Generates per-metric analysis charts
+- Produces detailed views of top performers
+- Creates branch comparison visualizations
+
+**Phase 5: Organization and Reporting**
+- Organizes results into structured folders
+- Populates "best" folders with top performers
+- Generates JSON and Markdown summary reports
+- Displays comprehensive Rich terminal report
 
 ### Output Structure
 
-All analysis results are saved to `analysis/<experiment_name>/`:
-
 ```
-analysis/
-└── shocktube_phase1/
-    ├── shocktube_phase1_error_analysis.json    # Intermediate data
-    ├── error_analysis_summary.md                # Summary report
-    ├── individual/                              # Individual run plots
-    │   ├── run1_std_evolution.png
-    │   ├── run2_std_evolution.png
-    │   └── ...
-    ├── branch_comparison/                       # Branch-level comparisons
-    │   ├── shocktube_phase1_branch_comparison_rho.png
-    │   ├── shocktube_phase1_branch_comparison_ux.png
-    │   ├── shocktube_phase1_branch_comparison_pp.png
-    │   └── shocktube_phase1_branch_comparison_ee.png
-    ├── best_performers/                         # Best performers comparison
-    │   └── best_performers_comparison.png
-    ├── var_evolution/                           # VAR evolution collages (ENHANCED)
-    │   ├── individual/                          # Individual run collages
-    │   │   ├── run1_var_evolution_collage.png  # Now shows "N VAR files" clearly
-    │   │   └── ...
-    │   ├── branch/                              # Branch-level collages
-    │   │   ├── exp_branch1_rho_evolution.png
-    │   │   └── ...
-    │   └── best_performers/                     # Best performers collages
-    │       ├── best_performers_rho_evolution.png
-    │       ├── best_performers_ux_evolution.png
-    │       ├── best_performers_pp_evolution.png
-    │       └── best_performers_ee_evolution.png
-    └── videos/                                  # NEW: Animated videos
-        ├── var_evolution/                       # VAR evolution videos
-        │   ├── run1_var_evolution.mp4          # Shows evolution across all VAR files
-        │   ├── run1_frames/                    # Individual frames (if ffmpeg unavailable)
-        │   └── ...
-        └── error_evolution/                     # Error evolution videos
-            ├── run1_error_evolution.mp4        # Shows error with mean/max/min tracking
-            ├── run1_error_frames/              # Individual frames (if ffmpeg unavailable)
-            └── ...
+analysis/<experiment_name>/
+├── var/
+│   ├── evolution/              # VAR evolution videos
+│   │   ├── run_001.mp4
+│   │   ├── run_002.mp4
+│   │   └── ...
+│   └── frames/                 # Video frames
+│       ├── run_001/
+│       └── ...
+├── error/
+│   ├── evolution/              # Error evolution videos
+│   │   ├── run_001.mp4         # Individual runs
+│   │   ├── run_002.mp4
+│   │   ├── <exp>_<branch>_overlay.mp4  # Branch comparisons
+│   │   └── <exp>_top3_best_performers_overlay.mp4
+│   ├── frames/                 # Video frames
+│   │   ├── run_001/
+│   │   └── ...
+│   └── best/                   # Best performers
+│       ├── videos/             # Best performers' videos
+│       ├── plots/              # Comparison plots
+│       └── summary.json        # Performance summary
+└── error_norms/                # Error norm analysis
+    ├── plots/
+    │   ├── combined_scores.png
+    │   ├── per_metric_l1.png
+    │   ├── per_metric_l2.png
+    │   ├── per_metric_linf.png
+    │   ├── top5_detailed.png
+    │   ├── branch_comparison.png
+    │   └── error_evolution_*.png
+    ├── <experiment>_error_norms_summary.json
+    └── <experiment>_error_norms_summary.md
 ```
 
-### Understanding the Results
+### Error Metrics
 
-#### 1. Top Performers
+Three error norms are calculated for each variable (ρ, u_x, p, e):
 
-The summary report lists the top 3 overall performing experiments based on mean standard deviation across all variables.
-
-**Lower values are better** - indicating closer agreement with analytical solutions.
-
-#### 2. Worst Deviations
-
-For each variable, identifies:
-- Which experiment/run has the worst mean deviation
-- Which specific VAR file (timestep) shows the worst error
-- The magnitude of that error
-
-This helps identify problematic regions in parameter space.
-
-#### 3. Branch Comparison
-
-Compares all runs within each branch to identify:
-- Most robust configurations within a branch
-- Parameter sensitivity within branches
-- Branch-level performance patterns
-
-#### 4. Best Performers by Branch
-
-For each branch, identifies the best performing run and compares these across branches to:
-- Determine scientifically significant differences between branches
-- Identify optimal branch configurations
-- Guide future parameter selection
-
-#### 5. VAR Evolution Collages (ENHANCED)
-
-Visual representations showing how each variable evolves across all timesteps:
-
-- **Individual collages**: Show how a single run evolves over time
-  - **NEW**: Title clearly states "N VAR files" analyzed
-  - **NEW**: Shows exactly 2 analytical solutions (initial & final) to avoid confusion
-  - **NEW**: Selective VAR file labeling (~8 labels) with file names and timesteps
-  - **FIX**: Previous versions showed misleading label counts
-- **Branch collages**: Compare evolution across different runs in the same branch  
-- **Best performer collages**: Compare evolution of the best run from each branch
-
-These help identify:
-- Convergence behavior
-- Stability issues  
-- Temporal error growth
-- **NEW**: Exact VAR file count being analyzed
-
-#### 6. Animated Evolution Videos (NEW)
-
-Two types of videos are automatically generated for each run:
-
-**VAR Evolution Videos** (`videos/var_evolution/*.mp4`):
-- Animates all 4 variables (ρ, u_x, p, e) frame-by-frame through all VAR files
-- Each frame shows numerical (blue) vs analytical (red dashed) solution
-- Title displays progress: "VAR N/Total"
-- Each subplot annotated with VAR file name and timestamp
-- Default: 2 fps, adjustable
-- Requires ffmpeg (falls back to individual PNG frames if unavailable)
-
-**Error Evolution Videos** (`videos/error_evolution/*.mp4`):
-- Animates standard deviation evolution for all 4 variables
-- **Point-to-point tracking** shows error progression through VAR files
-- **Real-time statistics** with visual markers:
-  - 🔴 **Current VAR** (red circle): Error at current timestep
-  - 🟢 **Mean** (green square): Running mean error  
-  - 🟠 **Max** (orange triangle): Peak error with VAR index
-  - 🔵 **Min** (blue triangle): Lowest error with VAR index
-- Text box shows numerical values for current/mean/max/min
-- **Identifies problematic VAR files** where errors spike
-- Default: 2 fps, adjustable
-- Requires ffmpeg (falls back to individual PNG frames if unavailable)
-
-**Why Videos?**
-- See temporal evolution patterns at a glance
-- Identify problematic timesteps quickly
-- Great for presentations and sharing results
-- Review many VAR files without manual clicking
-
-## Summary Report
-
-The analysis generates `error_analysis_summary.md` containing:
-
-```markdown
-# Error Analysis Summary Report
-
-## Top 3 Overall Performers
-1. **experiment/branch/run1** - Mean Std Dev: 1.234e-05
-2. **experiment/branch/run2** - Mean Std Dev: 1.456e-05
-3. **experiment/branch/run3** - Mean Std Dev: 1.678e-05
-
-## Worst Deviations by Variable
-
-### Variable: rho
-- **Worst Mean Deviation**: exp/branch/run (VAR 42, t=1.23e-01, value=5.67e-04)
-- **Worst Max Deviation**: exp/branch/run (VAR 38, t=1.10e-01, value=8.90e-04)
-
-### Variable: ux
-...
-
-## Best Performers by Branch
-
-### Experiment: shocktube_phase1
-- **massfix_default_gamma**: run_nu0.1_chi0.1 (score: 1.234e-05)
-- **massfix_gamma_is_1**: run_nu0.5_chi0.5 (score: 2.345e-05)
-- **nomassfix**: run_nu1.0_chi1.0 (score: 3.456e-05)
+**L1 Norm (Mean Absolute Error)**
 ```
+L1 = (1/N) Σ |numerical - analytical|
+```
+- Measures average absolute deviation
+- Sensitive to all errors equally
+- Good for overall error assessment
 
-This report is also logged to the console during analysis.
+**L2 Norm (Root Mean Square Error)**
+```
+L2 = √[(1/N) Σ (numerical - analytical)²]
+```
+- Emphasizes larger errors
+- Most commonly used metric
+- Good for comparing solutions
 
-## Auto-Processing Flags
+**L∞ Norm (Maximum Absolute Error)**
+```
+L∞ = max |numerical - analytical|
+```
+- Captures worst-case error
+- Important for stability analysis
+- Identifies problematic regions
 
-You can configure automatic post-processing reminders in `sweep.yaml`:
+### Combined Scoring
+
+The platform calculates a combined score to rank runs:
+
+1. For each metric (L1, L2, L∞), calculate mean across all variables
+2. Average all metric scores to get combined score
+3. Lower score = better performance
+
+This multi-metric approach ensures robust parameter identification.
+
+### Video Features
+
+**Individual Error Evolution Videos**
+- Show all four variables (ρ, u_x, p, e) evolving over time
+- Display both numerical and analytical solutions
+- Include absolute error visualization
+- Annotated with timestep and physical time
+
+**Combined Error Videos**
+- When configured, show L1, L2, and L∞ errors simultaneously
+- Side-by-side comparison of different error types
+- Helps understand error behavior across metrics
+
+**Overlay Comparison Videos**
+- Compare multiple runs on the same plot
+- Useful for branch comparison
+- Highlights performance differences
+- Shows top performers together
+
+### Configuration
+
+Control analysis behavior in `sweep.yaml`:
 
 ```yaml
-# --- Post-Processing Automation (Optional) ---
-auto_check: true               # Check job status after submission
-auto_postprocessing: true      # Display post-processing reminders
+error_analysis:
+  metrics: ['l1', 'l2', 'linf']    # Which metrics to calculate
+  combine_in_videos: true          # Show all metrics in one video
 ```
 
-When enabled:
-- `auto_check`: Automatically runs `--check` after job submission
-- `auto_postprocessing`: Displays reminders to run analysis after jobs complete
+## Error Norms Analysis Only
 
-**Note**: These flags provide reminders only. Actual post-processing must be run manually after jobs complete, as the data needs to be generated first.
-
-## Workflow Example
-
-Complete workflow for running and analyzing an experiment:
+### Command
 
 ```bash
-# 1. Generate and submit experiment
-python main.py shocktube_phase1
+python main.py <experiment_name> --error-norms
+```
 
-# 2. Check job status periodically
-python main.py shocktube_phase1 --check
+### Purpose
 
-# 3. After jobs complete, run comprehensive analysis
-python main.py shocktube_phase1 --analyze
+This mode focuses exclusively on error norm calculations without video generation. Use it when:
+- You only need numerical metrics
+- Video generation is too time-consuming
+- You want faster analysis turnaround
+- Storage space is limited
 
-# 4. Optionally, visualize specific runs
-python main.py shocktube_phase1 --viz ? --var random
+### What It Does
+
+1. Loads all VAR files from all runs
+2. Calculates L1, L2, and L∞ error norms
+3. Computes combined scores
+4. Identifies best performers (overall and per branch)
+5. Creates comparison plots only (no videos)
+6. Generates summary reports
+
+### Output
+
+Results are saved to `analysis/<experiment_name>/error_norms/`:
+- Comparison plots for all metrics
+- Top 5 detailed performance analysis
+- Branch comparison visualization
+- Error evolution plots for top 3
+- JSON and Markdown summary reports
+
+## Understanding Results
+
+### Best Performers
+
+The analysis identifies best performers at multiple levels:
+
+**Overall Best**
+- Top 5 runs across entire experiment
+- Ranked by combined score
+- Displayed with individual metric scores
+
+**Per Branch Best**
+- Best run in each branch
+- Useful for comparing branch strategies
+- Shows branch-specific optimization
+
+### Reading Summary Reports
+
+**JSON Format** (`*_summary.json`)
+```json
+{
+  "experiment": "shocktube_phase1",
+  "metrics_used": ["l1", "l2", "linf"],
+  "total_runs_analyzed": 18,
+  "top_5_overall": [
+    {
+      "rank": 1,
+      "run_name": "shocktube_phase1_nu_0.5_chi_1.0",
+      "combined_score": 1.234e-03,
+      "branch": "default",
+      "per_metric_scores": {
+        "l1": 1.1e-03,
+        "l2": 1.3e-03,
+        "linf": 1.3e-03
+      }
+    }
+  ],
+  "best_per_branch": {...},
+  "detailed_scores": {...}
+}
+```
+
+**Markdown Format** (`*_summary.md`)
+- Human-readable report
+- Top 5 overall performers with metrics
+- Best performer per branch
+- Easy to review and share
+
+### Interpreting Plots
+
+**Combined Scores Plot**
+- Bar chart comparing all runs
+- Lower bars = better performance
+- Color-coded by branch
+- Helps identify optimal parameters
+
+**Per-Metric Plots**
+- Separate plots for L1, L2, L∞
+- Compare metric-specific performance
+- May reveal trade-offs between metrics
+- Identify metric-specific outliers
+
+**Top 5 Detailed View**
+- Radar/spider plot showing all metrics
+- Visual comparison of top performers
+- Highlights relative strengths
+- Easy comparison of trade-offs
+
+**Branch Comparison**
+- Compare best run from each branch
+- Evaluate branch strategies
+- Identify most promising approach
+- Support decision-making
+
+**Error Evolution Plots**
+- Show how errors change over time
+- Identify convergence behavior
+- Detect stability issues
+- Compare temporal performance
+
+## Advanced Usage
+
+### Custom Error Calculation
+
+The `error_method` parameter controls spatial error calculation:
+
+```python
+# In the code (for developers)
+spatial_errors = calculate_spatial_errors(
+    sim_data, 
+    analytical_data, 
+    error_method='absolute'  # or 'relative', 'difference', 'squared'
+)
+```
+
+**Available methods:**
+- `absolute`: |numerical - analytical|
+- `relative`: |numerical - analytical| / |analytical|
+- `difference`: numerical - analytical
+- `squared`: (numerical - analytical)²
+
+### Automated Analysis Workflow
+
+```bash
+# Submit jobs, wait for completion, then analyze automatically
+python main.py my_experiment --wait --analyze
+```
+
+This is ideal for:
+- Overnight runs
+- Automated testing
+- CI/CD pipelines
+- Batch processing
+
+### Selective Analysis
+
+To analyze specific branches or runs, modify the manifest file:
+
+```bash
+# Create custom manifest with selected runs
+cat > runs/my_experiment/manifest_custom.txt << EOF
+run_001
+run_005
+run_010
+EOF
+
+# Then modify the analysis script to use custom manifest
 ```
 
 ## Performance Considerations
 
-### Visualization Mode
-- Fast: Only loads one VAR file per run
-- Suitable for quick checks
-- Memory efficient
+### Memory Requirements
 
-### Analysis Mode
-- Intensive: Loads **all** VAR files from **all** runs
-- May take significant time for large experiments
-- Requires sufficient memory
-- Recommended to run on HPC or powerful workstation
+Analysis loads all VAR files into memory:
+- Each VAR file: ~10-100 MB (depends on resolution)
+- Total memory needed: N_runs × N_vars × VAR_size
+- For 20 runs with 50 VAR files each: ~10-100 GB
 
-**Tip**: For very large experiments, consider:
-1. Running analysis on a compute node
-2. Processing branches separately
-3. Using the intermediate JSON data for iterative analysis
+**Tips for large experiments:**
+- Use `--error-norms` instead of `--analyze` to skip videos
+- Analyze branches separately
+- Use HPC nodes with sufficient RAM
+- Consider downsampling VAR files
 
-## Interpreting Standard Deviation Plots (ENHANCED)
+### Time Requirements
 
-### Individual Experiment Plots
+**Comprehensive Analysis** (`--analyze`):
+- VAR loading: 1-5 minutes per run
+- Video generation: 2-10 minutes per run
+- Total: ~5-20 minutes per run
+- For 20 runs: 2-7 hours
 
-Shows how error evolves over time (across VAR files) with enhanced visual markers:
+**Error Norms Only** (`--error-norms`):
+- VAR loading: 1-5 minutes per run
+- No video generation
+- Total: ~1-5 minutes per run
+- For 20 runs: 20 minutes - 2 hours
 
-- **Blue line with points**: Per-VAR standard deviation evolution
-- **Green dashed line**: Mean standard deviation across all VARs
-- **Orange triangle** (🔺): Maximum error point with VAR index label
-- **Blue triangle** (🔻): Minimum error point with VAR index label
-- **Text box**: Statistical summary showing value ranges and std of std
-- **X-axis**: "VAR File Index (0 to N-1)" - clearly labeled
-- **Title**: Shows total number of VAR files analyzed
+### Optimization Tips
 
-**Trends to look for**:
-- Flat line: Consistent error throughout simulation
-- Increasing trend: Error accumulation over time
-- Spikes: Identify specific VAR files with issues (now labeled!)
-- Max/min markers: Quickly see best and worst performing timesteps
-
-### Branch Comparison Plots
-
-Bar charts comparing mean standard deviation across runs:
-
-- **Lower bars**: Better performance
-- **Similar heights**: Robust to parameter variations
-- **One outlier**: Specific parameter combination issue
-
-### Best Performers Plot
-
-Compares the champion from each branch:
-
-- **Green bar**: Overall best performer
-- **Height differences**: Scientific significance between branches
-- **Similar heights**: Branches perform comparably
-
-## Tips and Best Practices
-
-1. **Start with visualization** (`--viz`) for quick sanity checks
-2. **Run comprehensive analysis** (`--analyze`) for detailed investigation
-3. **Use interactive mode** (`--viz ?`) to explore specific runs
-4. **Check summary report first** before diving into individual plots
-5. **Compare branch best performers** to guide methodology decisions
-6. **Look for temporal trends** in evolution collages **and videos** 🎥
-7. **Investigate worst deviations** to find parameter space boundaries
-8. **Watch error evolution videos** to spot when/where errors spike
-9. **Check VAR file counts** in titles to ensure all data was analyzed
-10. **Use frame sequences** if ffmpeg is unavailable - can still create videos manually
+1. **Use test mode first**: Verify with `--test 2 --analyze`
+2. **Parallel processing**: Run analysis on HPC compute node
+3. **Selective frames**: Modify FPS in video generation
+4. **Batch analysis**: Analyze branches sequentially
+5. **Storage**: Use fast storage for I/O-intensive operations
 
 ## Troubleshooting
 
 ### "No VAR files found"
-- Ensure simulations completed successfully
-- Check HPC paths in sweep.yaml
-- Verify data directory structure
 
-### "Failed to load VAR file"
-- Corrupted output files
-- Insufficient disk space during simulation
-- Check specific VAR file mentioned in error
+**Problem**: Cannot find simulation output
 
-### Analysis takes too long
-- Reduce number of runs with `--viz specific_runs`
-- Process one branch at a time
-- Run on compute node with more resources
-- **Video generation adds time but runs in parallel with collages**
+**Solutions:**
+```bash
+# Check data directory path in sweep.yaml
+cat config/my_experiment/plan/sweep.yaml | grep run_base_dir
 
-### Out of memory
-- Process smaller subsets of runs
-- Use visualization mode instead
-- Increase available RAM or use HPC
+# Verify files exist
+ls /path/to/run_base_dir/run_001/data/
 
-### Videos not generating
-- **Install ffmpeg**: `conda install ffmpeg` or system package manager
-- **Check ffmpeg**: Run `ffmpeg -version` to verify installation
-- **Use frame sequences**: Even without ffmpeg, individual PNG frames are generated
-- **Manual video creation**: Use provided ffmpeg command in logs to create videos from frames
-
-### ffmpeg not found
-- Platform automatically falls back to generating individual PNG frames
-- Frames saved in `*_frames/` directories
-- Console will show ffmpeg command to manually create videos
-- Example: `ffmpeg -framerate 2 -i frames/frame_%04d.png -c:v libx264 -pix_fmt yuv420p output.mp4`
-
-## Advanced Usage
-
-### Programmatic Access
-
-The error analysis can be accessed programmatically:
-
-```python
-from src.error_analysis import ExperimentErrorAnalyzer
-from pathlib import Path
-
-# Load existing analysis
-analyzer = ExperimentErrorAnalyzer(Path("analysis/shocktube_phase1"))
-analyzer.load_experiment_data("shocktube_phase1")
-
-# Find top performers
-top_3 = analyzer.find_top_performers(metric='mean_std', top_n=3)
-
-# Get branch best performers
-branch_best = analyzer.compare_branch_best_performers()
-
-# Find worst deviations
-worst = analyzer.find_worst_deviations()
+# Check proc0 directory
+ls /path/to/run_base_dir/run_001/data/proc0/
 ```
 
-This allows custom analysis and integration with other tools.
+### "Memory error during analysis"
+
+**Problem**: Not enough RAM to load all VAR files
+
+**Solutions:**
+1. Use `--error-norms` (no video generation)
+2. Analyze fewer runs at once
+3. Request more memory on HPC
+4. Downsample VAR files before analysis
+
+### "Video generation fails"
+
+**Problem**: FFmpeg not installed or configured
+
+**Solutions:**
+```bash
+# Check FFmpeg installation
+ffmpeg -version
+
+# Install if missing
+# Ubuntu/Debian
+sudo apt install ffmpeg
+
+# macOS
+brew install ffmpeg
+
+# Windows
+choco install ffmpeg
+```
+
+### "Analytical solution mismatch"
+
+**Problem**: Parameters don't match expected values
+
+**Solutions:**
+- Verify problem type (shock tube, etc.)
+- Check initial conditions in start_in.yaml
+- Ensure correct gamma, cs0, rho0 values
+- Review run_in.yaml for consistency
+
+## Best Practices
+
+1. **Test first**: Always use `--test` with analysis on small subset
+2. **Check one run**: Manually verify one run before batch analysis
+3. **Document parameters**: Keep notes on what parameters were tested
+4. **Version results**: Use git to track experiment configurations
+5. **Archive strategically**: Keep best performers, archive or delete others
+6. **Review videos**: Watch videos to understand error behavior qualitatively
+7. **Cross-validate**: Compare multiple metrics for robust conclusions
+8. **Iterate**: Use results to inform next parameter sweep
+
+## Examples
+
+### Example 1: Quick Check
+
+```bash
+# Test analysis on first 2 runs
+python main.py my_experiment --test 2
+# ... wait for simulations ...
+python main.py my_experiment --test 2 --analyze
+
+# Review results
+ls analysis/my_experiment/error/evolution/
+```
+
+### Example 2: Full Analysis
+
+```bash
+# Run full experiment
+python main.py my_experiment
+
+# After completion, comprehensive analysis
+python main.py my_experiment --analyze
+
+# Review summary
+cat analysis/my_experiment/error_norms/*_summary.md
+
+# Check best performer video
+vlc analysis/my_experiment/error/best/videos/rank_1.mp4
+```
+
+### Example 3: Automated Workflow
+
+```bash
+# Complete automation: generate, submit, wait, analyze
+python main.py my_experiment --wait --analyze
+
+# Results will be ready when done
+ls analysis/my_experiment/
+```
+
+### Example 4: Branch Comparison
+
+```bash
+# Run experiment with multiple branches
+python main.py my_experiment_branches
+
+# Analyze
+python main.py my_experiment_branches --analyze
+
+# Compare branch overlay videos
+ls analysis/my_experiment_branches/error/evolution/*_overlay.mp4
+
+# Review branch comparison plot
+open analysis/my_experiment_branches/error_norms/plots/branch_comparison.png
+```
+
+## See Also
+
+- [CLI Reference](cli-reference.md) - Complete command options
+- [User Guide](user-guide/index.md) - General usage patterns
+- [Troubleshooting](troubleshooting.md) - Common issues and solutions

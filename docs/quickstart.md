@@ -92,14 +92,25 @@ snakemake --profile .config/slurm --config experiment_name=shocktube_phase1 -n
 snakemake --profile .config/slurm --config experiment_name=shocktube_phase1
 ```
 
-### Check Job Status
+### Check Job Status and Analysis
 
 ```bash
 # Check status of submitted jobs
 python main.py shocktube_phase1 --check
+
+# Wait for jobs to complete, then run analysis
+python main.py shocktube_phase1 --wait --analyze
+
+# Run comprehensive error analysis (after jobs complete)
+python main.py shocktube_phase1 --analyze
+
+# Calculate L1/L2/L∞ error norms only
+python main.py shocktube_phase1 --error-norms
 ```
 
 ## Understanding the Output
+
+### Generated Configurations
 
 After running an experiment, you'll find:
 
@@ -117,6 +128,27 @@ platform/
 │       │   ├── run_002/
 │       │   └── ...
 │       └── submit_jobs.sh  # SLURM submission script
+```
+
+### Analysis Results
+
+After running analysis (`--analyze`), you'll find:
+
+```
+platform/
+├── analysis/
+│   └── shocktube_phase1/
+│       ├── var/
+│       │   ├── evolution/      # Individual VAR evolution videos
+│       │   └── frames/         # Video frames
+│       ├── error/
+│       │   ├── evolution/      # Individual error evolution videos
+│       │   ├── frames/         # Video frames
+│       │   └── best/           # Best performers' videos/plots
+│       └── error_norms/        # L1/L2 error norm analysis
+│           ├── plots/          # Comparison plots
+│           ├── *_summary.json  # JSON summary
+│           └── *_summary.md    # Markdown report
 ```
 
 ## Key Command Options
@@ -140,8 +172,14 @@ python main.py <experiment_name> --test [N]
 # Force rebuild of executables
 python main.py <experiment_name> --rebuild
 
-# Run analysis and plotting
+# Run comprehensive video analysis
 python main.py <experiment_name> --analyze
+
+# Calculate L1/L2/L∞ error norms
+python main.py <experiment_name> --error-norms
+
+# Wait for jobs then analyze
+python main.py <experiment_name> --wait --analyze
 
 # Check job status
 python main.py <experiment_name> --check
@@ -173,6 +211,13 @@ python main.py shocktube_phase2
 # 6. Submit to SLURM (on HPC)
 cd runs/shocktube_phase2
 sbatch submit_jobs.sh
+
+# 7. After jobs complete, run analysis
+python main.py shocktube_phase2 --analyze
+
+# 8. Review results
+ls analysis/shocktube_phase2/error/evolution/  # Videos
+cat analysis/shocktube_phase2/error_norms/*_summary.md  # Report
 ```
 
 ## Modifying Experiments

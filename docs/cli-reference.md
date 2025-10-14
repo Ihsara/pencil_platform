@@ -79,7 +79,7 @@ python main.py shocktube_phase1 --rebuild
 
 ### `--analyze`
 
-Run comprehensive error analysis across all VAR files for all runs.
+Run video-only analysis: creates individual error evolution videos and overlay comparisons.
 
 **Usage:**
 ```bash
@@ -87,48 +87,88 @@ python main.py shocktube_phase1 --analyze
 ```
 
 **What it does:**
-- Loads **all VAR files** from all simulation runs
-- Calculates standard deviation between numerical and analytical solutions
-- Identifies top 3 performing experiments
-- Finds worst deviations per variable
-- Compares performance across branches
-- Generates evolution collages showing temporal trends
-- Creates comprehensive summary report
+- Loads all VAR files from all simulation runs
+- Calculates spatial errors between numerical and analytical solutions
+- Creates individual error evolution videos for each run
+- Generates overlay comparison videos for branches
+- Creates top 3 performers overlay video
+- Calculates L1/L2/L∞ error norms with combined scoring
+- Generates comprehensive visualizations and summary reports
 
 **Output location:** `analysis/<experiment_name>/`
+
+**Folder structure:**
+```
+analysis/<experiment_name>/
+├── var/
+│   ├── evolution/      # Individual VAR evolution videos
+│   └── frames/         # Video frames
+├── error/
+│   ├── evolution/      # Individual error evolution videos
+│   ├── frames/         # Video frames
+│   └── best/           # Best performers' videos and plots
+└── error_norms/        # L1/L2 error norm analysis results
+    ├── plots/          # Comparison plots
+    ├── *_summary.json  # JSON summary
+    └── *_summary.md    # Markdown report
+```
 
 **Requirements:**
 - Simulation data must exist and be complete
 - Sufficient memory for loading all VAR files
+- FFmpeg installed for video generation
 
 **See:** [Analysis and Visualization Guide](analysis-and-visualization.md) for detailed information
 
-### `--viz [RUNS...]`
+### `--error-norms`
 
-Visualize specific runs with comparison plots (quick visualization mode).
+Run L1/L2 error norm analysis: calculates L1, L2, L∞ metrics with combined scoring.
 
 **Usage:**
 ```bash
-# Visualize all runs
-python main.py shocktube_phase1 --viz
-
-# Visualize specific runs
-python main.py shocktube_phase1 --viz run1 run2 run3
-
-# Interactive mode - select runs interactively
-python main.py shocktube_phase1 --viz ?
+python main.py shocktube_phase1 --error-norms
 ```
 
 **What it does:**
-- Generates comparison plots for selected runs
-- Uses single VAR file per run (middle by default)
-- Creates MSE metrics comparison table
-- Generates Quarto report template
-- Much faster than `--analyze` for quick checks
+- Loads all VAR files from all simulation runs
+- Calculates L1, L2, and L∞ error norms for all variables
+- Computes combined scores averaging all metrics
+- Identifies best performers overall and per branch
+- Generates comparison plots and detailed visualizations
+- Creates comprehensive summary reports
 
-**Output location:** `reports/<experiment_name>/`
+**Output location:** `analysis/<experiment_name>/error_norms/`
 
-**See:** [Analysis and Visualization Guide](analysis-and-visualization.md) for usage examples
+**What's included:**
+- Combined scores comparison plot (all runs)
+- Per-metric comparison plots (L1, L2, L∞)
+- Top 5 performers detailed view
+- Branch comparison analysis
+- Error evolution over time (top 3)
+- JSON and Markdown summary reports
+
+**Metrics calculated:**
+- **L1 norm**: Mean absolute error
+- **L2 norm**: Root mean square error
+- **L∞ norm**: Maximum absolute error
+
+**Note:** This analysis focuses on error norms only, without video generation. Results are saved to a dedicated `error_norms/` subfolder for easy organization.
+
+### `--viz [RUNS...]`
+
+**DEPRECATED:** This flag is deprecated and redirects to `--analyze`.
+
+**Usage:**
+```bash
+# Use --analyze instead
+python main.py shocktube_phase1 --analyze
+```
+
+**What it does:**
+- Redirects to video-only analysis (`--analyze`)
+- Will be removed in a future version
+
+**Migration:** Replace all `--viz` usage with `--analyze` for the same functionality.
 
 ### `--var SELECTION`
 
@@ -180,6 +220,38 @@ Job Status for shocktube_phase1:
   Failed: 0
   Total: 50
 ```
+
+### `--wait`
+
+Wait for job completion before proceeding. Useful for automated workflows.
+
+**Usage:**
+```bash
+# Wait for jobs to complete
+python main.py shocktube_phase1 --wait
+
+# Wait then auto-run analysis
+python main.py shocktube_phase1 --wait --analyze
+```
+
+**What it does:**
+- Monitors job status on the HPC cluster
+- Polls SLURM at regular intervals
+- Waits until all jobs are completed
+- Optionally runs analysis after completion (if `--analyze` is specified)
+
+**Common use cases:**
+```bash
+# Submit, wait, and analyze automatically
+python main.py my_experiment --wait --analyze
+
+# Just wait for completion
+python main.py my_experiment --wait
+```
+
+**Requirements:**
+- Jobs must be submitted first (automatically done in normal mode)
+- SLURM must be accessible
 
 ### `--help`, `-h`
 

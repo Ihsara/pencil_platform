@@ -22,7 +22,10 @@ The core concept is to separate **configuration** (what you want to run) from **
 - [Installation Guide](installation.md)
 - [Quick Start Tutorial](quickstart.md)
 - [User Guide](user-guide/index.md)
+- [Analysis and Visualization](analysis-and-visualization.md)
+- [CLI Reference](cli-reference.md)
 - [API Reference](api/index.md)
+- [Troubleshooting](troubleshooting.md)
 - [Contributing Guidelines](contributing.md)
 
 ## Documentation Contents
@@ -40,19 +43,17 @@ quickstart
 :caption: User Guide
 
 user-guide/index
-user-guide/configuration
+user-guide/base-experiments
 user-guide/parameter-sweeps
-user-guide/branches
-user-guide/workflow-management
-user-guide/examples
 ```
 
 ```{toctree}
 :maxdepth: 2
-:caption: Reference
+:caption: Analysis & Reference
 
-api/index
+analysis-and-visualization
 cli-reference
+api/index
 troubleshooting
 ```
 

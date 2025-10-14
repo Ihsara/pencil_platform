@@ -114,18 +114,37 @@ You should see the help message with available commands and options.
 
 The project requires the following Python packages (automatically installed):
 
+### Core Dependencies
 - **f90nml** (>=1.4.5): Fortran namelist parser
 - **flatdict** (>=4.0.1): Dictionary flattening utilities
 - **h5py** (>=3.14.0): HDF5 file handling
 - **jinja2** (>=3.1.6): Template engine for configuration generation
 - **loguru** (>=0.7.3): Advanced logging
-- **matplotlib** (>=3.10.6): Plotting and visualization
 - **numpy** (>=2.3.2): Numerical computing
 - **pandas** (>=2.3.2): Data analysis and manipulation
 - **pexpect** (>=4.9.0): Process interaction
 - **pyyaml** (>=6.0.2): YAML file parsing
 - **scipy** (>=1.16.1): Scientific computing
 - **tabulate** (>=0.9.0): Table formatting
+
+### Visualization and Analysis
+- **matplotlib** (>=3.10.6): Plotting and visualization
+- **seaborn** (>=0.13.2): Statistical data visualization
+- **ffmpeg-python** (>=0.2.0): Video generation for error evolution
+- **rich** (>=13.9.4): Terminal output formatting and tables
+
+### External Dependencies
+- **FFmpeg**: Required for video generation in analysis workflows
+  ```bash
+  # Ubuntu/Debian
+  sudo apt install ffmpeg
+  
+  # macOS
+  brew install ffmpeg
+  
+  # Windows (via Chocolatey)
+  choco install ffmpeg
+  ```
 
 ## HPC-Specific Setup
 
