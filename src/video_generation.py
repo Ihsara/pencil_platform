@@ -360,6 +360,14 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     legend_ax = fig.add_subplot(gs[2, :])
     legend_ax.axis('off')
     
+    # Add legend for the error line
+    from matplotlib.lines import Line2D
+    legend_elements = [
+        Line2D([0], [0], color='#1f77b4', linewidth=2, alpha=0.8, label='Spatial Error')
+    ]
+    legend_ax.legend(handles=legend_elements, loc='center', ncol=1, 
+                    fontsize=12, frameon=True)
+    
     # Statistics box in legend row
     stats_text = fig.text(0.5, 0.03, '', fontsize=9, horizontalalignment='center',
                          verticalalignment='bottom', family='monospace',
@@ -549,6 +557,14 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
         # Create legend in the last row (row 3, spans both columns)
         legend_ax = fig.add_subplot(gs[2, :])
         legend_ax.axis('off')
+        
+        # Add legend for the error line
+        from matplotlib.lines import Line2D
+        legend_elements = [
+            Line2D([0], [0], color='#1f77b4', linewidth=2, alpha=0.8, label='Spatial Error')
+        ]
+        legend_ax.legend(handles=legend_elements, loc='center', ncol=1, 
+                        fontsize=12, frameon=True)
         
         # Statistics box in legend row
         fig.text(0.5, 0.03, f'{var_file} | t={timestep:.4e} s | Frame {frame+1}/{max_timesteps}\n' + 
