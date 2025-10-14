@@ -10,6 +10,7 @@ from loguru import logger
 from typing import Dict, List, Tuple
 
 from .constants import DIRS, FILES
+from .logging_utils import setup_file_logging
 from .error_analysis import (
     calculate_std_deviation_across_vars, 
     calculate_absolute_deviation_per_var,
@@ -209,6 +210,9 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
         experiment_name: Name of the experiment suite
         error_method: Error calculation method for spatial errors
     """
+    # Setup file logging for this analysis run
+    setup_file_logging(experiment_name, 'analysis')
+    
     logger.info(f"=" * 80)
     logger.info(f"STARTING VIDEO-ONLY ANALYSIS: '{experiment_name}'")
     logger.info(f"=" * 80)
@@ -544,9 +548,12 @@ def analyze_suite_with_error_norms(experiment_name: str, metrics: List[str] = No
     if metrics is None:
         metrics = ['l1', 'l2', 'linf']
     
-    logger.info(f"=" * 80)
+    # Setup file logging for this analysis run
+    setup_file_logging(experiment_name, 'analysis')
+    
+    logger.info("=" * 80)
     logger.info(f"STARTING L1/L2 ERROR NORM ANALYSIS: '{experiment_name}'")
-    logger.info(f"=" * 80)
+    logger.info("=" * 80)
     
     plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
     with open(plan_file, 'r') as f: 

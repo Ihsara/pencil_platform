@@ -9,6 +9,7 @@ from copy import deepcopy
 import jinja2
 
 from .constants import DIRS, FILES
+from .logging_utils import setup_file_logging
 
 def _deep_merge_configs(base: dict, override: dict) -> dict:
     """
@@ -94,6 +95,12 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     """
     Reads an experiment plan, generates all configurations and scripts.
     """
+    # Extract experiment name for logging
+    experiment_name = plan_file.parent.parent.name
+    
+    # Setup file logging for this generation run
+    setup_file_logging(experiment_name, 'generation')
+    
     logger.info(f"Loading experiment plan from: {plan_file}")
     with open(plan_file, 'r') as f: plan = yaml.safe_load(f)
 

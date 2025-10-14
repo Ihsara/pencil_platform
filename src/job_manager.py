@@ -8,12 +8,15 @@ from loguru import logger
 import yaml
 
 from .constants import DIRS, FILES
+from .logging_utils import setup_file_logging
 
 def submit_suite(experiment_name: str, submit_script_path: Path, plan: dict):
     """
     Submits the generated job array script to SLURM and records the job ID.
     """
-    # This function is correct and remains unchanged.
+    # Setup file logging for this submission
+    setup_file_logging(experiment_name, 'submission')
+    
     logger.info("Attempting to submit job to SLURM...")
     try:
         cmd = ["sbatch", str(submit_script_path)]
@@ -53,6 +56,10 @@ def check_suite_status(experiment_name: str, return_status: bool = False):
     Returns:
         Dict with status counts if return_status=True, otherwise None
     """
+    # Setup file logging only for direct status checks (not for internal polling)
+    if not return_status:
+        setup_file_logging(experiment_name, 'status')
+    
     logger.info(f"--- STATUS CHECK MODE for '{experiment_name}' ---")
     
     local_exp_dir = DIRS.runs / experiment_name
