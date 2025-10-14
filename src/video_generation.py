@@ -150,7 +150,7 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     
     # Create animation
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=n_vars,
-                                  interval=1000//fps, blit=True, repeat=True)
+                                  interval=1000//fps, blit=False, repeat=True)
     
     # Optionally create individual frames (disabled by default to save resources)
     if save_frames:
@@ -427,7 +427,7 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
     
     # Create animation
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
-                                  interval=1000//fps, blit=True, repeat=True)
+                                  interval=1000//fps, blit=False, repeat=True)
     
     # Optionally create individual frames (disabled by default to save resources)
     if save_frames:
@@ -705,7 +705,7 @@ def create_overlay_error_evolution_video(
     
     # Create animation
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
-                                  interval=1000//fps, blit=True, repeat=True)
+                                  interval=1000//fps, blit=False, repeat=True)
     
     # Save animation as GIF
     output_file = output_path / f"{output_name}_error_evolution.gif"
