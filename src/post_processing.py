@@ -32,6 +32,7 @@ from .video_generation import (
     create_overlay_error_evolution_video,
 )
 from .experiment_name_decoder import format_experiment_title, format_short_experiment_name
+from .analysis_organizer import AnalysisOrganizer
 
 # --- Add Pencil Code Python Library to Path ---
 PENCIL_CODE_PYTHON_PATH = DIRS.root.parent / "pencil-code" / "python"
@@ -518,6 +519,25 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                             combined_scores, metrics, error_norms_dir, experiment_name)
     
     # ============================================================
+    # PHASE 6: Organize folder structure and create "best" folders
+    # ============================================================
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 6: Organizing folder structure")
+    logger.info("=" * 80)
+    
+    organizer = AnalysisOrganizer(experiment_name, analysis_dir)
+    organizer.organize()
+    
+    # Populate best performers folders
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 7: Populating best performers folders")
+    logger.info("=" * 80)
+    
+    organizer.populate_best_performers(
+        error_norms_cache, combined_scores, top_n=3, metrics=metrics
+    )
+    
+    # ============================================================
     # FINAL RICH REPORT
     # ============================================================
     logger.info("\n" + "=" * 80)
@@ -525,7 +545,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     logger.info("=" * 80)
     
     generate_final_rich_report(
-        experiment_name, error_evolution_dir, error_norms_dir, 
+        experiment_name, organizer.error_evolution_dir, organizer.error_norms_dir, 
         len(loaded_data_cache), sorted_runs[:5], branch_best, 
         combined_scores, metrics
     )
