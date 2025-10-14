@@ -814,10 +814,18 @@ def create_combined_error_evolution_video(
                     lines[var][error_type].set_data(x_coords, errors)
 
             # L-infinity norm is max of absolute error
-            abs_errors = spatial_errors_dict['Absolute'][var]['errors_per_timestep'][frame]
-            x_coords_abs = spatial_errors_dict['Absolute'][var]['x'] * unit_length
-            max_error_idx = np.argmax(abs_errors)
-            inf_markers[var].set_data([x_coords_abs[max_error_idx]], [abs_errors[max_error_idx]])
+            # Find the absolute error key (could be 'Absolute', 'L1/LINF (Absolute)', etc.)
+            abs_error_key = None
+            for key in spatial_errors_dict.keys():
+                if 'Absolute' in key or 'absolute' in key.lower():
+                    abs_error_key = key
+                    break
+            
+            if abs_error_key and var in spatial_errors_dict[abs_error_key]:
+                abs_errors = spatial_errors_dict[abs_error_key][var]['errors_per_timestep'][frame]
+                x_coords_abs = spatial_errors_dict[abs_error_key][var]['x'] * unit_length
+                max_error_idx = np.argmax(abs_errors)
+                inf_markers[var].set_data([x_coords_abs[max_error_idx]], [abs_errors[max_error_idx]])
             
         var_file = spatial_errors_dict[first_error_type]['rho']['var_files'][frame]
         timestep = spatial_errors_dict[first_error_type]['rho']['timesteps'][frame]
@@ -887,10 +895,18 @@ def create_combined_error_evolution_frames(
                     errors = spatial_errors[var]['errors_per_timestep'][frame]
                     ax.plot(x_coords, errors, '-', linewidth=2, color=colors.get(error_type, 'k'), alpha=0.8, label=error_type)
             
-            abs_errors = spatial_errors_dict['Absolute'][var]['errors_per_timestep'][frame]
-            x_coords_abs = spatial_errors_dict['Absolute'][var]['x'] * unit_length
-            max_error_idx = np.argmax(abs_errors)
-            ax.plot(x_coords_abs[max_error_idx], abs_errors[max_error_idx], 'o', color=colors['L_inf'], markersize=8, alpha=0.9, label='L_inf Norm')
+            # Find the absolute error data (could be named 'Absolute', 'L1/LINF (Absolute)', etc.)
+            abs_error_key = None
+            for key in spatial_errors_dict.keys():
+                if 'Absolute' in key or 'absolute' in key.lower():
+                    abs_error_key = key
+                    break
+            
+            if abs_error_key and var in spatial_errors_dict[abs_error_key]:
+                abs_errors = spatial_errors_dict[abs_error_key][var]['errors_per_timestep'][frame]
+                x_coords_abs = spatial_errors_dict[abs_error_key][var]['x'] * unit_length
+                max_error_idx = np.argmax(abs_errors)
+                ax.plot(x_coords_abs[max_error_idx], abs_errors[max_error_idx], 'o', color=colors.get('L_inf', 'red'), markersize=8, alpha=0.9, label='L_inf Norm')
 
             ax.set_xlabel('Position (x) [kpc]', fontsize=11)
             ax.set_ylabel(f'Error in {label}', fontsize=11)
