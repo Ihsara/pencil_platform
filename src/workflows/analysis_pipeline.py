@@ -244,12 +244,10 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     error_dir = analysis_dir / "error"
     
     var_evolution_dir = var_dir / "evolution"
-    var_frames_dir = var_dir / "frames"
     error_evolution_dir = error_dir / "evolution"
     error_frames_dir = error_dir / "frames"
 
     var_evolution_dir.mkdir(parents=True, exist_ok=True)
-    var_frames_dir.mkdir(parents=True, exist_ok=True)
     error_evolution_dir.mkdir(parents=True, exist_ok=True)
     error_frames_dir.mkdir(parents=True, exist_ok=True)
 

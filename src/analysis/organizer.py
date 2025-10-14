@@ -52,7 +52,6 @@ class AnalysisOrganizer:
         
         self.var_dir = self.base_dir / "var"
         self.var_evolution_dir = self.var_dir / "evolution"
-        self.var_frames_dir = self.var_dir / "frames"
         
         self.best_dir = self.base_dir / "best"
         self.best_evolution_dir = self.best_dir / "evolution"
@@ -67,7 +66,6 @@ class AnalysisOrganizer:
         self.error_norms_dir.mkdir(parents=True, exist_ok=True)
         
         self.var_evolution_dir.mkdir(parents=True, exist_ok=True)
-        self.var_frames_dir.mkdir(parents=True, exist_ok=True)
         
         self.best_evolution_dir.mkdir(parents=True, exist_ok=True)
         
@@ -82,14 +80,12 @@ class AnalysisOrganizer:
         - error_frames/
         - error_norms/
         - var_evolution/
-        - var_frames/
         
         New structure:
         - error/evolution/
         - error/frames/
         - error/norms/
         - var/evolution/
-        - var/frames/
         """
         logger.info("Migrating existing files to new structure...")
         
@@ -99,7 +95,6 @@ class AnalysisOrganizer:
             self.base_dir / "error_frames": self.error_frames_dir,
             self.base_dir / "error_norms": self.error_norms_dir,
             self.base_dir / "var_evolution": self.var_evolution_dir,
-            self.base_dir / "var_frames": self.var_frames_dir,
         }
         
         for old_dir, new_dir in migrations.items():
