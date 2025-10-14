@@ -9,7 +9,7 @@ import json
 from typing import Dict, List, Tuple, Optional
 import seaborn as sns
 
-from .error_metrics import METRIC_REGISTRY, calculate_error, calculate_all_errors
+from src.analysis.metrics import METRIC_REGISTRY, calculate_error, calculate_all_errors
 
 
 def calculate_error_norms(sim_data_list: List[dict], analytical_data_list: List[dict],

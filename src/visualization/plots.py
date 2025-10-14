@@ -18,7 +18,7 @@ from pathlib import Path
 from loguru import logger
 from typing import Dict, List, Tuple, Optional
 
-from .experiment_name_decoder import format_experiment_title, format_short_experiment_name
+from src.experiment.naming import format_experiment_title, format_short_experiment_name
 
 # ============================================================================
 # SECTION 1: BASIC COMPARISON PLOTS
@@ -70,7 +70,7 @@ def plot_simulation_vs_analytical(sim_data: dict, analytical_data: dict, output_
 # ============================================================================
 # Import animation/video functions from video_generation module
 
-from .video_generation import (
+from src.visualization.videos import (
     create_var_evolution_video,
     create_var_evolution_frames,
     create_error_evolution_video,
@@ -82,7 +82,7 @@ from .video_generation import (
 # ============================================================================
 # Import collage functions from visualization_collage module
 
-from .visualization_collage import (
+from src.visualization.collages import (
     create_var_evolution_collage,
     create_branch_var_evolution_collage,
     create_best_performers_var_evolution_collage,

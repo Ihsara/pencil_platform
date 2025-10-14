@@ -7,8 +7,8 @@ from pathlib import Path
 from loguru import logger
 import yaml
 
-from .constants import DIRS, FILES
-from .logging_utils import setup_file_logging
+from src.core.constants import DIRS, FILES
+from src.core.logging import setup_file_logging
 
 def submit_suite(experiment_name: str, submit_script_path: Path, plan: dict):
     """

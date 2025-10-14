@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, Optional
 from loguru import logger
 
-from .constants import DIRS
+from src.core.constants import DIRS
 
 
 def _load_sweep_config(experiment_name: str) -> Optional[Dict]:

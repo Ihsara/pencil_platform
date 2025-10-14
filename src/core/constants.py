@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # --- Project-wide directory structure ---
-PROJECT_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 @dataclass(frozen=True)
 class Dirs:

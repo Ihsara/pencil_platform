@@ -7,7 +7,7 @@ from pathlib import Path
 from loguru import logger
 from typing import Dict, List
 
-from .experiment_name_decoder import format_experiment_title, format_short_experiment_name
+from src.experiment.naming import format_experiment_title, format_short_experiment_name
 
 
 def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: List[dict],

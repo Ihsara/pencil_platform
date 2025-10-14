@@ -8,8 +8,8 @@ from loguru import logger
 from copy import deepcopy
 import jinja2
 
-from .constants import DIRS, FILES
-from .logging_utils import setup_file_logging
+from src.core.constants import DIRS, FILES
+from src.core.logging import setup_file_logging
 
 def _deep_merge_configs(base: dict, override: dict) -> dict:
     """

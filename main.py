@@ -6,10 +6,10 @@ from pathlib import Path
 from loguru import logger
 
 # Import logic from the src directory
-from src.suite_generator import run_suite
-from src.post_processing import visualize_suite, analyze_suite_videos_only, analyze_suite_with_error_norms
-from src.job_manager import submit_suite, check_suite_status, wait_for_completion
-from src.constants import DIRS, FILES
+from src.experiment.generator import run_suite
+from src.workflows.analysis_pipeline import visualize_suite, analyze_suite_videos_only, analyze_suite_with_error_norms
+from src.experiment.job_manager import submit_suite, check_suite_status, wait_for_completion
+from src.core.constants import DIRS, FILES
 
 def configure_logging():
     """Configures the loguru logger for clean, formatted output."""

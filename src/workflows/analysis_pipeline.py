@@ -9,30 +9,30 @@ import numpy as np
 from loguru import logger
 from typing import Dict, List, Tuple
 
-from .constants import DIRS, FILES
-from .logging_utils import setup_file_logging
-from .error_analysis import (
+from src.core.constants import DIRS, FILES
+from src.core.logging import setup_file_logging
+from src.analysis.errors import (
     calculate_std_deviation_across_vars, 
     calculate_absolute_deviation_per_var,
     calculate_spatial_errors,
     calculate_error_norms,
     ExperimentErrorAnalyzer
 )
-from .error_metrics import calculate_errors_over_time
-from .visualization import (
+from src.analysis.metrics import calculate_errors_over_time
+from src.visualization.plots import (
     create_combined_scores_plot,
     create_per_metric_plots,
     create_best_performers_plot,
     create_branch_comparison_plot,
     create_error_evolution_plots,
 )
-from .video_generation import (
+from src.visualization.videos import (
     create_var_evolution_video,
     create_error_evolution_video,
     create_overlay_error_evolution_video,
 )
-from .experiment_name_decoder import format_experiment_title, format_short_experiment_name
-from .analysis_organizer import AnalysisOrganizer
+from src.experiment.naming import format_experiment_title, format_short_experiment_name
+from src.analysis.organizer import AnalysisOrganizer
 
 # --- Add Pencil Code Python Library to Path ---
 PENCIL_CODE_PYTHON_PATH = DIRS.root.parent / "pencil-code" / "python"
