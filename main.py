@@ -98,7 +98,7 @@ def main():
             analyze_suite_with_error_norms(experiment_name)
         elif args.analyze:
             logger.info("--- VIDEO-ONLY ANALYSIS MODE ---")
-            analyze_suite_videos_only(experiment_name)
+            analyze_suite_videos_only(experiment_name, combined_video=True)
         elif args.viz is not None:
             logger.info("--- VISUALIZATION MODE ---")
             

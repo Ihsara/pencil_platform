@@ -30,6 +30,7 @@ from src.visualization.videos import (
     create_var_evolution_video,
     create_error_evolution_video,
     create_overlay_error_evolution_video,
+    create_combined_error_evolution_video
 )
 from src.experiment.naming import format_experiment_title, format_short_experiment_name
 from src.analysis.organizer import AnalysisOrganizer
@@ -195,12 +196,12 @@ def analyze_suite_comprehensive(experiment_name: str, error_method: str = 'absol
     analyze_suite_videos_only(experiment_name, error_method)
 
 
-def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolute'):
+def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolute', combined_video: bool = False):
     """Comprehensive analysis: Creates videos, calculates L1/L2 error norms, and generates final report.
     
     Workflow:
     1. Load all VAR files and calculate errors (cached)
-    2. Create individual error evolution videos
+    2. Create individual error evolution videos (and combined, if requested)
     3. Find best performer in each branch → create overlay videos
     4. Find top 3 best performers overall → create overlay video
     5. Calculate L1/L2 error norms with combined scoring
@@ -210,31 +211,46 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     Args:
         experiment_name: Name of the experiment suite
         error_method: Error calculation method for spatial errors
+        combined_video: If True, generate a combined error evolution video.
     """
     # Setup file logging for this analysis run
     setup_file_logging(experiment_name, 'analysis')
     
     logger.info(f"=" * 80)
     logger.info(f"STARTING VIDEO-ONLY ANALYSIS: '{experiment_name}'")
+    if combined_video:
+        logger.info("Combined error video generation ENABLED.")
     logger.info(f"=" * 80)
     
     plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
     with open(plan_file, 'r') as f: 
         plan = yaml.safe_load(f)
     
+    # Read error analysis configuration from plan file
+    error_config = plan.get('error_analysis', {})
+    metrics = error_config.get('metrics', ['l1', 'l2', 'linf'])
+    combine_in_videos = error_config.get('combine_in_videos', True)
+    
+    logger.info(f"Error analysis configuration:")
+    logger.info(f"  ├─ Metrics to calculate: {', '.join([m.upper() for m in metrics])}")
+    logger.info(f"  └─ Combine in videos: {combine_in_videos}")
+    
     hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
     manifest_file = DIRS.runs / experiment_name / FILES.manifest
     analysis_dir = DIRS.root / "analysis" / experiment_name
     
-    # Create new directory structure
-    var_evolution_dir = analysis_dir / "var_evolution"
-    error_evolution_dir = analysis_dir / "error_evolution"
-    var_frames_dir = analysis_dir / "var_frames"
-    error_frames_dir = analysis_dir / "error_frames"
+    # Create directory structure following the standard: var/, error/, best/
+    var_dir = analysis_dir / "var"
+    error_dir = analysis_dir / "error"
     
+    var_evolution_dir = var_dir / "evolution"
+    var_frames_dir = var_dir / "frames"
+    error_evolution_dir = error_dir / "evolution"
+    error_frames_dir = error_dir / "frames"
+
     var_evolution_dir.mkdir(parents=True, exist_ok=True)
-    error_evolution_dir.mkdir(parents=True, exist_ok=True)
     var_frames_dir.mkdir(parents=True, exist_ok=True)
+    error_evolution_dir.mkdir(parents=True, exist_ok=True)
     error_frames_dir.mkdir(parents=True, exist_ok=True)
 
     with open(manifest_file, 'r') as f: 
@@ -283,38 +299,67 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                        f"Branch: [{branch_idx}/{branch_total}] ({branch_pct:.1f}%) | "
                        f"Run: {run_name}")
             
-            result = process_run_analysis(hpc_run_base_dir / run_name, run_name, branch_name, error_method)
-            if result:
-                std_devs, abs_devs, spatial_errors, all_sim_data, all_analytical_data = result
+            # --- START: Modified section for combined video ---
+            all_sim_data = load_all_var_files(hpc_run_base_dir / run_name)
+            if not all_sim_data:
+                logger.warning(f"     └─ ✗ Failed to load VAR files")
+                continue
+
+            all_analytical_data = [get_analytical_solution(s['params'], s['x'], s['t']) for s in all_sim_data]
+            if not all(all_analytical_data):
+                logger.warning(f"     └─ ✗ Failed to generate analytical solutions")
+                continue
+            
+            # Always calculate absolute error for caching
+            spatial_errors_abs = calculate_spatial_errors(all_sim_data, all_analytical_data, error_method='absolute')
+
+            # Cache the essential data
+            loaded_data_cache[run_name] = {
+                'sim_data': all_sim_data,
+                'analytical_data': all_analytical_data,
+                'branch': branch_name,
+                'spatial_errors': spatial_errors_abs,
+            }
+            
+            # Get unit length
+            unit_length = 1.0
+            if all_sim_data and 'params' in all_sim_data[0]:
+                unit_length = all_sim_data[0]['params'].unit_length
+
+            logger.info(f"     ├─ Creating var evolution video and frames...")
+            create_var_evolution_video(
+                all_sim_data, all_analytical_data, var_evolution_dir, run_name, fps=2, save_frames=True
+            )
+            
+            # Create COMBINED error evolution with all configured metrics by DEFAULT
+            logger.info(f"     ├─ Creating combined error evolution (L1, L2, LINF) video and frames...")
+            if combine_in_videos and len(metrics) > 1:
+                # Calculate spatial errors for each error calculation method
+                spatial_errors_dict = {}
                 
-                # Cache data
-                loaded_data_cache[run_name] = {
-                    'sim_data': all_sim_data,
-                    'analytical_data': all_analytical_data,
-                    'branch': branch_name,
-                    'std_devs': std_devs,
-                    'spatial_errors': spatial_errors
-                }
+                # Map metrics to error calculation methods
+                # L1 and LINF use absolute error, L2 uses squared error
+                if 'l1' in metrics or 'linf' in metrics:
+                    spatial_errors_dict['L1/LINF (Absolute)'] = spatial_errors_abs
+                if 'l2' in metrics:
+                    spatial_errors_sq = calculate_spatial_errors(all_sim_data, all_analytical_data, error_method='squared')
+                    spatial_errors_dict['L2 (Squared)'] = spatial_errors_sq
                 
-                # Create individual error evolution video
-                unit_length = 1.0
-                if all_sim_data and 'params' in all_sim_data[0]:
-                    params = all_sim_data[0]['params']
-                    if hasattr(params, 'unit_length'):
-                        unit_length = params.unit_length  # Already in cm
-                
-                logger.info(f"     ├─ Creating var evolution video and frames...")
-                create_var_evolution_video(
-                    all_sim_data, all_analytical_data, var_evolution_dir, run_name, fps=2, save_frames=True
+                # Create combined video showing all metrics together
+                create_combined_error_evolution_video(
+                    spatial_errors_dict, error_evolution_dir, run_name, fps=2, 
+                    unit_length=unit_length, save_frames=True
                 )
-                
-                logger.info(f"     ├─ Creating error evolution video and frames...")
-                create_error_evolution_video(
-                    spatial_errors, error_evolution_dir, run_name, fps=2, unit_length=unit_length, save_frames=True
-                )
-                logger.info(f"     └─ ✓ Cached {len(all_sim_data)} VAR files")
+                logger.info(f"     └─ ✓ Created combined error evolution with {len(spatial_errors_dict)} error types")
             else:
-                logger.warning(f"     └─ ✗ Failed to process run")
+                # Fallback: create single error evolution video
+                logger.info(f"     ├─ Creating single error evolution video and frames...")
+                create_error_evolution_video(
+                    spatial_errors_abs, error_evolution_dir, run_name, fps=2, 
+                    unit_length=unit_length, save_frames=True
+                )
+                logger.info(f"     └─ ✓ Created error evolution video")
+            # --- END: Modified section ---
     
     # ============================================================
     # PHASE 2: Find best performers and create overlay videos
@@ -418,10 +463,10 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     # PHASE 3: Calculate L1/L2 error norms (reusing loaded data)
     # ============================================================
     logger.info("\n" + "=" * 80)
-    logger.info("PHASE 3: Calculating L1/L2 error norms")
+    logger.info("PHASE 3: Calculating error norms")
     logger.info("=" * 80)
     
-    metrics = ['l1', 'l2', 'linf']
+    # Use metrics from configuration
     error_norms_dir = analysis_dir / "error_norms"
     error_norms_dir.mkdir(parents=True, exist_ok=True)
     plots_dir = error_norms_dir / "plots"

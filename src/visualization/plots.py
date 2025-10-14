@@ -75,6 +75,8 @@ from src.visualization.videos import (
     create_var_evolution_frames,
     create_error_evolution_video,
     create_error_evolution_frames,
+    create_combined_error_evolution_video,
+    create_combined_error_evolution_frames,
 )
 
 # ============================================================================
@@ -325,6 +327,8 @@ __all__ = [
     'create_var_evolution_frames',
     'create_error_evolution_video',
     'create_error_evolution_frames',
+    'create_combined_error_evolution_video',
+    'create_combined_error_evolution_frames',
     
     # Collage plots
     'create_var_evolution_collage',

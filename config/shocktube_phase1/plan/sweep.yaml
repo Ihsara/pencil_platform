@@ -43,6 +43,14 @@ hpc:
 auto_check: true              # If true, automatically check job status after submission
 auto_postprocessing: true     # If true, display reminder to run --analyze and --viz after jobs complete
 
+# --- Error Analysis Configuration ---
+# Specifies which error metrics to calculate and visualize
+# Available metrics: 'l1', 'l2', 'linf'
+# All specified metrics will be combined in error evolution videos and frames
+error_analysis:
+  metrics: ['l1', 'l2', 'linf']  # List of metrics to calculate and visualize
+  combine_in_videos: true         # If true, show all metrics in the same frame/evolution
+
 # --- Experiment Generation Parameters ---
 base_experiment: 'shocktube_base'
 output_prefix: 'res400_nohyper'

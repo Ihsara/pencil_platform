@@ -717,3 +717,189 @@ def create_overlay_error_evolution_video(
         logger.error(f"Failed to save overlay animation: {e}")
     finally:
         plt.close()
+
+
+def create_combined_error_evolution_video(
+    spatial_errors_dict: Dict[str, Dict], 
+    output_path: Path, 
+    run_name: str, 
+    fps: int = 2, 
+    unit_length: float = 1.0,
+    save_frames: bool = False
+):
+    """
+    Creates an animated GIF showing combined spatial error evolutions (e.g., L1, L2, L_inf) for a single run.
+    
+    Args:
+        spatial_errors_dict: Dictionary where keys are error metric names (e.g., 'Absolute', 'Squared')
+                             and values are spatial error data from calculate_spatial_errors().
+        output_path: Directory to save the animation.
+        run_name: Name of the run.
+        fps: Frames per second.
+        unit_length: Unit conversion factor for length.
+        save_frames: Whether to save individual PNG frames.
+    """
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    if not np.isfinite(unit_length) or unit_length > 1e20 or unit_length == 0:
+        logger.warning(f"Invalid unit_length value ({unit_length}). Using 1.0 instead.")
+        unit_length = 1.0
+        
+    variables = ['rho', 'ux', 'pp', 'ee']
+    var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+    colors = {'Absolute': '#1f77b4', 'Squared': '#ff7f0e', 'L_inf': 'red'}
+    
+    fig = plt.figure(figsize=(14, 16))
+    gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08,
+                          hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
+    axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+    
+    first_error_type = list(spatial_errors_dict.keys())[0]
+    max_timesteps = len(spatial_errors_dict[first_error_type]['rho']['errors_per_timestep'])
+    
+    lines = {var: {} for var in variables}
+    inf_markers = {var: None for var in variables}
+
+    for idx, (var, label) in enumerate(zip(variables, var_labels)):
+        ax = axes[idx]
+        
+        for error_type, spatial_errors in spatial_errors_dict.items():
+            if var in spatial_errors:
+                line, = ax.plot([], [], '-', linewidth=2, color=colors.get(error_type, 'k'), alpha=0.8, label=error_type)
+                lines[var][error_type] = line
+
+        inf_marker, = ax.plot([], [], 'o', color=colors['L_inf'], markersize=8, alpha=0.9, label='L_inf Norm (Max Abs)')
+        inf_markers[var] = inf_marker
+        
+        x_raw = spatial_errors_dict[first_error_type][var]['x']
+        x_coords = x_raw * unit_length
+        ax.set_xlim(x_coords.min(), x_coords.max())
+        
+        all_errors = []
+        for error_type, spatial_errors in spatial_errors_dict.items():
+            if var in spatial_errors:
+                all_errors.extend(np.concatenate(spatial_errors[var]['errors_per_timestep']))
+        
+        if all_errors:
+            y_min, y_max = np.min(all_errors), np.max(all_errors)
+            y_range = y_max - y_min if y_max > y_min else 1.0
+            ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
+
+        ax.set_xlabel('Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]', fontsize=11)
+        ax.set_ylabel(f'Error in {label}', fontsize=11)
+        ax.set_title(label, fontsize=12, fontweight='bold')
+        ax.legend(loc='best')
+        ax.grid(True, alpha=0.3)
+
+    legend_ax = fig.add_subplot(gs[2, :])
+    legend_ax.axis('off')
+
+    formatted_title = format_experiment_title(run_name, max_line_length=60)
+    title = fig.suptitle('', fontsize=13, fontweight='bold', y=0.96)
+    
+    def init():
+        for var in variables:
+            for line in lines[var].values():
+                line.set_data([], [])
+            inf_markers[var].set_data([], [])
+        title.set_text(f'{formatted_title} - VAR 0')
+        return [l for v in lines.values() for l in v.values()] + list(inf_markers.values()) + [title]
+
+    def animate(frame):
+        for var in variables:
+            for error_type, spatial_errors in spatial_errors_dict.items():
+                if var in spatial_errors:
+                    x_coords = spatial_errors[var]['x'] * unit_length
+                    errors = spatial_errors[var]['errors_per_timestep'][frame]
+                    lines[var][error_type].set_data(x_coords, errors)
+
+            # L-infinity norm is max of absolute error
+            abs_errors = spatial_errors_dict['Absolute'][var]['errors_per_timestep'][frame]
+            x_coords_abs = spatial_errors_dict['Absolute'][var]['x'] * unit_length
+            max_error_idx = np.argmax(abs_errors)
+            inf_markers[var].set_data([x_coords_abs[max_error_idx]], [abs_errors[max_error_idx]])
+            
+        var_file = spatial_errors_dict[first_error_type]['rho']['var_files'][frame]
+        timestep = spatial_errors_dict[first_error_type]['rho']['timesteps'][frame]
+        var_num = var_file.replace('VAR', '') if 'VAR' in var_file else str(frame)
+        title.set_text(f'{formatted_title} - VAR {var_num} | t={timestep:.4e} s')
+        
+        return [l for v in lines.values() for l in v.values()] + list(inf_markers.values()) + [title]
+
+    anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
+                                  interval=1000//fps, blit=False, repeat=True)
+
+    if save_frames:
+        logger.info("Creating individual combined error frames...")
+        create_combined_error_evolution_frames(spatial_errors_dict, output_path, run_name, unit_length)
+
+    output_file = output_path / f"{run_name}_combined_error_evolution.gif"
+    try:
+        writer = animation.PillowWriter(fps=fps)
+        anim.save(output_file, writer=writer)
+        logger.success(f"Saved combined error evolution animation to {output_file}")
+    except Exception as e:
+        logger.error(f"Failed to save combined animation: {e}")
+    finally:
+        plt.close()
+
+
+def create_combined_error_evolution_frames(
+    spatial_errors_dict: Dict[str, Dict], 
+    output_path: Path, 
+    run_name: str,
+    unit_length: float = 1.0
+):
+    """
+    Creates individual PNG frames for combined spatial error evolution.
+    """
+    frames_dir = output_path.parent / "combined_error_frames" / run_name
+    frames_dir.mkdir(parents=True, exist_ok=True)
+    
+    variables = ['rho', 'ux', 'pp', 'ee']
+    var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
+    colors = {'Absolute': '#1f77b4', 'Squared': '#ff7f0e', 'L_inf': 'red'}
+    
+    first_error_type = list(spatial_errors_dict.keys())[0]
+    max_timesteps = len(spatial_errors_dict[first_error_type]['rho']['errors_per_timestep'])
+    
+    logger.info(f"Creating {max_timesteps} combined spatial error evolution frames...")
+    
+    for frame in range(max_timesteps):
+        fig = plt.figure(figsize=(14, 16))
+        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08,
+                              hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
+        axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+
+        var_file = spatial_errors_dict[first_error_type]['rho']['var_files'][frame]
+        timestep = spatial_errors_dict[first_error_type]['rho']['timesteps'][frame]
+        var_num = var_file.replace('VAR', '') if 'VAR' in var_file else str(frame)
+        
+        formatted_title = format_experiment_title(run_name, max_line_length=60)
+        fig.suptitle(f'{formatted_title} - VAR {var_num} | t={timestep:.4e} s', 
+                     fontsize=13, fontweight='bold', y=0.96)
+
+        for idx, (var, label) in enumerate(zip(variables, var_labels)):
+            ax = axes[idx]
+            for error_type, spatial_errors in spatial_errors_dict.items():
+                if var in spatial_errors:
+                    x_coords = spatial_errors[var]['x'] * unit_length
+                    errors = spatial_errors[var]['errors_per_timestep'][frame]
+                    ax.plot(x_coords, errors, '-', linewidth=2, color=colors.get(error_type, 'k'), alpha=0.8, label=error_type)
+            
+            abs_errors = spatial_errors_dict['Absolute'][var]['errors_per_timestep'][frame]
+            x_coords_abs = spatial_errors_dict['Absolute'][var]['x'] * unit_length
+            max_error_idx = np.argmax(abs_errors)
+            ax.plot(x_coords_abs[max_error_idx], abs_errors[max_error_idx], 'o', color=colors['L_inf'], markersize=8, alpha=0.9, label='L_inf Norm')
+
+            ax.set_xlabel('Position (x) [kpc]', fontsize=11)
+            ax.set_ylabel(f'Error in {label}', fontsize=11)
+            ax.set_title(label, fontsize=12, fontweight='bold')
+            ax.legend(loc='best')
+            ax.grid(True, alpha=0.3)
+      
+        frame_file = frames_dir / f"frame_{frame:04d}.png"
+        plt.savefig(frame_file, dpi=100, bbox_inches='tight')
+        plt.close()
+        
+    logger.success(f"Saved {max_timesteps} combined error frames to {frames_dir}")
