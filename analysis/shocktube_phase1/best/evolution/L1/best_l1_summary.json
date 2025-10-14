@@ -1,0 +1,20 @@
+{
+  "metric": "L1",
+  "top_performers": [
+    {
+      "rank": 1,
+      "run_name": "res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5",
+      "score": 660.0073539638571
+    },
+    {
+      "rank": 2,
+      "run_name": "res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5",
+      "score": 660.0073539638571
+    },
+    {
+      "rank": 3,
+      "run_name": "res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0",
+      "score": 681.2134147412903
+    }
+  ]
+}

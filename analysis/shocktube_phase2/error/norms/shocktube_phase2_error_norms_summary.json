@@ -1,0 +1,84 @@
+{
+  "experiment": "shocktube_phase2",
+  "metrics_used": [
+    "l1"
+  ],
+  "total_runs_analyzed": 4,
+  "top_5_overall": [
+    {
+      "rank": 1,
+      "run_name": "res400_hyper3_nu9e-12_chi9e-12_gamma_default",
+      "combined_score": 167206.72231464105,
+      "branch": "gamma_default",
+      "per_metric_scores": {
+        "l1": 167206.72231464105
+      }
+    },
+    {
+      "rank": 2,
+      "run_name": "res400_hyper3_nu9e-13_chi9e-13_gamma_default",
+      "combined_score": 168017.22289980997,
+      "branch": "gamma_default",
+      "per_metric_scores": {
+        "l1": 168017.22289980997
+      }
+    },
+    {
+      "rank": 3,
+      "run_name": "res400_hyper3_nu9e-15_chi9e-15_gamma_default",
+      "combined_score": 168362.93919627217,
+      "branch": "gamma_default",
+      "per_metric_scores": {
+        "l1": 168362.93919627217
+      }
+    },
+    {
+      "rank": 4,
+      "run_name": "res400_hyper3_nu9e-14_chi9e-14_gamma_default",
+      "combined_score": 168438.69009369815,
+      "branch": "gamma_default",
+      "per_metric_scores": {
+        "l1": 168438.69009369815
+      }
+    }
+  ],
+  "best_per_branch": {
+    "gamma_default": {
+      "run_name": "res400_hyper3_nu9e-12_chi9e-12_gamma_default",
+      "combined_score": 167206.72231464105,
+      "per_metric_scores": {
+        "l1": 167206.72231464105
+      }
+    }
+  },
+  "detailed_scores": {
+    "res400_hyper3_nu9e-15_chi9e-15_gamma_default": {
+      "combined_score": 168362.93919627217,
+      "branch": "gamma_default",
+      "per_metric_scores": {
+        "l1": 168362.93919627217
+      }
+    },
+    "res400_hyper3_nu9e-14_chi9e-14_gamma_default": {
+      "combined_score": 168438.69009369815,
+      "branch": "gamma_default",
+      "per_metric_scores": {
+        "l1": 168438.69009369815
+      }
+    },
+    "res400_hyper3_nu9e-13_chi9e-13_gamma_default": {
+      "combined_score": 168017.22289980997,
+      "branch": "gamma_default",
+      "per_metric_scores": {
+        "l1": 168017.22289980997
+      }
+    },
+    "res400_hyper3_nu9e-12_chi9e-12_gamma_default": {
+      "combined_score": 167206.72231464105,
+      "branch": "gamma_default",
+      "per_metric_scores": {
+        "l1": 167206.72231464105
+      }
+    }
+  }
+}

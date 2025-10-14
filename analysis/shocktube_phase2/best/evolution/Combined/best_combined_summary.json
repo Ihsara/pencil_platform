@@ -1,0 +1,29 @@
+{
+  "metric": "Combined",
+  "top_performers": [
+    {
+      "rank": 1,
+      "run_name": "res400_hyper3_nu9e-12_chi9e-12_gamma_default",
+      "combined_score": 167206.72231464105,
+      "per_metric_scores": {
+        "l1": 167206.72231464105
+      }
+    },
+    {
+      "rank": 2,
+      "run_name": "res400_hyper3_nu9e-13_chi9e-13_gamma_default",
+      "combined_score": 168017.22289980997,
+      "per_metric_scores": {
+        "l1": 168017.22289980997
+      }
+    },
+    {
+      "rank": 3,
+      "run_name": "res400_hyper3_nu9e-15_chi9e-15_gamma_default",
+      "combined_score": 168362.93919627217,
+      "per_metric_scores": {
+        "l1": 168362.93919627217
+      }
+    }
+  ]
+}
