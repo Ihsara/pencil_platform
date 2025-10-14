@@ -180,12 +180,12 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
     Args:
         sim_data_list: List of simulation data from all VAR files
         analytical_data_list: List of analytical solutions for all VAR files
-        output_path: Directory to save the frames (should be var_frames base directory)
+        output_path: Directory to save the frames (should be evolution base directory)
         run_name: Name of the run for title
         variables: List of variables to plot
     """
-    # Save frames in var_frames/{run_name}/ directory
-    frames_dir = output_path.parent / "var_frames" / run_name
+    # Save frames in frames/{run_name}/ directory
+    frames_dir = output_path.parent / "frames" / run_name
     frames_dir.mkdir(parents=True, exist_ok=True)
     
     var_labels = {
@@ -747,7 +747,9 @@ def create_combined_error_evolution_video(
         
     variables = ['rho', 'ux', 'pp', 'ee']
     var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
-    colors = {'Absolute': '#1f77b4', 'Squared': '#ff7f0e', 'L_inf': 'red'}
+    # Improved color scheme with better visibility
+    colors = {'Absolute': '#1f77b4', 'Squared': '#ff7f0e', 'L_inf': '#d62728'}
+    linestyles = {'Absolute': '-', 'Squared': '--'}
     
     fig = plt.figure(figsize=(14, 16))
     gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08,
@@ -765,10 +767,11 @@ def create_combined_error_evolution_video(
         
         for error_type, spatial_errors in spatial_errors_dict.items():
             if var in spatial_errors:
-                line, = ax.plot([], [], '-', linewidth=2, color=colors.get(error_type, 'k'), alpha=0.8, label=error_type)
+                linestyle = linestyles.get(error_type, '-')
+                line, = ax.plot([], [], linestyle, linewidth=2.5, color=colors.get(error_type, 'k'), alpha=0.85)
                 lines[var][error_type] = line
 
-        inf_marker, = ax.plot([], [], 'o', color=colors['L_inf'], markersize=8, alpha=0.9, label='L_inf Norm (Max Abs)')
+        inf_marker, = ax.plot([], [], 'o', color=colors['L_inf'], markersize=8, alpha=0.9)
         inf_markers[var] = inf_marker
         
         x_raw = spatial_errors_dict[first_error_type][var]['x']
@@ -788,11 +791,27 @@ def create_combined_error_evolution_video(
         ax.set_xlabel('Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]', fontsize=11)
         ax.set_ylabel(f'Error in {label}', fontsize=11)
         ax.set_title(label, fontsize=12, fontweight='bold')
-        ax.legend(loc='best')
         ax.grid(True, alpha=0.3)
 
+    # Create separate legend dialog at the bottom
     legend_ax = fig.add_subplot(gs[2, :])
     legend_ax.axis('off')
+    
+    # Build legend elements
+    from matplotlib.lines import Line2D
+    legend_elements = []
+    for error_type in spatial_errors_dict.keys():
+        linestyle = linestyles.get(error_type, '-')
+        legend_elements.append(
+            Line2D([0], [0], color=colors.get(error_type, 'k'), linestyle=linestyle,
+                   linewidth=2.5, alpha=0.85, label=error_type)
+        )
+    legend_elements.append(
+        Line2D([0], [0], marker='o', color='w', markerfacecolor=colors['L_inf'],
+               markersize=8, alpha=0.9, linestyle='None', label='L_inf Norm (Max Abs)')
+    )
+    legend_ax.legend(handles=legend_elements, loc='center', ncol=3, 
+                    fontsize=12, frameon=True)
 
     formatted_title = format_experiment_title(run_name, max_line_length=60)
     title = fig.suptitle('', fontsize=13, fontweight='bold', y=0.96)
@@ -866,7 +885,9 @@ def create_combined_error_evolution_frames(
     
     variables = ['rho', 'ux', 'pp', 'ee']
     var_labels = [r'$\rho$', r'$u_x$', r'$p$', r'$e$']
-    colors = {'Absolute': '#1f77b4', 'Squared': '#ff7f0e', 'L_inf': 'red'}
+    # Improved color scheme with better visibility
+    colors = {'Absolute': '#1f77b4', 'Squared': '#ff7f0e', 'L_inf': '#d62728'}
+    linestyles = {'Absolute': '-', 'Squared': '--'}
     
     first_error_type = list(spatial_errors_dict.keys())[0]
     max_timesteps = len(spatial_errors_dict[first_error_type]['rho']['errors_per_timestep'])
@@ -893,7 +914,8 @@ def create_combined_error_evolution_frames(
                 if var in spatial_errors:
                     x_coords = spatial_errors[var]['x'] * unit_length
                     errors = spatial_errors[var]['errors_per_timestep'][frame]
-                    ax.plot(x_coords, errors, '-', linewidth=2, color=colors.get(error_type, 'k'), alpha=0.8, label=error_type)
+                    linestyle = linestyles.get(error_type, '-')
+                    ax.plot(x_coords, errors, linestyle, linewidth=2.5, color=colors.get(error_type, 'k'), alpha=0.85)
             
             # Find the absolute error data (could be named 'Absolute', 'L1/LINF (Absolute)', etc.)
             abs_error_key = None
@@ -906,13 +928,32 @@ def create_combined_error_evolution_frames(
                 abs_errors = spatial_errors_dict[abs_error_key][var]['errors_per_timestep'][frame]
                 x_coords_abs = spatial_errors_dict[abs_error_key][var]['x'] * unit_length
                 max_error_idx = np.argmax(abs_errors)
-                ax.plot(x_coords_abs[max_error_idx], abs_errors[max_error_idx], 'o', color=colors.get('L_inf', 'red'), markersize=8, alpha=0.9, label='L_inf Norm')
+                ax.plot(x_coords_abs[max_error_idx], abs_errors[max_error_idx], 'o', color=colors['L_inf'], markersize=8, alpha=0.9)
 
             ax.set_xlabel('Position (x) [kpc]', fontsize=11)
             ax.set_ylabel(f'Error in {label}', fontsize=11)
             ax.set_title(label, fontsize=12, fontweight='bold')
-            ax.legend(loc='best')
             ax.grid(True, alpha=0.3)
+        
+        # Create separate legend dialog at the bottom
+        legend_ax = fig.add_subplot(gs[2, :])
+        legend_ax.axis('off')
+        
+        # Build legend elements
+        from matplotlib.lines import Line2D
+        legend_elements = []
+        for error_type in spatial_errors_dict.keys():
+            linestyle = linestyles.get(error_type, '-')
+            legend_elements.append(
+                Line2D([0], [0], color=colors.get(error_type, 'k'), linestyle=linestyle,
+                       linewidth=2.5, alpha=0.85, label=error_type)
+            )
+        legend_elements.append(
+            Line2D([0], [0], marker='o', color='w', markerfacecolor=colors['L_inf'],
+                   markersize=8, alpha=0.9, linestyle='None', label='L_inf Norm (Max Abs)')
+        )
+        legend_ax.legend(handles=legend_elements, loc='center', ncol=3, 
+                        fontsize=12, frameon=True)
       
         frame_file = frames_dir / f"frame_{frame:04d}.png"
         plt.savefig(frame_file, dpi=100, bbox_inches='tight')
