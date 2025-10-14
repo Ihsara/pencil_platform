@@ -1,6 +1,6 @@
-# This is the base run configuration for the Phase 2 experiment.
-# It includes hyperdiffusion parameters by default and is set for
-# an adiabatic run (lgamma_is_1 = false).
+# Phase 2 run configuration
+# This inherits from shocktube_base and overrides specific parameters
+# for hyperdiffusion parameter sweep.
 format: namelist
 data:
   run_pars:
@@ -14,23 +14,23 @@ data:
     it1: 100
     itorder: 3
     lpencil_check: false
-    nt: 60000 # Increased nt for higher resolution runs
+    nt: 60000
 
   density_run_pars:
-    diffrho_shock: 0.5 # Default value from Phase 1 winner
+    diffrho_shock: 1.0      # Fixed value from task requirement
     idiff: 'shock'
-    lmassdiff_fix: true # Default to true, branch can override
-    lgamma_is_1: true  
+    lmassdiff_fix: true
+    lgamma_is_1: false      # F as specified in task
 
   entropy_run_pars:
-    chi_shock: 0.5      # Default value from Phase 1 winner
-    iheatcond: ['shock', 'hyper3'] # Enable hyperdiffusion
-    chi_hyper3: 1.9e-14 # Placeholder value for res=1600, C=1.0
+    chi_shock: 1.0          # Fixed value from task requirement
+    iheatcond: ['shock', 'hyper3']
+    chi_hyper3: 9.0e-14     # Placeholder, will be swept
 
   viscosity_run_pars:
-    ivisc: ['nu-shock', 'hyper3-nu-const'] # Enable hyperdiffusion
-    nu_shock: 0.5       # Default value from Phase 1 winner
-    nu_hyper3: 1.9e-14  # Placeholder value for res=1600, C=1.0
+    ivisc: ['nu-shock', 'hyper3-nu-const']
+    nu_shock: 1.0           # Fixed value from task requirement
+    nu_hyper3: 9.0e-14      # Placeholder, will be swept
 
   shock_run_pars:
     con_bias: 0.05

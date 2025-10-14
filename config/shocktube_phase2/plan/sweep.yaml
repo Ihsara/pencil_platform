@@ -1,57 +1,72 @@
 # ===================================================================
-# Plan for Shocktube Phase 2: Hyperdiffusion & Convergence (Agnostic)
+# Plan for the Shocktube Phase 2 Parameter Sweep
 # ===================================================================
+# This file defines the hyperdiffusion parameter sweep.
+# Phase 2 focuses on finding the best nu_hyper3 and chi_hyper3 values
+# while keeping shock parameters fixed at their optimal values from Phase 1.
+---
+
+# --- HPC Execution Parameters ---
 hpc:
-  source_base_dir: '/scratch/project_2008296/chau/chausims/sod_10_test_proj/quick_test_sod'
+  source_base_dir: '/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod'
   run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase2'
+
   module_loads: |
-    module load gcc/11.2.0 openmpi/4.1.2 openblas/0.3.18-omp csc-tools StdEnv hdf5/1.10.7-mpi
-  pencil_code_home: '/scratch/project_2008296/chau/pencil-code'
+    module load gcc/11.2.0
+    module load openmpi/4.1.2
+    module load openblas/0.3.18-omp
+    module load csc-tools
+    module load StdEnv
+    module load hdf5/1.10.7-mpi
+
   sbatch:
     job_name: "shock_sweep_ph2"
     account: "project_2008296"
     partition: "small"
-    time: "01:00:00"
+    time: "00:30:00"
     nodes: 1
     ntasks: 1
     cpus_per_task: 1
     mail_user: "chau.c.tran@aalto.fi"
     mail_type: "END"
 
+# --- Post-Processing Automation (Optional) ---
+auto_check: true
+auto_postprocessing: true
+
+# --- Error Analysis Configuration ---
+# Using L1 error metric for consistency with Phase 1
+error_analysis:
+  metrics: ['l1']
+  combine_in_videos: true
+
 # --- Experiment Generation Parameters ---
 base_experiment: 'shocktube_base'
-output_prefix: 'shock'
+output_prefix: 'res400_hyper3'
 
-# --- Configuration-Driven Naming and Logic ---
-run_name_template: "{{ output_prefix }}_res{{ nxgrid }}_C{{ hyper_C | fs_safe }}_{{ branch.name }}"
+# Naming scheme for Phase 2 runs
+run_name_template: "{{ output_prefix }}_nu{{ nu_hyper3 | fs_safe }}_chi{{ chi_hyper3 | fs_safe }}_{{ branch.name }}"
 
-derived_parameters:
-  u_max: 200.0
-  dx: "1.0 / nxgrid"
-  nu_hyper3: "hyper_C * (dx**3 * u_max)" # Corrected from dx**5 based on typical scaling
-  chi_hyper3: "nu_hyper3"
+# --- Global Modifications ---
+# These modifications apply to ALL runs in this phase
+modifications:
+  run_in.yaml:
+    # Fix shock parameters at their optimal values from Phase 1
+    density_run_pars: { diffrho_shock: 1.0 }
+    viscosity_run_pars: { nu_shock: 1.0 }
+    entropy_run_pars: { chi_shock: 1.0 }
 
 # --- Parameter Sweeps ---
+# Sweep hyperdiffusion parameters while keeping them equal (nu_hyper3 = chi_hyper3)
 parameter_sweeps:
-  - type: product
-    variable: nxgrid
-    values: [400, 800, 1600]
-  - type: product
-    variable: hyper_C
-    values: [0.2, 1.0, 5.0]
+  - type: linked
+    variables: [nu_hyper3, chi_hyper3]
+    values: [9.0e-15, 9.0e-14, 9.0e-13, 9.0e-12]
 
 # --- Branches ---
+# Test with lgamma_is_1 = false as specified
 branches:
-  - name: "with_best_fit"
+  - name: "gamma_default"
     settings:
       run_in.yaml:
-        density_run_pars: { diffrho_shock: 0.5 }
-        entropy_run_pars: { chi_shock: 0.5 }
-        viscosity_run_pars: { nu_shock: 0.5 }
-
-  - name: "with_second_best_fit"
-    settings:
-      run_in.yaml:
-        density_run_pars: { diffrho_shock: 1.0 }
-        entropy_run_pars: { chi_shock: 1.0 }
-        viscosity_run_pars: { nu_shock: 1.0 }
+        density_run_pars: { lgamma_is_1: false }
