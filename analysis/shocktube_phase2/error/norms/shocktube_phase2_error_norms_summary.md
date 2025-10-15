@@ -4,38 +4,56 @@
 
 **Metrics Used**: L1
 
-**Total Runs Analyzed**: 4
+**Total Runs Analyzed**: 12
 
 ## 🥇 Top 5 Overall Performers
 
-### #1: res400_hyper3_nu9e-12_chi9e-12_gamma_default
-- **Branch**: gamma_default
-- **Combined Score**: 1.672067e+05
+### #1: res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma
+- **Branch**: best_l1_rank1_nu0p5_default_gamma
+- **Combined Score**: 1.488961e+05
 - **Per-Metric Scores**:
-  - L1: 1.672067e+05
+  - L1: 1.488961e+05
 
-### #2: res400_hyper3_nu9e-13_chi9e-13_gamma_default
-- **Branch**: gamma_default
-- **Combined Score**: 1.680172e+05
+### #2: res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma
+- **Branch**: best_l1_rank1_nu0p5_default_gamma
+- **Combined Score**: 1.499085e+05
 - **Per-Metric Scores**:
-  - L1: 1.680172e+05
+  - L1: 1.499085e+05
 
-### #3: res400_hyper3_nu9e-15_chi9e-15_gamma_default
-- **Branch**: gamma_default
-- **Combined Score**: 1.683629e+05
+### #3: res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma
+- **Branch**: best_l1_rank1_nu0p5_default_gamma
+- **Combined Score**: 1.499261e+05
 - **Per-Metric Scores**:
-  - L1: 1.683629e+05
+  - L1: 1.499261e+05
 
-### #4: res400_hyper3_nu9e-14_chi9e-14_gamma_default
-- **Branch**: gamma_default
-- **Combined Score**: 1.684387e+05
+### #4: res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma
+- **Branch**: best_l1_rank1_nu0p5_default_gamma
+- **Combined Score**: 1.500135e+05
 - **Per-Metric Scores**:
-  - L1: 1.684387e+05
+  - L1: 1.500135e+05
+
+### #5: res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1
+- **Branch**: best_l1_rank2_nu0p5_gamma_is_1
+- **Combined Score**: 1.516207e+05
+- **Per-Metric Scores**:
+  - L1: 1.516207e+05
 
 ## 🏆 Best Performer per Branch
 
-### gamma_default
-- **Run**: res400_hyper3_nu9e-12_chi9e-12_gamma_default
+### best_l1_rank1_nu0p5_default_gamma
+- **Run**: res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma
+- **Combined Score**: 1.488961e+05
+- **Per-Metric Scores**:
+  - L1: 1.488961e+05
+
+### best_l1_rank2_nu0p5_gamma_is_1
+- **Run**: res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1
+- **Combined Score**: 1.516207e+05
+- **Per-Metric Scores**:
+  - L1: 1.516207e+05
+
+### best_l1_rank3_nu1p0_default_gamma
+- **Run**: res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma
 - **Combined Score**: 1.672067e+05
 - **Per-Metric Scores**:
   - L1: 1.672067e+05
