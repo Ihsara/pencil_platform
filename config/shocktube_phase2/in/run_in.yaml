@@ -10,7 +10,7 @@ data:
     dsnap: 2.0e-4
     dtmin: 1.0e-12
     isave: 1000
-    tmax: 1.0e-4
+    tmax: 0.002
     it1: 100
     itorder: 3
     lpencil_check: false
