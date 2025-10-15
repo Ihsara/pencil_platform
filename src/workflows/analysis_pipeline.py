@@ -48,6 +48,15 @@ except ImportError as e:
     logger.error(f"FATAL: Failed to import Pencil Code modules. {e}")
     sys.exit(1)
 
+def clear_directory(directory: Path):
+    """Clears all files in a directory, creating it if it doesn't exist."""
+    if directory.exists():
+        import shutil
+        logger.info(f"Clearing existing directory: {directory}")
+        shutil.rmtree(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+
+
 def get_analytical_solution(params, x: np.ndarray, t: float) -> dict | None:
     """Calculates the analytical Sod shock tube solution."""
     try:
@@ -247,9 +256,11 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     error_evolution_dir = error_dir / "evolution"
     error_frames_dir = error_dir / "frames"
 
-    var_evolution_dir.mkdir(parents=True, exist_ok=True)
-    error_evolution_dir.mkdir(parents=True, exist_ok=True)
-    error_frames_dir.mkdir(parents=True, exist_ok=True)
+    # Clear old visualizations before creating new ones
+    logger.info("Clearing old visualization directories...")
+    clear_directory(var_evolution_dir)
+    clear_directory(error_evolution_dir)
+    clear_directory(error_frames_dir)
 
     with open(manifest_file, 'r') as f: 
         run_names = [line.strip() for line in f if line.strip()]
@@ -466,9 +477,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     
     # Use metrics from configuration
     error_norms_dir = analysis_dir / "error_norms"
-    error_norms_dir.mkdir(parents=True, exist_ok=True)
     plots_dir = error_norms_dir / "plots"
-    plots_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Clear old error norm results before creating new ones
+    logger.info("Clearing old error norm directories...")
+    clear_directory(error_norms_dir)
+    clear_directory(plots_dir)
     
     error_norms_cache = {}
     
@@ -628,10 +642,12 @@ def analyze_suite_with_error_norms(experiment_name: str, metrics: List[str] = No
     
     # Create NEW subfolder for error norm results
     error_norms_dir = analysis_dir / "error_norms"
-    error_norms_dir.mkdir(parents=True, exist_ok=True)
-    
     plots_dir = error_norms_dir / "plots"
-    plots_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Clear old error norm results before creating new ones
+    logger.info("Clearing old error norm directories...")
+    clear_directory(error_norms_dir)
+    clear_directory(plots_dir)
 
     with open(manifest_file, 'r') as f: 
         run_names = [line.strip() for line in f if line.strip()]
