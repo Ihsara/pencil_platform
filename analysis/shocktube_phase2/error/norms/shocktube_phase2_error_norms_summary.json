@@ -3,160 +3,244 @@
   "metrics_used": [
     "l1"
   ],
-  "total_runs_analyzed": 12,
+  "total_runs_analyzed": 24,
   "top_5_overall": [
     {
       "rank": 1,
-      "run_name": "res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma",
-      "combined_score": 148896.1427188472,
+      "run_name": "res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma",
+      "combined_score": 102476.66235699877,
       "branch": "best_l1_rank1_nu0p5_default_gamma",
       "per_metric_scores": {
-        "l1": 148896.1427188472
+        "l1": 102476.66235699877
       }
     },
     {
       "rank": 2,
-      "run_name": "res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma",
-      "combined_score": 149908.52112741803,
+      "run_name": "res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma",
+      "combined_score": 102476.66235699877,
       "branch": "best_l1_rank1_nu0p5_default_gamma",
       "per_metric_scores": {
-        "l1": 149908.52112741803
+        "l1": 102476.66235699877
       }
     },
     {
       "rank": 3,
-      "run_name": "res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma",
-      "combined_score": 149926.11395413196,
-      "branch": "best_l1_rank1_nu0p5_default_gamma",
+      "run_name": "res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1",
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank2_nu0p5_gamma_is_1",
       "per_metric_scores": {
-        "l1": 149926.11395413196
+        "l1": 102476.66235699877
       }
     },
     {
       "rank": 4,
-      "run_name": "res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma",
-      "combined_score": 150013.48607172334,
-      "branch": "best_l1_rank1_nu0p5_default_gamma",
+      "run_name": "res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1",
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank2_nu0p5_gamma_is_1",
       "per_metric_scores": {
-        "l1": 150013.48607172334
+        "l1": 102476.66235699877
       }
     },
     {
       "rank": 5,
-      "run_name": "res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1",
-      "combined_score": 151620.70208498638,
-      "branch": "best_l1_rank2_nu0p5_gamma_is_1",
+      "run_name": "res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma",
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank3_nu1p0_default_gamma",
       "per_metric_scores": {
-        "l1": 151620.70208498638
+        "l1": 102476.66235699877
       }
     }
   ],
   "best_per_branch": {
     "best_l1_rank1_nu0p5_default_gamma": {
-      "run_name": "res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma",
-      "combined_score": 148896.1427188472,
+      "run_name": "res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma",
+      "combined_score": 102476.66235699877,
       "per_metric_scores": {
-        "l1": 148896.1427188472
+        "l1": 102476.66235699877
       }
     },
     "best_l1_rank2_nu0p5_gamma_is_1": {
-      "run_name": "res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1",
-      "combined_score": 151620.70208498638,
+      "run_name": "res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1",
+      "combined_score": 102476.66235699877,
       "per_metric_scores": {
-        "l1": 151620.70208498638
+        "l1": 102476.66235699877
       }
     },
     "best_l1_rank3_nu1p0_default_gamma": {
-      "run_name": "res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma",
-      "combined_score": 167206.72231464105,
+      "run_name": "res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma",
+      "combined_score": 102476.66235699877,
       "per_metric_scores": {
-        "l1": 167206.72231464105
+        "l1": 102476.66235699877
       }
     }
   },
   "detailed_scores": {
     "res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma": {
-      "combined_score": 150013.48607172334,
+      "combined_score": 1005122.5804728963,
       "branch": "best_l1_rank1_nu0p5_default_gamma",
       "per_metric_scores": {
-        "l1": 150013.48607172334
+        "l1": 1005122.5804728963
       }
     },
     "res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma": {
-      "combined_score": 149926.11395413196,
+      "combined_score": 1004063.2861971722,
       "branch": "best_l1_rank1_nu0p5_default_gamma",
       "per_metric_scores": {
-        "l1": 149926.11395413196
+        "l1": 1004063.2861971722
       }
     },
     "res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma": {
-      "combined_score": 149908.52112741803,
+      "combined_score": 1005813.8104780603,
       "branch": "best_l1_rank1_nu0p5_default_gamma",
       "per_metric_scores": {
-        "l1": 149908.52112741803
+        "l1": 1005813.8104780603
       }
     },
     "res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma": {
-      "combined_score": 148896.1427188472,
+      "combined_score": 1001481.3728427824,
       "branch": "best_l1_rank1_nu0p5_default_gamma",
       "per_metric_scores": {
-        "l1": 148896.1427188472
+        "l1": 1001481.3728427824
+      }
+    },
+    "res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma": {
+      "combined_score": 556596.269593199,
+      "branch": "best_l1_rank1_nu0p5_default_gamma",
+      "per_metric_scores": {
+        "l1": 556596.269593199
+      }
+    },
+    "res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma": {
+      "combined_score": 152459.9388120624,
+      "branch": "best_l1_rank1_nu0p5_default_gamma",
+      "per_metric_scores": {
+        "l1": 152459.9388120624
+      }
+    },
+    "res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma": {
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank1_nu0p5_default_gamma",
+      "per_metric_scores": {
+        "l1": 102476.66235699877
+      }
+    },
+    "res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma": {
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank1_nu0p5_default_gamma",
+      "per_metric_scores": {
+        "l1": 102476.66235699877
       }
     },
     "res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1": {
-      "combined_score": 152358.02128174985,
+      "combined_score": 955526.0895539568,
       "branch": "best_l1_rank2_nu0p5_gamma_is_1",
       "per_metric_scores": {
-        "l1": 152358.02128174985
+        "l1": 955526.0895539568
       }
     },
     "res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1": {
-      "combined_score": 152305.7819834001,
+      "combined_score": 954819.3651130574,
       "branch": "best_l1_rank2_nu0p5_gamma_is_1",
       "per_metric_scores": {
-        "l1": 152305.7819834001
+        "l1": 954819.3651130574
       }
     },
     "res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1": {
-      "combined_score": 151620.70208498638,
+      "combined_score": 954921.7416005314,
       "branch": "best_l1_rank2_nu0p5_gamma_is_1",
       "per_metric_scores": {
-        "l1": 151620.70208498638
+        "l1": 954921.7416005314
       }
     },
     "res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1": {
-      "combined_score": 152489.88349303257,
+      "combined_score": 958202.3206529517,
       "branch": "best_l1_rank2_nu0p5_gamma_is_1",
       "per_metric_scores": {
-        "l1": 152489.88349303257
+        "l1": 958202.3206529517
+      }
+    },
+    "res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1": {
+      "combined_score": 525296.1177478356,
+      "branch": "best_l1_rank2_nu0p5_gamma_is_1",
+      "per_metric_scores": {
+        "l1": 525296.1177478356
+      }
+    },
+    "res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1": {
+      "combined_score": 138592.06485121092,
+      "branch": "best_l1_rank2_nu0p5_gamma_is_1",
+      "per_metric_scores": {
+        "l1": 138592.06485121092
+      }
+    },
+    "res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1": {
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank2_nu0p5_gamma_is_1",
+      "per_metric_scores": {
+        "l1": 102476.66235699877
+      }
+    },
+    "res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1": {
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank2_nu0p5_gamma_is_1",
+      "per_metric_scores": {
+        "l1": 102476.66235699877
       }
     },
     "res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma": {
-      "combined_score": 168362.93919627217,
+      "combined_score": 584827.7380825679,
       "branch": "best_l1_rank3_nu1p0_default_gamma",
       "per_metric_scores": {
-        "l1": 168362.93919627217
+        "l1": 584827.7380825679
       }
     },
     "res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma": {
-      "combined_score": 168438.69009369815,
+      "combined_score": 585201.8445851024,
       "branch": "best_l1_rank3_nu1p0_default_gamma",
       "per_metric_scores": {
-        "l1": 168438.69009369815
+        "l1": 585201.8445851024
       }
     },
     "res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma": {
-      "combined_score": 168017.22289980997,
+      "combined_score": 584057.744342695,
       "branch": "best_l1_rank3_nu1p0_default_gamma",
       "per_metric_scores": {
-        "l1": 168017.22289980997
+        "l1": 584057.744342695
       }
     },
     "res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma": {
-      "combined_score": 167206.72231464105,
+      "combined_score": 579490.7045358579,
       "branch": "best_l1_rank3_nu1p0_default_gamma",
       "per_metric_scores": {
-        "l1": 167206.72231464105
+        "l1": 579490.7045358579
+      }
+    },
+    "res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma": {
+      "combined_score": 163491.05905801215,
+      "branch": "best_l1_rank3_nu1p0_default_gamma",
+      "per_metric_scores": {
+        "l1": 163491.05905801215
+      }
+    },
+    "res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma": {
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank3_nu1p0_default_gamma",
+      "per_metric_scores": {
+        "l1": 102476.66235699877
+      }
+    },
+    "res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma": {
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank3_nu1p0_default_gamma",
+      "per_metric_scores": {
+        "l1": 102476.66235699877
+      }
+    },
+    "res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma": {
+      "combined_score": 102476.66235699877,
+      "branch": "best_l1_rank3_nu1p0_default_gamma",
+      "per_metric_scores": {
+        "l1": 102476.66235699877
       }
     }
   }
