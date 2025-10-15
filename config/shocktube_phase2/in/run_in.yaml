@@ -7,7 +7,7 @@ data:
     bcx: ['a', 's', 's', 's', 's', 's']
     cdt: 0.1
     cdtv: 0.1
-    dsnap: 2.0e-4
+    dsnap: 1.0e-4
     dtmin: 1.0e-12
     isave: 1000
     tmax: 0.002
