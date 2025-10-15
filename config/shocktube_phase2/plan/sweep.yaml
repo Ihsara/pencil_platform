@@ -57,7 +57,7 @@ run_name_template: "{{ output_prefix }}_nu{{ nu_hyper3 | fs_safe }}_chi{{ chi_hy
 parameter_sweeps:
   - type: linked
     variables: [nu_hyper3, chi_hyper3]
-    values: [9.0e-15, 9.0e-14, 9.0e-13, 9.0e-12]
+    values: [9.0e-15, 9.0e-14, 9.0e-13, 9.0e-12, 9.0e-11, 9.0e-10, 9.0e-9, 9.0e-8]
 
 # --- Branches ---
 # Three scenarios based on top 3 L1 performers from Phase 1
