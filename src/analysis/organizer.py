@@ -176,21 +176,16 @@ class AnalysisOrganizer:
         for metric in metrics:
             logger.info(f"  ├─ Processing {metric.upper()} metric...")
             
-            # Calculate average score for this metric across all variables
+            # Calculate score for this metric using ONLY DENSITY (rho)
             metric_scores = {}
             for run_name, cached in error_norms_cache.items():
                 error_norms = cached['error_norms']
                 
-                scores = []
-                for var in ['rho', 'ux', 'pp', 'ee']:
-                    if var in error_norms and metric in error_norms[var]:
-                        mean_val = error_norms[var][metric]['mean']
-                        if mean_val is not None and not (isinstance(mean_val, float) and (mean_val != mean_val or mean_val == float('inf'))):  # Check for NaN and inf
-                            scores.append(mean_val)
-                
-                if scores:
-                    import numpy as np
-                    metric_scores[run_name] = np.mean(scores)
+                # Use ONLY density error for scoring
+                if 'rho' in error_norms and metric in error_norms['rho']:
+                    mean_val = error_norms['rho'][metric]['mean']
+                    if mean_val is not None and not (isinstance(mean_val, float) and (mean_val != mean_val or mean_val == float('inf'))):  # Check for NaN and inf
+                        metric_scores[run_name] = mean_val
             
             # Sort and get top N
             sorted_runs = sorted(metric_scores.items(), key=lambda x: x[1])

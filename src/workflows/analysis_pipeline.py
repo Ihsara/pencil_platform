@@ -377,23 +377,22 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     logger.info("PHASE 2: Creating overlay videos")
     logger.info("=" * 80)
     
-    # Calculate average error for each run (using mean of all timesteps and variables)
+    # Calculate average error for each run using ONLY DENSITY (rho)
     run_scores = {}
     for run_name, cached in loaded_data_cache.items():
         spatial_errors = cached['spatial_errors']
         
-        # Calculate average L2 error across all variables and timesteps
+        # Calculate average L2 error for DENSITY ONLY across all timesteps
         total_error = 0
         count = 0
-        for var in ['rho', 'ux', 'pp', 'ee']:
-            if var in spatial_errors:
-                for errors in spatial_errors[var]['errors_per_timestep']:
-                    total_error += np.sqrt(np.mean(errors**2))  # L2 norm
-                    count += 1
+        if 'rho' in spatial_errors:
+            for errors in spatial_errors['rho']['errors_per_timestep']:
+                total_error += np.sqrt(np.mean(errors**2))  # L2 norm
+                count += 1
         
         avg_error = total_error / count if count > 0 else float('inf')
         run_scores[run_name] = avg_error
-        logger.info(f"  {run_name}: avg L2 error = {avg_error:.6e}")
+        logger.info(f"  {run_name}: avg L2 error (rho only) = {avg_error:.6e}")
     
     # Find best performer in each branch
     logger.info(f"\n🏆 Finding best performers in each branch...")
@@ -502,24 +501,20 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 'n_timesteps': len(all_sim_data)
             }
     
-    # Calculate combined scores
-    logger.info(f"\nCalculating combined scores...")
+    # Calculate combined scores using ONLY DENSITY (rho)
+    logger.info(f"\nCalculating combined scores (using DENSITY only)...")
     combined_scores = {}
     
     for run_name, cached in error_norms_cache.items():
         error_norms = cached['error_norms']
         scores_per_metric = {}
         
+        # Use ONLY density (rho) for all metrics
         for metric in metrics:
-            metric_scores = []
-            for var in ['rho', 'ux', 'pp', 'ee']:
-                if var in error_norms and metric in error_norms[var]:
-                    mean_val = error_norms[var][metric]['mean']
-                    if np.isfinite(mean_val):
-                        metric_scores.append(mean_val)
-            
-            if metric_scores:
-                scores_per_metric[metric] = np.mean(metric_scores)
+            if 'rho' in error_norms and metric in error_norms['rho']:
+                mean_val = error_norms['rho'][metric]['mean']
+                if np.isfinite(mean_val):
+                    scores_per_metric[metric] = mean_val
         
         if scores_per_metric:
             combined_score = np.mean(list(scores_per_metric.values()))
@@ -739,19 +734,15 @@ def analyze_suite_with_error_norms(experiment_name: str, metrics: List[str] = No
     for run_name, cached in error_norms_cache.items():
         error_norms = cached['error_norms']
         
-        # Calculate combined score: average of mean values across all variables and metrics
+        # Calculate combined score using ONLY DENSITY (rho)
         scores_per_metric = {}
         
+        # Use ONLY density (rho) for all metrics
         for metric in metrics:
-            metric_scores = []
-            for var in ['rho', 'ux', 'pp', 'ee']:
-                if var in error_norms and metric in error_norms[var]:
-                    mean_val = error_norms[var][metric]['mean']
-                    if np.isfinite(mean_val):
-                        metric_scores.append(mean_val)
-            
-            if metric_scores:
-                scores_per_metric[metric] = np.mean(metric_scores)
+            if 'rho' in error_norms and metric in error_norms['rho']:
+                mean_val = error_norms['rho'][metric]['mean']
+                if np.isfinite(mean_val):
+                    scores_per_metric[metric] = mean_val
         
         # Combined score is the average of all metric scores
         if scores_per_metric:
