@@ -52,7 +52,17 @@ RUN_DIR="${RUN_BASE_DIR}/${RUN_NAME}"
 LOCAL_GENERATED_CONFIG_DIR="${SLURM_SUBMIT_DIR}/runs/{{ experiment_name }}/generated_configs/${RUN_NAME}"
 LOGFILE="${RUN_DIR}/simulation.log"
 
+# --- Setup submission logging directory ---
+TIMESTAMP=$(date +"%Y-%m-%d_%H-%M")
+SUBMISSION_LOG_BASE="${SLURM_SUBMIT_DIR}/logs/submission/${TIMESTAMP}/{{ sbatch.job_name }}_${SLURM_JOB_ID}/array_${SLURM_ARRAY_TASK_ID}"
+mkdir -p "${SUBMISSION_LOG_BASE}"
+
+PC_BUILD_LOG="${SUBMISSION_LOG_BASE}/pc_build.log"
+PC_START_LOG="${SUBMISSION_LOG_BASE}/pc_start.log"
+PC_RUN_LOG="${SUBMISSION_LOG_BASE}/pc_run.log"
+
 echo "INFO: Starting SLURM task ${SLURM_ARRAY_TASK_ID} for run: ${RUN_NAME}"
+echo "INFO: Submission logs will be stored in: ${SUBMISSION_LOG_BASE}"
 
 # --- 1. Clean up existing run directory if it exists ---
 if [ -d "${RUN_DIR}" ]; then
@@ -88,25 +98,27 @@ module purge
 {{ module_loads | indent(0) }}
 
 # Build the code, cleaning previous artifacts first
-pc_build --cleanall >> $LOGFILE 2>&1
-pc_build >> $LOGFILE 2>&1
-if [ $? -ne 0 ]; then echo "ERROR: pc_build failed" | tee -a $LOGFILE >&2; exit 1; fi
-echo "INFO: Build finished." >> $LOGFILE 2>&1
+echo "INFO: Running pc_build --cleanall..." | tee -a $LOGFILE
+pc_build --cleanall >> "${PC_BUILD_LOG}" 2>&1
+echo "INFO: Running pc_build..." | tee -a $LOGFILE
+pc_build >> "${PC_BUILD_LOG}" 2>&1
+if [ $? -ne 0 ]; then echo "ERROR: pc_build failed. Check ${PC_BUILD_LOG}" | tee -a $LOGFILE >&2; exit 1; fi
+echo "INFO: Build finished. Full output in ${PC_BUILD_LOG}" | tee -a $LOGFILE
 {% endif %}
 
 # --- 6. Run the simulation ---
 if [ ! -e data/param.nml ]; then
-    echo "INFO: Running START..." >>$LOGFILE 2>&1
-    srun ./start.csh >>$LOGFILE 2>&1
-    if [ $? -ne 0 ]; then echo "ERROR: start.csh failed" | tee -a $LOGFILE >&2; exit 1; fi
-    echo "INFO: START finished." >>$LOGFILE 2>&1
+    echo "INFO: Running START..." | tee -a $LOGFILE
+    srun ./start.csh >> "${PC_START_LOG}" 2>&1
+    if [ $? -ne 0 ]; then echo "ERROR: start.csh failed. Check ${PC_START_LOG}" | tee -a $LOGFILE >&2; exit 1; fi
+    echo "INFO: START finished. Full output in ${PC_START_LOG}" | tee -a $LOGFILE
 else
-    echo "INFO: Skipping START (data/param.nml exists)." >>$LOGFILE 2>&1
+    echo "INFO: Skipping START (data/param.nml exists)." | tee -a $LOGFILE
 fi
 
-echo "INFO: Running RUN..." >>$LOGFILE 2>&1
-srun ./run.csh >>$LOGFILE 2>&1
-if [ $? -ne 0 ]; then echo "ERROR: run.csh failed" | tee -a $LOGFILE >&2; exit 1; fi
-echo "INFO: RUN finished successfully." >>$LOGFILE 2>&1
+echo "INFO: Running RUN..." | tee -a $LOGFILE
+srun ./run.csh >> "${PC_RUN_LOG}" 2>&1
+if [ $? -ne 0 ]; then echo "ERROR: run.csh failed. Check ${PC_RUN_LOG}" | tee -a $LOGFILE >&2; exit 1; fi
+echo "INFO: RUN finished successfully. Full output in ${PC_RUN_LOG}" | tee -a $LOGFILE
 
 echo "INFO: SLURM task finished successfully."
