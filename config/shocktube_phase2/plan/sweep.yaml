@@ -44,7 +44,7 @@ error_analysis:
 
 # --- Experiment Generation Parameters ---
 base_experiment: 'shocktube_base'
-output_prefix: 'res400_hyper3'
+output_prefix: 'res{{ data.nxgrid }}_hyper3'
 
 # Naming scheme for Phase 2 runs
 run_name_template: "{{ output_prefix }}_nu{{ nu_hyper3 | fs_safe }}_chi{{ chi_hyper3 | fs_safe }}_{{ branch.name }}"

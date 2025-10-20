@@ -3,18 +3,19 @@ format: namelist
 data:
   run_pars:
     bcx: ['a', 's', 's', 's', 's', 's']
-    cdt: 0.01
-    cdtv: 0.01
+    cdt: 0.005
+    cdtv: 0.005
+    cdts: 0.005
     cvsid: "9a97ecc83"
-    dsnap: 1.0e-4
+    dsnap: 1.0e-5
     dtmin: 1.0e-12
     dvid: 0.02
     isave: 10000
-    tmax: 0.002
+    tmax: 0.001
     it1: 1000
     itorder: 3
     lpencil_check: false
-    nt: 120000
+    nt: 1200000
 
   density_run_pars:
     diffrho_shock: 1.0

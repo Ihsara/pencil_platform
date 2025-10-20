@@ -14,7 +14,7 @@ hpc:
   source_base_dir: '/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod'
   
   # The absolute path where all new experiment run directories will be created.
-  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase1'
+  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase1_highres'
 
   module_loads: |
     module load gcc/11.2.0
@@ -53,7 +53,7 @@ error_analysis:
 
 # --- Experiment Generation Parameters ---
 base_experiment: 'shocktube_base'
-output_prefix: '{data.nxgrid}_nohyper'
+output_prefix: 'res{{ data.nxgrid }}_nohyper'
 
 # Defines the naming scheme for Phase 1 runs.
 run_name_template: "{{ output_prefix }}_{{ branch.name }}_nu{{ nu_shock | fs_safe }}_chi{{ chi_shock | fs_safe }}_diffrho{{ diffrho_shock | fs_safe }}"

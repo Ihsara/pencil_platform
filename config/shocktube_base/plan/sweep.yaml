@@ -1,7 +1,7 @@
 # Plan for the shocktube parameter sweep
 ---
 base_experiment: 'shocktube_base'
-output_prefix: 'shock_res400'
+output_prefix: 'shock_res{{ data.nxgrid }}'
 
 sweep_parameters:
   nu_shock: [0.1, 0.5, 1.0, 5.0]

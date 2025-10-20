@@ -1,44 +1,35 @@
-# This is an exact representation of the working run.in, including hyper-params
+# config/shocktube_base/in/run_in.yaml
 format: namelist
 data:
   run_pars:
     bcx: ['a', 's', 's', 's', 's', 's']
-    cdt: 0.1
-    cdtv: 0.1
+    cdt: 0.005
+    cdtv: 0.005
+    cdts: 0.005
     cvsid: "9a97ecc83"
     dsnap: 1.0e-5
     dtmin: 1.0e-12
     dvid: 0.02
-    isave: 1000
-    tmax: 1.0e-4
-    it1: 100
+    isave: 10000
+    tmax: 0.001
+    it1: 1000
     itorder: 3
     lpencil_check: false
-    nt: 6000
+    nt: 1200000
 
   density_run_pars:
     diffrho_shock: 1.0
     idiff: 'shock'
     lmassdiff_fix: true
 
+  # Include the hyper params in the base, as they exist in the working reference
   entropy_run_pars:
-    chi_hyper3: 9.0e-14
     chi_shock: 1.0
-    iheatcond: ['shock', 'hyper3']
+    iheatcond: ['shock']
 
   viscosity_run_pars:
-    ivisc: ['nu-shock', 'hyper3-nu-const']
-    nu_hyper3: 3.0e-12
+    ivisc: ['nu-shock']
     nu_shock: 1.0
-
-  shock_run_pars:
-    con_bias: 0.05
-    dtfactor: 0.2
-    ishock_max: 1
-    lconvergence_only: true
-    lgaussian_smooth: true
-    lmax_shock: false
-    shock_div_pow: 1.75
   
   eos_run_pars: {}
   hydro_run_pars: {}

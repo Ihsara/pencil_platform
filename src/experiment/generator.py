@@ -155,7 +155,17 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     
     for branch in plan.get('branches', [{'name': 'default', 'settings': {}}]):
         for current_params in all_param_combinations:
-            context = {'plan': plan, 'branch': branch, 'output_prefix': plan.get('output_prefix', ''), **current_params}
+            # Process output_prefix as a template to resolve dynamic values like {data.nxgrid}
+            raw_output_prefix = plan.get('output_prefix', '')
+            env_prefix = jinja2.Environment()
+            # Create context with config data for template evaluation
+            prefix_context = {'data': base_configs.get('cparam_local.yaml', {}).get('data', {}), **current_params}
+            try:
+                output_prefix = env_prefix.from_string(raw_output_prefix).render(prefix_context)
+            except:
+                output_prefix = raw_output_prefix  # Fallback to raw string if template fails
+            
+            context = {'plan': plan, 'branch': branch, 'output_prefix': output_prefix, **current_params}
             if 'derived_parameters' in plan:
                 for key, formula in plan['derived_parameters'].items():
                     if isinstance(formula, str):

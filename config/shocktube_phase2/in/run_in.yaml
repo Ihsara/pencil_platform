@@ -1,45 +1,35 @@
-# Phase 2 run configuration
-# This inherits from shocktube_base and overrides specific parameters
-# for hyperdiffusion parameter sweep.
+# config/shocktube_base/in/run_in.yaml
 format: namelist
 data:
   run_pars:
     bcx: ['a', 's', 's', 's', 's', 's']
-    cdt: 0.1
-    cdtv: 0.1
-    dsnap: 1.0e-4
+    cdt: 0.005
+    cdtv: 0.005
+    cdts: 0.005
+    cvsid: "9a97ecc83"
+    dsnap: 1.0e-5
     dtmin: 1.0e-12
-    isave: 1000
-    tmax: 0.002
-    it1: 100
+    dvid: 0.02
+    isave: 10000
+    tmax: 0.001
+    it1: 1000
     itorder: 3
     lpencil_check: false
-    nt: 60000
+    nt: 1200000
 
   density_run_pars:
-    diffrho_shock: 1.0      # Fixed value from task requirement
+    diffrho_shock: 1.0
     idiff: 'shock'
     lmassdiff_fix: true
-    lgamma_is_1: false      # F as specified in task
 
+  # Include the hyper params in the base, as they exist in the working reference
   entropy_run_pars:
-    chi_shock: 1.0          # Fixed value from task requirement
-    iheatcond: ['shock', 'hyper3']
-    chi_hyper3: 9.0e-14     # Placeholder, will be swept
+    chi_shock: 1.0
+    iheatcond: ['shock']
 
   viscosity_run_pars:
-    ivisc: ['nu-shock', 'hyper3-nu-const']
-    nu_shock: 1.0           # Fixed value from task requirement
-    nu_hyper3: 9.0e-14      # Placeholder, will be swept
-
-  shock_run_pars:
-    con_bias: 0.05
-    dtfactor: 0.2
-    ishock_max: 1
-    lconvergence_only: true
-    lgaussian_smooth: true
-    lmax_shock: false
-    shock_div_pow: 1.75
+    ivisc: ['nu-shock']
+    nu_shock: 1.0
   
   eos_run_pars: {}
   hydro_run_pars: {}
