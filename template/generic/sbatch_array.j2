@@ -54,7 +54,7 @@ LOGFILE="${RUN_DIR}/simulation.log"
 
 # --- Setup submission logging directory ---
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M")
-SUBMISSION_LOG_BASE="${SLURM_SUBMIT_DIR}/logs/submission/${TIMESTAMP}/{{ sbatch.job_name }}_${SLURM_JOB_ID}/array_${SLURM_ARRAY_TASK_ID}"
+SUBMISSION_LOG_BASE="${SLURM_SUBMIT_DIR}/logs/submission/{{ experiment_name }}/${TIMESTAMP}/${SLURM_JOB_ID}/array_${SLURM_ARRAY_TASK_ID}"
 mkdir -p "${SUBMISSION_LOG_BASE}"
 
 PC_BUILD_LOG="${SUBMISSION_LOG_BASE}/pc_build.log"
