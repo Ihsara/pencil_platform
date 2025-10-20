@@ -3,32 +3,26 @@
   "top_performers": [
     {
       "rank": 1,
-      "run_name": "res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0",
-      "combined_score": 4933.015515307579,
+      "run_name": "res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0",
+      "combined_score": 0.01433109394827798,
       "per_metric_scores": {
-        "l1": 681.2134147412903,
-        "l2": 1875.8193240292571,
-        "linf": 12242.01380715219
+        "l1": 0.01433109394827798
       }
     },
     {
       "rank": 2,
-      "run_name": "res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0",
-      "combined_score": 4933.015515307579,
+      "run_name": "res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0",
+      "combined_score": 0.01433109394827798,
       "per_metric_scores": {
-        "l1": 681.2134147412903,
-        "l2": 1875.8193240292571,
-        "linf": 12242.01380715219
+        "l1": 0.01433109394827798
       }
     },
     {
       "rank": 3,
-      "run_name": "res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5",
-      "combined_score": 5104.797752223258,
+      "run_name": "res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0",
+      "combined_score": 0.015579535321888332,
       "per_metric_scores": {
-        "l1": 660.0073539638571,
-        "l2": 1870.8320608049016,
-        "linf": 12783.553841901015
+        "l1": 0.015579535321888332
       }
     }
   ]
