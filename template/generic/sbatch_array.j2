@@ -53,7 +53,7 @@ LOCAL_GENERATED_CONFIG_DIR="${SLURM_SUBMIT_DIR}/runs/{{ experiment_name }}/gener
 LOGFILE="${RUN_DIR}/simulation.log"
 
 # --- Setup submission logging directory ---
-TIMESTAMP=$(date +"%Y-%m-%d_%H-%M")
+TIMESTAMP=$(date +"sub_%Y%m%d%H%M")
 SUBMISSION_LOG_BASE="${SLURM_SUBMIT_DIR}/logs/submission/{{ experiment_name }}/${TIMESTAMP}/${SLURM_JOB_ID}/array_${SLURM_ARRAY_TASK_ID}"
 mkdir -p "${SUBMISSION_LOG_BASE}"
 

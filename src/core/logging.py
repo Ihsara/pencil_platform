@@ -18,7 +18,9 @@ def setup_file_logging(experiment_name: str, command_type: str) -> Path:
     new log file in the appropriate directory structure.
     
     Directory structure:
-        logs/{command_type}/{experiment_name}/{timestamp}_{command_type}.log
+        logs/{command_type}/{experiment_name}/{timestamp}/{command_type}.log
+        
+    Where timestamp is in format: sub_YYYYMMDDHHMM (e.g., sub_202510210025)
     
     Args:
         experiment_name: Name of the experiment (e.g., 'shocktube_phase1')
@@ -35,15 +37,15 @@ def setup_file_logging(experiment_name: str, command_type: str) -> Path:
         >>> log_file = setup_file_logging('my_experiment', 'analysis')
         >>> logger.info("This message goes to both console and file")
     """
-    # Create timestamp in ISO 8601 format (filesystem-safe)
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    # Create timestamp in format sub_YYYYMMDDHHMM
+    timestamp = datetime.now().strftime("sub_%Y%m%d%H%M")
     
-    # Create log directory structure
-    log_dir = Path("logs") / command_type / experiment_name
+    # Create log directory structure with timestamp folder
+    log_dir = Path("logs") / command_type / experiment_name / timestamp
     log_dir.mkdir(parents=True, exist_ok=True)
     
     # Create log file path
-    log_file = log_dir / f"{timestamp}_{command_type}.log"
+    log_file = log_dir / f"{command_type}.log"
     
     # Add file sink to loguru (in addition to default console sink)
     # Using a detailed format for file logs with full context
