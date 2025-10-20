@@ -38,7 +38,9 @@ def l1_norm(numerical: np.ndarray, analytical: np.ndarray) -> float:
     Reference:
         Gent et al. (2018), Equation (23)
     """
-    return np.mean(np.abs(numerical - analytical))
+    analytical_copy = np.where(analytical == 0, 1, analytical)  
+    
+    return np.mean(np.abs((numerical - analytical)/analytical_copy))
 
 
 def l2_norm(numerical: np.ndarray, analytical: np.ndarray) -> float:

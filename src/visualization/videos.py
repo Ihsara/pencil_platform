@@ -73,7 +73,7 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
         lines[var], = ax.plot([], [], 'b-', linewidth=2, alpha=0.8)
         analytical_lines[var], = ax.plot([], [], 'r--', linewidth=2.5, alpha=0.9)
         
-        ax.set_xlabel('Position (x) [kpc]', fontsize=11)
+        ax.set_xlabel('x [kpc]', fontsize=11)
         ax.set_ylabel(var_labels.get(var, var), fontsize=11)
         ax.set_yscale(var_scales.get(var, 'linear'))
         ax.set_title(f'{var.upper()}', fontsize=12, fontweight='bold')
@@ -107,7 +107,7 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
                      loc='center', ncol=2, fontsize=12, frameon=True)
     
     # Info text in legend row
-    info_text = fig.text(0.5, 0.03, '', fontsize=10, horizontalalignment='center',
+    info_text = fig.text(0.5, 0.03, '', fontsize=15, horizontalalignment='center',
                         verticalalignment='bottom')
     
     # Main title with decoded experiment name
@@ -248,7 +248,7 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
                 ax.plot(analytical_data['x'], analytical_data[var] * unit_dict[var], 
                        'r--', linewidth=2.5, alpha=0.9)
                 
-                ax.set_xlabel('Position (x) [kpc]', fontsize=11)
+                ax.set_xlabel('x [kpc]', fontsize=11)
                 ax.set_ylabel(var_labels.get(var, var), fontsize=11)
                 ax.set_yscale(var_scales.get(var, 'linear'))
                 ax.set_title(f'{var.upper()}', fontsize=12, fontweight='bold')
@@ -339,7 +339,7 @@ def create_error_evolution_video(spatial_errors: Dict, output_path: Path, run_na
         lines[var], = ax.plot([], [], '-', linewidth=2, color='#1f77b4', alpha=0.8)
         
         # Determine appropriate x-axis label
-        x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
+        x_label = 'x [kpc]' if unit_length != 1.0 else 'x [normalized]'
         ax.set_xlabel(x_label, fontsize=11)
         ax.set_ylabel(f'Error in {label}', fontsize=11)
         ax.set_title(f'{label}', fontsize=12, fontweight='bold')
@@ -534,7 +534,7 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
                 stats_lines.append(f'{label}: Mean={mean_err:.3e}, Max={max_err:.3e}')
                 
                 # Determine appropriate x-axis label
-                x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
+                x_label = 'x [kpc]' if unit_length != 1.0 else 'x [normalized]'
                 ax.set_xlabel(x_label, fontsize=11)
                 ax.set_ylabel(f'Error in {label}', fontsize=11)
                 ax.set_title(f'{label}', fontsize=12, fontweight='bold')
@@ -644,7 +644,7 @@ def create_overlay_error_evolution_video(
                               label=run_name, alpha=0.8)
                 lines[var].append((line, run_name, spatial_errors))
         
-        x_label = 'Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]'
+        x_label = 'x [kpc]' if unit_length != 1.0 else 'x [normalized]'
         ax.set_xlabel(x_label, fontsize=11)
         ax.set_ylabel(f'Error in {var_labels[idx]}', fontsize=11)
         ax.set_title(f'{var_labels[idx]} Spatial Error Comparison', fontsize=12)
@@ -788,7 +788,7 @@ def create_combined_error_evolution_video(
             y_range = y_max - y_min if y_max > y_min else 1.0
             ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
 
-        ax.set_xlabel('Position (x) [kpc]' if unit_length != 1.0 else 'Position (x) [normalized]', fontsize=11)
+        ax.set_xlabel('x [kpc]' if unit_length != 1.0 else 'x [normalized]', fontsize=11)
         ax.set_ylabel(f'Error in {label}', fontsize=11)
         ax.set_title(label, fontsize=12, fontweight='bold')
         ax.grid(True, alpha=0.3)
@@ -930,7 +930,7 @@ def create_combined_error_evolution_frames(
                 max_error_idx = np.argmax(abs_errors)
                 ax.plot(x_coords_abs[max_error_idx], abs_errors[max_error_idx], 'o', color=colors['L_inf'], markersize=8, alpha=0.9)
 
-            ax.set_xlabel('Position (x) [kpc]', fontsize=11)
+            ax.set_xlabel('x [kpc]', fontsize=11)
             ax.set_ylabel(f'Error in {label}', fontsize=11)
             ax.set_title(label, fontsize=12, fontweight='bold')
             ax.grid(True, alpha=0.3)
