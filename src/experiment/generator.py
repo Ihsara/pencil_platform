@@ -128,10 +128,35 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
     auto_rebuild = False
     rebuild_reason = ""
     critical_cparams = ['nxgrid', 'nygrid', 'nzgrid', 'ncpus', 'nprocx', 'nprocy', 'nprocz']
-    for sweep in plan.get('parameter_sweeps', []):
-        if sweep.get('variable') in critical_cparams:
-            auto_rebuild = True; rebuild_reason = f"Sweep modifies '{sweep.get('variable')}'."
-            break
+    
+    # Check if cparam_local differs from base experiment's cparam_local
+    base_experiment_name = plan['base_experiment']
+    base_cparam_path = DIRS.config / base_experiment_name / DIRS.in_subdir / 'cparam_local.yaml'
+    if base_cparam_path.exists():
+        with open(base_cparam_path, 'r') as f:
+            base_cparam = yaml.safe_load(f)
+        
+        # Get the final merged cparam_local after all merging
+        final_cparam = base_configs.get('cparam_local.yaml', {})
+        
+        # Compare critical parameters
+        base_data = base_cparam.get('data', {})
+        final_data = final_cparam.get('data', {})
+        
+        for param in critical_cparams:
+            base_value = base_data.get(param)
+            final_value = final_data.get(param)
+            if base_value != final_value:
+                auto_rebuild = True
+                rebuild_reason = f"cparam_local.yaml parameter '{param}' differs from base experiment '{base_experiment_name}' ({base_value} vs {final_value})."
+                break
+    
+    # Check if parameter sweeps modify critical cparams
+    if not auto_rebuild:
+        for sweep in plan.get('parameter_sweeps', []):
+            if sweep.get('variable') in critical_cparams:
+                auto_rebuild = True; rebuild_reason = f"Sweep modifies '{sweep.get('variable')}'."
+                break
     
     critical_files = ['cparam_local.yaml', 'Makefile_local.yaml']
     if not auto_rebuild:
