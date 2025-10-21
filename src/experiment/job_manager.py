@@ -195,7 +195,9 @@ def get_job_stage_info(log_base_dir: Path):
         Dict with stage information: {
             'stage': str,  # 'build', 'start', 'run', 'completed', 'failed', 'unknown'
             'iteration': int or None,  # Latest iteration if in 'run' stage
-            'details': str  # Additional info
+            'details': str,  # Additional info
+            'failed_log': Path or None,  # Path to the log file where failure occurred
+            'error_tail': list or None  # Last N lines of the failed log
         }
     """
     build_log = log_base_dir / "pc_build.log"
@@ -204,7 +206,8 @@ def get_job_stage_info(log_base_dir: Path):
     
     # Check if logs exist and determine stage
     if not log_base_dir.exists():
-        return {'stage': 'unknown', 'iteration': None, 'details': 'Log directory not found'}
+        return {'stage': 'unknown', 'iteration': None, 'details': 'Log directory not found', 
+                'failed_log': None, 'error_tail': None}
     
     # Check for failures in any log
     for log_file, stage_name in [(build_log, 'build'), (start_log, 'start'), (run_log, 'run')]:
@@ -213,7 +216,16 @@ def get_job_stage_info(log_base_dir: Path):
                 with open(log_file, 'r') as f:
                     content = f.read()
                     if 'ERROR:' in content or 'FATAL ERROR:' in content or 'failed' in content.lower():
-                        return {'stage': 'failed', 'iteration': None, 'details': f'Failed in {stage_name} stage'}
+                        # Get last 15 lines for error context
+                        lines = content.split('\n')
+                        error_tail = lines[-15:] if len(lines) > 15 else lines
+                        return {
+                            'stage': 'failed', 
+                            'iteration': None, 
+                            'details': f'Failed in {stage_name} stage',
+                            'failed_log': log_file,
+                            'error_tail': error_tail
+                        }
             except:
                 pass
     
@@ -233,38 +245,49 @@ def get_job_stage_info(log_base_dir: Path):
                 
                 # Check if completed
                 if 'finished successfully' in ''.join(lines[-50:]).lower():
-                    return {'stage': 'completed', 'iteration': latest_iteration, 'details': 'Run finished successfully'}
+                    return {'stage': 'completed', 'iteration': latest_iteration, 'details': 'Run finished successfully',
+                            'failed_log': None, 'error_tail': None}
                 
                 if latest_iteration is not None:
-                    return {'stage': 'run', 'iteration': latest_iteration, 'details': f'Running iteration {latest_iteration}'}
+                    return {'stage': 'run', 'iteration': latest_iteration, 'details': f'Running iteration {latest_iteration}',
+                            'failed_log': None, 'error_tail': None}
                 else:
-                    return {'stage': 'run', 'iteration': None, 'details': 'Run started, no iterations yet'}
+                    return {'stage': 'run', 'iteration': None, 'details': 'Run started, no iterations yet',
+                            'failed_log': None, 'error_tail': None}
         except:
-            return {'stage': 'run', 'iteration': None, 'details': 'Run stage (reading error)'}
+            return {'stage': 'run', 'iteration': None, 'details': 'Run stage (reading error)',
+                    'failed_log': None, 'error_tail': None}
     
     elif start_log.exists():
         try:
             with open(start_log, 'r') as f:
                 content = f.read()
                 if 'completed successfully' in content.lower():
-                    return {'stage': 'start_complete', 'iteration': None, 'details': 'Start completed, waiting for run'}
+                    return {'stage': 'start_complete', 'iteration': None, 'details': 'Start completed, waiting for run',
+                            'failed_log': None, 'error_tail': None}
                 else:
-                    return {'stage': 'start', 'iteration': None, 'details': 'Starting simulation'}
+                    return {'stage': 'start', 'iteration': None, 'details': 'Starting simulation',
+                            'failed_log': None, 'error_tail': None}
         except:
-            return {'stage': 'start', 'iteration': None, 'details': 'Start stage'}
+            return {'stage': 'start', 'iteration': None, 'details': 'Start stage',
+                    'failed_log': None, 'error_tail': None}
     
     elif build_log.exists():
         try:
             with open(build_log, 'r') as f:
                 content = f.read()
                 if 'completed successfully' in content.lower() or 'finished' in content.lower():
-                    return {'stage': 'build_complete', 'iteration': None, 'details': 'Build completed'}
+                    return {'stage': 'build_complete', 'iteration': None, 'details': 'Build completed',
+                            'failed_log': None, 'error_tail': None}
                 else:
-                    return {'stage': 'build', 'iteration': None, 'details': 'Building code'}
+                    return {'stage': 'build', 'iteration': None, 'details': 'Building code',
+                            'failed_log': None, 'error_tail': None}
         except:
-            return {'stage': 'build', 'iteration': None, 'details': 'Build stage'}
+            return {'stage': 'build', 'iteration': None, 'details': 'Build stage',
+                    'failed_log': None, 'error_tail': None}
     
-    return {'stage': 'initializing', 'iteration': None, 'details': 'Job initializing'}
+    return {'stage': 'initializing', 'iteration': None, 'details': 'Job initializing',
+            'failed_log': None, 'error_tail': None}
 
 
 def tail_log_file(log_file: Path, num_lines: int = 10):
@@ -352,6 +375,7 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     table.add_column("Details", style="white")
     
     stage_counts = {'initializing': 0, 'build': 0, 'start': 0, 'run': 0, 'completed': 0, 'failed': 0}
+    failed_tasks = []
     
     for job_dir in sorted(job_dirs, key=lambda x: int(x.name.split('_')[-1])):
         task_id = int(job_dir.name.split('_')[-1])
@@ -361,6 +385,16 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
         stage = stage_info['stage']
         iteration = stage_info['iteration']
         details = stage_info['details']
+        
+        # Track failed tasks
+        if stage == 'failed':
+            failed_tasks.append({
+                'task_id': task_id,
+                'run_name': run_name,
+                'log_file': stage_info.get('failed_log'),
+                'error_tail': stage_info.get('error_tail'),
+                'details': details
+            })
         
         # Count stages
         if stage in stage_counts:
@@ -400,6 +434,23 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     console.print(f"  Running: {stage_counts['run']}")
     console.print(f"  Completed: {stage_counts['completed']}")
     console.print(f"  Failed: {stage_counts['failed']}")
+    
+    # Show detailed error information for failed tasks
+    if failed_tasks:
+        console.print("\n[bold red]═══ FAILED TASKS - ERROR DETAILS ═══[/bold red]")
+        for failure in failed_tasks:
+            console.print(f"\n[red]Task {failure['task_id']}: {failure['run_name']}[/red]")
+            console.print(f"[yellow]Error: {failure['details']}[/yellow]")
+            
+            if failure['log_file']:
+                console.print(f"[cyan]Log file: {failure['log_file']}[/cyan]")
+                
+                if failure['error_tail']:
+                    console.print("[dim]Last 15 lines of log:[/dim]")
+                    for line in failure['error_tail']:
+                        if line.strip():  # Skip empty lines
+                            console.print(f"  [dim]{line.rstrip()}[/dim]")
+            console.print()  # Blank line between failures
 
 
 def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait: int = None, initial_delay: int = 5):
