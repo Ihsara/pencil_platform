@@ -402,7 +402,7 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     console.print(f"  Failed: {stage_counts['failed']}")
 
 
-def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait: int = None):
+def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait: int = None, initial_delay: int = 5):
     """
     Waits for a SLURM job array to complete by polling status and monitoring log files.
     
@@ -410,6 +410,7 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
         experiment_name: Name of the experiment
         poll_interval: Seconds between status checks (default: 60)
         max_wait: Maximum seconds to wait before giving up (default: None = wait forever)
+        initial_delay: Seconds to wait before first check (default: 5, gives job time to start)
         
     Returns:
         True if job completed successfully, False if failed or timed out
@@ -420,7 +421,12 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
     
     console = Console()
     console.print(f"\n[cyan]Waiting for job completion: {experiment_name}[/cyan]")
-    console.print(f"[dim]Poll interval: {poll_interval}s[/dim]\n")
+    console.print(f"[dim]Poll interval: {poll_interval}s, initial delay: {initial_delay}s[/dim]\n")
+    
+    # Give the job a moment to start and create initial logs
+    if initial_delay > 0:
+        console.print(f"[yellow]Waiting {initial_delay}s for job to initialize...[/yellow]")
+        time.sleep(initial_delay)
     
     start_time = time.time()
     iteration = 0
@@ -455,9 +461,40 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
                 progress.start()  # Resume progress display
             
             if completed_or_failed == total and (status['PENDING'] == 0 and status['RUNNING'] == 0):
-                # All jobs done according to SLURM
-                # Verify by checking log files
+                # All jobs done according to SLURM - but verify this isn't a false positive
+                # Check if we have any log files to verify actual completion
+                progress.stop()
                 console.print("\n[yellow]All SLURM jobs reported as done. Verifying completion...[/yellow]")
+                
+                # Try to get detailed progress from logs
+                local_exp_dir = DIRS.runs / experiment_name
+                batch_id_file = local_exp_dir / ".batch_id"
+                if batch_id_file.exists():
+                    batch_id = batch_id_file.read_text().strip()
+                    log_base = Path("logs/submission") / experiment_name
+                    
+                    # Check if any logs exist
+                    has_logs = False
+                    if log_base.exists():
+                        submission_dirs = sorted(log_base.glob("sub_*"), key=lambda x: x.name, reverse=True)
+                        if submission_dirs:
+                            latest_submission = submission_dirs[0]
+                            job_dirs = list(latest_submission.glob(f"{batch_id}/array_*"))
+                            if not job_dirs:
+                                # Try alternative locations
+                                all_job_id_dirs = [d for d in latest_submission.iterdir() if d.is_dir() and d.name.isdigit()]
+                                for job_id_dir in all_job_id_dirs:
+                                    job_dirs.extend(job_id_dir.glob("array_*"))
+                            has_logs = len(job_dirs) > 0
+                    
+                    # If no logs exist and we're reporting complete, this is likely a false positive
+                    if not has_logs and iteration < 3:
+                        console.print("[yellow]No log files found yet - job may still be initializing. Continuing to wait...[/yellow]")
+                        progress.start()
+                        time.sleep(poll_interval)
+                        continue
+                
+                # We have logs or enough iterations passed - check detailed status
                 monitor_job_progress(experiment_name, show_details=False)
                 
                 if status['FAILED'] > 0:
