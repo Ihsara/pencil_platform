@@ -166,9 +166,218 @@ def check_suite_status(experiment_name: str, return_status: bool = False):
             return None
 
 
+def get_job_stage_info(log_base_dir: Path):
+    """
+    Analyzes log files to determine the current stage of a job.
+    
+    Args:
+        log_base_dir: Path to the submission log directory for a specific array task
+        
+    Returns:
+        Dict with stage information: {
+            'stage': str,  # 'build', 'start', 'run', 'completed', 'failed', 'unknown'
+            'iteration': int or None,  # Latest iteration if in 'run' stage
+            'details': str  # Additional info
+        }
+    """
+    build_log = log_base_dir / "pc_build.log"
+    start_log = log_base_dir / "pc_start.log"
+    run_log = log_base_dir / "pc_run.log"
+    
+    # Check if logs exist and determine stage
+    if not log_base_dir.exists():
+        return {'stage': 'unknown', 'iteration': None, 'details': 'Log directory not found'}
+    
+    # Check for failures in any log
+    for log_file, stage_name in [(build_log, 'build'), (start_log, 'start'), (run_log, 'run')]:
+        if log_file.exists():
+            try:
+                with open(log_file, 'r') as f:
+                    content = f.read()
+                    if 'ERROR:' in content or 'FATAL ERROR:' in content or 'failed' in content.lower():
+                        return {'stage': 'failed', 'iteration': None, 'details': f'Failed in {stage_name} stage'}
+            except:
+                pass
+    
+    # Determine current stage based on which logs exist and their completion
+    if run_log.exists():
+        # In run stage - extract latest iteration
+        try:
+            with open(run_log, 'r') as f:
+                lines = f.readlines()
+                latest_iteration = None
+                for line in reversed(lines):
+                    # Look for iteration pattern: starts with whitespace and number
+                    match = re.match(r'^\s+(\d+)\s+', line)
+                    if match:
+                        latest_iteration = int(match.group(1))
+                        break
+                
+                # Check if completed
+                if 'finished successfully' in ''.join(lines[-50:]).lower():
+                    return {'stage': 'completed', 'iteration': latest_iteration, 'details': 'Run finished successfully'}
+                
+                if latest_iteration is not None:
+                    return {'stage': 'run', 'iteration': latest_iteration, 'details': f'Running iteration {latest_iteration}'}
+                else:
+                    return {'stage': 'run', 'iteration': None, 'details': 'Run started, no iterations yet'}
+        except:
+            return {'stage': 'run', 'iteration': None, 'details': 'Run stage (reading error)'}
+    
+    elif start_log.exists():
+        try:
+            with open(start_log, 'r') as f:
+                content = f.read()
+                if 'completed successfully' in content.lower():
+                    return {'stage': 'start_complete', 'iteration': None, 'details': 'Start completed, waiting for run'}
+                else:
+                    return {'stage': 'start', 'iteration': None, 'details': 'Starting simulation'}
+        except:
+            return {'stage': 'start', 'iteration': None, 'details': 'Start stage'}
+    
+    elif build_log.exists():
+        try:
+            with open(build_log, 'r') as f:
+                content = f.read()
+                if 'completed successfully' in content.lower() or 'finished' in content.lower():
+                    return {'stage': 'build_complete', 'iteration': None, 'details': 'Build completed'}
+                else:
+                    return {'stage': 'build', 'iteration': None, 'details': 'Building code'}
+        except:
+            return {'stage': 'build', 'iteration': None, 'details': 'Build stage'}
+    
+    return {'stage': 'initializing', 'iteration': None, 'details': 'Job initializing'}
+
+
+def tail_log_file(log_file: Path, num_lines: int = 10):
+    """
+    Returns the last N lines of a log file.
+    
+    Args:
+        log_file: Path to log file
+        num_lines: Number of lines to return (default: 10)
+        
+    Returns:
+        List of strings (lines)
+    """
+    if not log_file.exists():
+        return []
+    
+    try:
+        with open(log_file, 'r') as f:
+            lines = f.readlines()
+            return lines[-num_lines:]
+    except:
+        return []
+
+
+def monitor_job_progress(experiment_name: str, show_details: bool = True):
+    """
+    Monitors the detailed progress of running jobs by checking log files.
+    
+    Args:
+        experiment_name: Name of the experiment
+        show_details: Whether to show detailed progress for each task
+    """
+    from rich.console import Console
+    from rich.table import Table
+    
+    console = Console()
+    
+    # Get batch ID and manifest
+    local_exp_dir = DIRS.runs / experiment_name
+    batch_id_file = local_exp_dir / ".batch_id"
+    manifest_file = local_exp_dir / FILES.manifest
+    
+    if not batch_id_file.exists() or not manifest_file.exists():
+        logger.error("Cannot monitor progress: batch ID or manifest file not found")
+        return
+    
+    batch_id = batch_id_file.read_text().strip()
+    with open(manifest_file, 'r') as f:
+        run_names = [line.strip() for line in f.readlines()]
+    
+    # Find submission log directories
+    log_base = Path("logs/submission") / experiment_name
+    if not log_base.exists():
+        logger.warning("No submission logs found yet")
+        return
+    
+    # Find the most recent submission directory
+    submission_dirs = sorted(log_base.glob("sub_*"), key=lambda x: x.name, reverse=True)
+    if not submission_dirs:
+        logger.warning("No submission directories found")
+        return
+    
+    latest_submission = submission_dirs[0]
+    job_dirs = list(latest_submission.glob(f"{batch_id}/array_*"))
+    
+    if not job_dirs:
+        logger.warning(f"No array task logs found for job {batch_id}")
+        return
+    
+    # Create progress table
+    table = Table(title=f"Job Progress: {experiment_name} (Job ID: {batch_id})")
+    table.add_column("Task", style="cyan")
+    table.add_column("Run Name", style="yellow")
+    table.add_column("Stage", style="green")
+    table.add_column("Iteration", style="magenta")
+    table.add_column("Details", style="white")
+    
+    stage_counts = {'initializing': 0, 'build': 0, 'start': 0, 'run': 0, 'completed': 0, 'failed': 0}
+    
+    for job_dir in sorted(job_dirs, key=lambda x: int(x.name.split('_')[-1])):
+        task_id = int(job_dir.name.split('_')[-1])
+        run_name = run_names[task_id - 1] if task_id <= len(run_names) else "Unknown"
+        
+        stage_info = get_job_stage_info(job_dir)
+        stage = stage_info['stage']
+        iteration = stage_info['iteration']
+        details = stage_info['details']
+        
+        # Count stages
+        if stage in stage_counts:
+            stage_counts[stage] += 1
+        
+        # Add to table
+        iter_str = str(iteration) if iteration is not None else "-"
+        table.add_row(
+            str(task_id),
+            run_name[:40] + "..." if len(run_name) > 40 else run_name,
+            stage,
+            iter_str,
+            details
+        )
+        
+        # Show log tail if requested and job is running
+        if show_details and stage in ['build', 'start', 'run']:
+            console.print(f"\n[cyan]Task {task_id} - Last 5 lines:[/cyan]")
+            if stage == 'build':
+                log_file = job_dir / "pc_build.log"
+            elif stage == 'start':
+                log_file = job_dir / "pc_start.log"
+            else:
+                log_file = job_dir / "pc_run.log"
+            
+            tail_lines = tail_log_file(log_file, 5)
+            for line in tail_lines:
+                console.print(f"  [dim]{line.rstrip()}[/dim]")
+    
+    console.print(table)
+    
+    # Print summary
+    console.print("\n[bold]Summary:[/bold]")
+    console.print(f"  Initializing: {stage_counts['initializing']}")
+    console.print(f"  Building: {stage_counts['build']}")
+    console.print(f"  Starting: {stage_counts['start']}")
+    console.print(f"  Running: {stage_counts['run']}")
+    console.print(f"  Completed: {stage_counts['completed']}")
+    console.print(f"  Failed: {stage_counts['failed']}")
+
+
 def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait: int = None):
     """
-    Waits for a SLURM job array to complete by polling status periodically.
+    Waits for a SLURM job array to complete by polling status and monitoring log files.
     
     Args:
         experiment_name: Name of the experiment
@@ -187,6 +396,7 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
     console.print(f"[dim]Poll interval: {poll_interval}s[/dim]\n")
     
     start_time = time.time()
+    iteration = 0
     
     with Progress(
         SpinnerColumn(),
@@ -197,7 +407,9 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
         task = progress.add_task("[cyan]Checking job status...", total=None)
         
         while True:
-            # Check status
+            iteration += 1
+            
+            # Check SLURM status
             status = check_suite_status(experiment_name, return_status=True)
             
             if status is None:
@@ -208,8 +420,17 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
             total = sum(status.values())
             completed_or_failed = status['COMPLETED'] + status['FAILED']
             
+            # Also check detailed progress from log files
+            if iteration % 3 == 0:  # Every 3rd iteration, show detailed progress
+                console.print(f"\n[cyan]═══ Poll #{iteration} - Detailed Progress ═══[/cyan]")
+                monitor_job_progress(experiment_name, show_details=False)
+            
             if completed_or_failed == total and (status['PENDING'] == 0 and status['RUNNING'] == 0):
-                # All jobs done
+                # All jobs done according to SLURM
+                # Verify by checking log files
+                console.print("\n[yellow]All SLURM jobs reported as done. Verifying completion...[/yellow]")
+                monitor_job_progress(experiment_name, show_details=False)
+                
                 if status['FAILED'] > 0:
                     logger.warning(f"Job array completed with {status['FAILED']} failures")
                     return False

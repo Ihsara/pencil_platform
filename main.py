@@ -8,7 +8,7 @@ from loguru import logger
 # Import logic from the src directory
 from src.experiment.generator import run_suite
 from src.workflows.analysis_pipeline import visualize_suite, analyze_suite_videos_only, analyze_suite_with_error_norms
-from src.experiment.job_manager import submit_suite, check_suite_status, wait_for_completion
+from src.experiment.job_manager import submit_suite, check_suite_status, wait_for_completion, monitor_job_progress
 from src.core.constants import DIRS, FILES
 
 def configure_logging():
@@ -45,6 +45,8 @@ def main():
                        help="Forcefully rebuild the executables in each new run directory.")
     parser.add_argument("--check", action="store_true", 
                        help="Check the status of the last submitted job for an experiment.")
+    parser.add_argument("--monitor", action="store_true",
+                       help="Monitor detailed progress of running jobs by examining log files. Shows current stage (build/start/run) and iteration counts.")
     parser.add_argument("--wait", action="store_true",
                        help="Wait for job completion before proceeding. Useful with --analyze to auto-run analysis after jobs finish.")
     
@@ -79,6 +81,8 @@ def main():
     try:
         if args.check:
             check_suite_status(experiment_name)
+        elif args.monitor:
+            monitor_job_progress(experiment_name, show_details=True)
         elif args.wait:
             # Wait for job completion
             if wait_for_completion(experiment_name):
