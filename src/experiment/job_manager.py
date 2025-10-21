@@ -45,13 +45,14 @@ def submit_suite(experiment_name: str, submit_script_path: Path, plan: dict):
         logger.error("SLURM job submission failed.")
         logger.error(f"  STDERR: {e.stderr}")
 
-def check_suite_status(experiment_name: str, return_status: bool = False):
+def check_suite_status(experiment_name: str, return_status: bool = False, silent: bool = False):
     """
     Checks the status of a submitted SLURM job array using the saved batch ID.
     
     Args:
         experiment_name: Name of the experiment
         return_status: If True, returns a dict with status counts instead of just logging
+        silent: If True, suppresses logger output (for use with progress displays)
         
     Returns:
         Dict with status counts if return_status=True, otherwise None
@@ -60,7 +61,8 @@ def check_suite_status(experiment_name: str, return_status: bool = False):
     if not return_status:
         setup_file_logging(experiment_name, 'status')
     
-    logger.info(f"--- STATUS CHECK MODE for '{experiment_name}' ---")
+    if not silent:
+        logger.info(f"--- STATUS CHECK MODE for '{experiment_name}' ---")
     
     local_exp_dir = DIRS.runs / experiment_name
     batch_id_file = local_exp_dir / ".batch_id"
@@ -78,7 +80,8 @@ def check_suite_status(experiment_name: str, return_status: bool = False):
         logger.error(f"Batch ID file '{batch_id_file}' is empty.")
         sys.exit(1)
 
-    logger.info(f"Querying SLURM for batch job ID: {batch_id}")
+    if not silent:
+        logger.info(f"Querying SLURM for batch job ID: {batch_id}")
 
     try:
 
@@ -107,12 +110,26 @@ def check_suite_status(experiment_name: str, return_status: bool = False):
         failed_runs = []
         total_tasks = len(run_names)
 
-        # If sacct returns nothing, it often means the job is old and completed.
-        # We will assume completion if no specific status is found for any task.
+        # If sacct returns nothing, check if job was just submitted (may not be in sacct yet)
         if not status_map:
-             logger.warning(f"No active or recent job tasks found for Job ID {batch_id}.")
-             logger.warning("This usually means the job array has completed successfully and is no longer in the recent accounting database.")
-             counts["COMPLETED"] = total_tasks
+            # Try squeue to see if job is still queued
+            try:
+                squeue_cmd = ["squeue", "-j", batch_id, "-h"]
+                squeue_result = subprocess.run(squeue_cmd, capture_output=True, text=True)
+                if squeue_result.stdout.strip():
+                    # Job is in queue, mark as pending
+                    if not silent:
+                        logger.info(f"Job {batch_id} is queued or just starting (not yet in sacct)")
+                    counts["PENDING"] = total_tasks
+                else:
+                    # Job not in squeue either - likely old and completed
+                    if not silent:
+                        logger.warning(f"No active or recent job tasks found for Job ID {batch_id}.")
+                        logger.warning("This usually means the job array has completed successfully and is no longer in the recent accounting database.")
+                    counts["COMPLETED"] = total_tasks
+            except:
+                # If squeue fails, assume pending
+                counts["PENDING"] = total_tasks
         else:
             for i in range(total_tasks):
                 task_id = i + 1
@@ -132,14 +149,15 @@ def check_suite_status(experiment_name: str, return_status: bool = False):
                 else:
                     counts["OTHER"] += 1
         
-        logger.info("--- Job Status Summary ---")
-        logger.info(f"  Total Simulations: {total_tasks}")
-        logger.info(f"  Completed: {counts['COMPLETED']}")
-        logger.info(f"  Failed/Cancelled: {counts['FAILED']}")
-        logger.info(f"  Running: {counts['RUNNING']}")
-        logger.info(f"  Pending: {counts['PENDING']}")
+        if not silent:
+            logger.info("--- Job Status Summary ---")
+            logger.info(f"  Total Simulations: {total_tasks}")
+            logger.info(f"  Completed: {counts['COMPLETED']}")
+            logger.info(f"  Failed/Cancelled: {counts['FAILED']}")
+            logger.info(f"  Running: {counts['RUNNING']}")
+            logger.info(f"  Pending: {counts['PENDING']}")
         
-        if failed_runs:
+        if failed_runs and not silent:
             logger.warning("The following simulations failed:")
             plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
             with open(plan_file, 'r') as f:
@@ -310,10 +328,19 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
         return
     
     latest_submission = submission_dirs[0]
+    
+    # Find all job directories - could be under the batch_id or directly
     job_dirs = list(latest_submission.glob(f"{batch_id}/array_*"))
     
+    # If not found, try looking for any array directories
     if not job_dirs:
-        logger.warning(f"No array task logs found for job {batch_id}")
+        all_job_id_dirs = [d for d in latest_submission.iterdir() if d.is_dir() and d.name.isdigit()]
+        for job_id_dir in all_job_id_dirs:
+            job_dirs.extend(job_id_dir.glob("array_*"))
+    
+    if not job_dirs:
+        logger.warning(f"No array task logs found for job {batch_id} in {latest_submission}")
+        logger.info(f"Searched in: {latest_submission / batch_id}")
         return
     
     # Create progress table
@@ -409,8 +436,8 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
         while True:
             iteration += 1
             
-            # Check SLURM status
-            status = check_suite_status(experiment_name, return_status=True)
+            # Check SLURM status (silent mode to not interfere with progress display)
+            status = check_suite_status(experiment_name, return_status=True, silent=True)
             
             if status is None:
                 logger.error("Failed to check job status")
@@ -422,8 +449,10 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
             
             # Also check detailed progress from log files
             if iteration % 3 == 0:  # Every 3rd iteration, show detailed progress
+                progress.stop()  # Temporarily stop progress display
                 console.print(f"\n[cyan]═══ Poll #{iteration} - Detailed Progress ═══[/cyan]")
                 monitor_job_progress(experiment_name, show_details=False)
+                progress.start()  # Resume progress display
             
             if completed_or_failed == total and (status['PENDING'] == 0 and status['RUNNING'] == 0):
                 # All jobs done according to SLURM

@@ -33,7 +33,7 @@ def main():
                        help="The name of the experiment to generate.")
     parser.add_argument("--test", nargs='?', const=2, type=int, default=None, 
                        help="Enable test mode. Generates a limited number of runs without submitting.")
-    parser.add_argument("--analyze", action="store_true", 
+    parser.add_argument("-a", "--analyze", action="store_true", 
                        help="Run video-only analysis: creates individual error evolution videos and overlay comparisons for branches and top performers.")
     parser.add_argument("--error-norms", action="store_true",
                        help="Run L1/L2 error norm analysis: calculates L1, L2, L∞ metrics with combined scoring to find best parameters. Results saved to 'error_norms' subfolder.")
@@ -45,10 +45,10 @@ def main():
                        help="Forcefully rebuild the executables in each new run directory.")
     parser.add_argument("--check", action="store_true", 
                        help="Check the status of the last submitted job for an experiment.")
-    parser.add_argument("--monitor", action="store_true",
+    parser.add_argument("-m", "--monitor", action="store_true",
                        help="Monitor detailed progress of running jobs by examining log files. Shows current stage (build/start/run) and iteration counts.")
-    parser.add_argument("--wait", action="store_true",
-                       help="Wait for job completion before proceeding. Useful with --analyze to auto-run analysis after jobs finish.")
+    parser.add_argument("-w", "--wait", action="store_true",
+                       help="Wait for job completion. Can be combined: -mwa = submit + wait + analyze.")
     
     args = parser.parse_args()
     experiment_name = args.experiment_name
@@ -79,28 +79,34 @@ def main():
     logger.info(f"Selected experiment: '{experiment_name}'")
     
     try:
+        # Check for standalone monitoring/analysis modes (no submission)
         if args.check:
             check_suite_status(experiment_name)
-        elif args.monitor:
+        elif args.monitor and not args.wait and not args.analyze:
+            # Monitor only (standalone)
             monitor_job_progress(experiment_name, show_details=True)
-        elif args.wait:
-            # Wait for job completion
+        elif args.wait and not any([args.monitor, args.analyze, args.viz, args.error_norms]):
+            # Wait only (for already-submitted job, standalone)
             if wait_for_completion(experiment_name):
-                # Job completed successfully
-                if args.analyze:
-                    logger.info("Job completed! Starting video-only analysis...")
-                    analyze_suite_videos_only(experiment_name)
-                else:
-                    logger.success("Job completed! You can now run analysis or visualization.")
-                    logger.info(f"Analysis: python main.py {experiment_name} --analyze")
-                    logger.info(f"Visualization: python main.py {experiment_name} --viz")
+                logger.success("Job completed! You can now run analysis or visualization.")
+                logger.info(f"Analysis: python main.py {experiment_name} --analyze")
+                logger.info(f"Visualization: python main.py {experiment_name} --viz")
+            else:
+                logger.error("Job did not complete successfully")
+                sys.exit(1)
+        elif args.wait and args.analyze and not any([args.viz, args.error_norms]):
+            # Wait + Analyze (for already-submitted job)
+            if wait_for_completion(experiment_name):
+                logger.info("Job completed! Starting video-only analysis...")
+                analyze_suite_videos_only(experiment_name)
             else:
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
         elif args.error_norms:
             logger.info("--- L1/L2 ERROR NORM ANALYSIS MODE ---")
             analyze_suite_with_error_norms(experiment_name)
-        elif args.analyze:
+        elif args.analyze and not args.wait:
+            # Analyze only (standalone)
             logger.info("--- VIDEO-ONLY ANALYSIS MODE ---")
             analyze_suite_videos_only(experiment_name, combined_video=True)
         elif args.viz is not None:
@@ -174,7 +180,22 @@ def main():
                     logger.info("Auto-check enabled, checking job status...")
                     check_suite_status(experiment_name)
                 
-                if auto_postprocessing:
+                # Handle -w (wait) flag in submission mode
+                if args.wait:
+                    logger.info("Waiting for job completion...")
+                    if args.monitor:
+                        logger.info("(Use Ctrl+C to exit, then run with --monitor to check progress)")
+                    
+                    if wait_for_completion(experiment_name):
+                        if args.analyze:
+                            logger.info("Job completed! Starting video-only analysis...")
+                            analyze_suite_videos_only(experiment_name)
+                        else:
+                            logger.success("Job completed!")
+                    else:
+                        logger.error("Job did not complete successfully")
+                        sys.exit(1)
+                elif auto_postprocessing:
                     logger.info("Auto-postprocessing enabled.")
                     logger.info("Note: Postprocessing should be run after jobs complete.")
                     logger.info("To run analysis: python main.py {} --analyze".format(experiment_name))
