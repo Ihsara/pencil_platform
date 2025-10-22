@@ -374,27 +374,55 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     table.add_column("Iteration", style="magenta")
     table.add_column("Details", style="white")
     
-    stage_counts = {'initializing': 0, 'build': 0, 'start': 0, 'run': 0, 'completed': 0, 'failed': 0}
+    stage_counts = {'initializing': 0, 'build': 0, 'start': 0, 'run': 0, 'completed': 0, 'failed': 0, 'pending': 0}
     failed_tasks = []
     
-    for job_dir in sorted(job_dirs, key=lambda x: int(x.name.split('_')[-1])):
+    # Create a mapping of task_id to job_dir for easy lookup
+    job_dir_map = {}
+    for job_dir in job_dirs:
         task_id = int(job_dir.name.split('_')[-1])
-        run_name = run_names[task_id - 1] if task_id <= len(run_names) else "Unknown"
+        job_dir_map[task_id] = job_dir
+    
+    # Loop through ALL tasks (1 to len(run_names)), not just ones with log directories
+    for task_id in range(1, len(run_names) + 1):
+        run_name = run_names[task_id - 1]
         
-        stage_info = get_job_stage_info(job_dir)
-        stage = stage_info['stage']
-        iteration = stage_info['iteration']
-        details = stage_info['details']
-        
-        # Track failed tasks
-        if stage == 'failed':
-            failed_tasks.append({
-                'task_id': task_id,
-                'run_name': run_name,
-                'log_file': stage_info.get('failed_log'),
-                'error_tail': stage_info.get('error_tail'),
-                'details': details
-            })
+        # Check if this task has a log directory
+        if task_id in job_dir_map:
+            job_dir = job_dir_map[task_id]
+            stage_info = get_job_stage_info(job_dir)
+            stage = stage_info['stage']
+            iteration = stage_info['iteration']
+            details = stage_info['details']
+            
+            # Track failed tasks
+            if stage == 'failed':
+                failed_tasks.append({
+                    'task_id': task_id,
+                    'run_name': run_name,
+                    'log_file': stage_info.get('failed_log'),
+                    'error_tail': stage_info.get('error_tail'),
+                    'details': details
+                })
+            
+            # Show log tail if requested and job is running
+            if show_details and stage in ['build', 'start', 'run']:
+                console.print(f"\n[cyan]Task {task_id} - Last 5 lines:[/cyan]")
+                if stage == 'build':
+                    log_file = job_dir / "pc_build.log"
+                elif stage == 'start':
+                    log_file = job_dir / "pc_start.log"
+                else:
+                    log_file = job_dir / "pc_run.log"
+                
+                tail_lines = tail_log_file(log_file, 5)
+                for line in tail_lines:
+                    console.print(f"  [dim]{line.rstrip()}[/dim]")
+        else:
+            # Task hasn't started yet - no log directory
+            stage = 'pending'
+            iteration = None
+            details = 'Not started yet'
         
         # Count stages
         if stage in stage_counts:
@@ -409,25 +437,12 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
             iter_str,
             details
         )
-        
-        # Show log tail if requested and job is running
-        if show_details and stage in ['build', 'start', 'run']:
-            console.print(f"\n[cyan]Task {task_id} - Last 5 lines:[/cyan]")
-            if stage == 'build':
-                log_file = job_dir / "pc_build.log"
-            elif stage == 'start':
-                log_file = job_dir / "pc_start.log"
-            else:
-                log_file = job_dir / "pc_run.log"
-            
-            tail_lines = tail_log_file(log_file, 5)
-            for line in tail_lines:
-                console.print(f"  [dim]{line.rstrip()}[/dim]")
     
     console.print(table)
     
     # Print summary
     console.print("\n[bold]Summary:[/bold]")
+    console.print(f"  Pending: {stage_counts['pending']}")
     console.print(f"  Initializing: {stage_counts['initializing']}")
     console.print(f"  Building: {stage_counts['build']}")
     console.print(f"  Starting: {stage_counts['start']}")
