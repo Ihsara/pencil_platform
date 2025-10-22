@@ -64,7 +64,7 @@ parameter_sweeps:
 branches:
   # Scenario 1: Best L1 performer (rank 1)
   # nu=0.5, chi=0.5, diffrho=0.5, default_gamma
-  - name: "best_l1_rank1_nu0p5_default_gamma"
+  - name: "r1_nu0.5_dg"
     settings:
       run_in.yaml:
         density_run_pars: 
@@ -77,7 +77,7 @@ branches:
 
   # Scenario 2: Second best L1 performer (rank 2)
   # nu=0.5, chi=0.5, diffrho=0.5, gamma_is_1
-  - name: "best_l1_rank2_nu0p5_gamma_is_1"
+  - name: "r2_nu0.5_g1"
     settings:
       run_in.yaml:
         density_run_pars: 
@@ -90,7 +90,7 @@ branches:
 
   # Scenario 3: Third best L1 performer (rank 3)
   # nu=1.0, chi=1.0, diffrho=1.0, default_gamma
-  - name: "best_l1_rank3_nu1p0_default_gamma"
+  - name: "r3_nu1.0_dg"
     settings:
       run_in.yaml:
         density_run_pars: 

@@ -6,7 +6,7 @@
 #SBATCH --nodes={{ sbatch.nodes }}
 #SBATCH --ntasks={{ sbatch.ntasks }}
 #SBATCH --cpus-per-task={{ sbatch.cpus_per_task }}
-#SBATCH --array=1-{{ num_jobs }}
+#SBATCH --array=1-{{ num_jobs }}%{{ num_jobs }}
 #SBATCH --output={{ run_base_dir }}/slurm_logs/output_%A_%a.txt
 #SBATCH --error={{ run_base_dir }}/slurm_logs/errors_%A_%a.txt
 {% if sbatch.mail_user %}
