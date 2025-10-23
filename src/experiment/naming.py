@@ -385,41 +385,69 @@ def format_short_experiment_name(experiment_name: str,
         experiment_type: Optional experiment type for proper decoding
     
     Returns:
-        Compact formatted name
+        Compact formatted name with fallback to simple truncation if decoding fails
     
     Example:
         >>> format_short_experiment_name('res400_nohyper_massfix_gamma_is_1_nu5p0')
         'R400_H:None_MF:T_γ:1_ν:5.0'
     """
-    decoded = decode_experiment_name(experiment_name, experiment_type)
-    
-    if not decoded:
-        return experiment_name[:30] + "..." if len(experiment_name) > 30 else experiment_name
-    
-    parts = []
-    
-    # Abbreviated labels
-    abbrev_map = {
-        'res': 'R',
-        'hyper3': 'H',
-        'massfix': 'MF',
-        'gamma': 'γ',
-        'nu': 'ν',
-        'nu_shock': 'ν',
-        'chi': 'χ',
-        'chi_shock': 'χ',
-        'diffrho': 'Dρ',
-        'diffrho_shock': 'Dρ',
-    }
-    
-    for key, abbrev in abbrev_map.items():
-        if key in decoded:
-            value = decoded[key]
+    try:
+        decoded = decode_experiment_name(experiment_name, experiment_type)
+        
+        # If decoding failed or returned empty, use simple fallback
+        if not decoded:
+            return _fallback_short_name(experiment_name)
+        
+        parts = []
+        
+        # Abbreviated labels
+        abbrev_map = {
+            'res': 'R',
+            'hyper3': 'H',
+            'massfix': 'MF',
+            'gamma': 'γ',
+            'nu': 'ν',
+            'nu_shock': 'ν',
+            'chi': 'χ',
+            'chi_shock': 'χ',
+            'diffrho': 'Dρ',
+            'diffrho_shock': 'Dρ',
+        }
+        
+        for key, abbrev in abbrev_map.items():
+            if key in decoded:
+                value = decoded[key]
+                
+                # Special handling for massfix
+                if key == 'massfix':
+                    value = 'T' if value == 'True' else 'F'
+                
+                parts.append(f"{abbrev}:{value}")
+        
+        # If we got parts, return them; otherwise fall back
+        if parts:
+            return "_".join(parts)
+        else:
+            return _fallback_short_name(experiment_name)
             
-            # Special handling for massfix
-            if key == 'massfix':
-                value = 'T' if value == 'True' else 'F'
-            
-            parts.append(f"{abbrev}:{value}")
+    except Exception as e:
+        # If anything goes wrong, use fallback
+        logger.debug(f"Error in format_short_experiment_name: {e}")
+        return _fallback_short_name(experiment_name)
+
+
+def _fallback_short_name(experiment_name: str) -> str:
+    """
+    Fallback method to create a shortened name when intelligent decoding fails.
+    Simply truncates long names with ellipsis.
     
-    return "_".join(parts)
+    Args:
+        experiment_name: Raw experiment name
+    
+    Returns:
+        Truncated name if too long, otherwise original name
+    """
+    max_length = 45
+    if len(experiment_name) <= max_length:
+        return experiment_name
+    return experiment_name[:max_length] + "..."
