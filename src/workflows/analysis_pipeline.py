@@ -91,13 +91,27 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         
         logger.info(f"Loading all {len(var_files)} VAR files from {run_path}")
         
-        params = read.param(datadir=str(data_dir), quiet=True)
+        # OPTIMIZATION: Read grid, params, dim, and index ONCE before the loop
+        # These don't change between VAR files, so we can reuse them
+        params = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
         grid = read.grid(datadir=str(data_dir), quiet=True, trim=True)
+        dim = read.dim(str(data_dir), proc=-1)
+        index = read.index(datadir=str(data_dir))
+        
+        # Create a simulation object to pass pre-loaded data to read.var
+        from pencil.sim import __Simulation__
+        sim = __Simulation__()
+        sim.datadir = str(data_dir)
+        sim.dim = dim
+        sim.param = params
+        sim.index = index
+        sim.grid = grid
         
         all_data = []
         for var_file in var_files:
             try:
-                var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=True)
+                # Pass sim object to avoid re-reading grid/params/dim/index
+                var = read.var(var_file.name, sim=sim, quiet=True, trimall=True)
                 
                 density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
                 cp, gamma = params.cp, params.gamma
@@ -116,6 +130,7 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
                                              (gamma * np.log(density)) - ((gamma - 1.0) * lnrho0))
                 internal_energy = pressure / (density * (gamma - 1.0)) if gamma > 1.0 else np.zeros_like(density)
                 
+                # Use grid.x from the pre-loaded grid object
                 all_data.append({
                     "x": np.squeeze(grid.x), 
                     "rho": np.squeeze(density), 
