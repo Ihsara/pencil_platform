@@ -9,6 +9,7 @@ import yaml
 
 from src.core.constants import DIRS, FILES
 from src.core.logging import setup_file_logging
+from src.experiment.naming import format_short_experiment_name
 
 def submit_suite(experiment_name: str, submit_script_path: Path, plan: dict):
     """
@@ -430,9 +431,11 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
         
         # Add to table
         iter_str = str(iteration) if iteration is not None else "-"
+        # Use intelligent name shortening instead of simple truncation
+        short_name = format_short_experiment_name(run_name, experiment_name)
         table.add_row(
             str(task_id),
-            run_name[:40] + "..." if len(run_name) > 40 else run_name,
+            short_name,
             stage,
             iter_str,
             details
