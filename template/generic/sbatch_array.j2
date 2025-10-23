@@ -53,7 +53,18 @@ LOCAL_GENERATED_CONFIG_DIR="${SLURM_SUBMIT_DIR}/runs/{{ experiment_name }}/gener
 LOGFILE="${RUN_DIR}/simulation.log"
 
 # --- Setup submission logging directory ---
-TIMESTAMP=$(date +"sub_%Y%m%d%H%M")
+# Use SLURM job submission time instead of task start time to ensure all tasks use same timestamp
+TIMESTAMP=$(squeue -j ${SLURM_JOB_ID} -h -o %V | head -1 | sed 's/.*\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\).*/sub_\1/' | tr -d ':T-' | cut -c1-16)
+# Fallback to submission time if squeue fails (for completed jobs)
+if [ -z "$TIMESTAMP" ] || [ "$TIMESTAMP" = "sub_" ]; then
+    # Extract from job accounting - use batch job submission time
+    TIMESTAMP="sub_$(sacct -j ${SLURM_JOB_ID} -n -X -o Submit | head -1 | sed 's/T//;s/://g;s/-//g' | cut -c1-12)"
+fi
+# Final fallback to current time if both methods fail
+if [ -z "$TIMESTAMP" ] || [ "$TIMESTAMP" = "sub_" ]; then
+    TIMESTAMP=$(date +"sub_%Y%m%d%H%M")
+fi
+
 SUBMISSION_LOG_BASE="${SLURM_SUBMIT_DIR}/logs/submission/{{ experiment_name }}/${TIMESTAMP}/${SLURM_JOB_ID}/array_${SLURM_ARRAY_TASK_ID}"
 mkdir -p "${SUBMISSION_LOG_BASE}"
 
