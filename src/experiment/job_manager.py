@@ -353,14 +353,15 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     
     latest_submission = submission_dirs[0]
     
-    # Find all job directories - could be under the batch_id or directly
-    job_dirs = list(latest_submission.glob(f"{batch_id}/array_*"))
+    # Find ALL job directories - SLURM sometimes creates multiple job IDs
+    # Search for all numeric directories (job IDs) and collect all array tasks
+    job_dirs = []
+    all_job_id_dirs = [d for d in latest_submission.iterdir() if d.is_dir() and d.name.isdigit()]
     
-    # If not found, try looking for any array directories
-    if not job_dirs:
-        all_job_id_dirs = [d for d in latest_submission.iterdir() if d.is_dir() and d.name.isdigit()]
-        for job_id_dir in all_job_id_dirs:
-            job_dirs.extend(job_id_dir.glob("array_*"))
+    for job_id_dir in all_job_id_dirs:
+        job_dirs.extend(job_id_dir.glob("array_*"))
+    
+    logger.info(f"Found {len(all_job_id_dirs)} job ID(s) with {len(job_dirs)} total array task(s)")
     
     if not job_dirs:
         logger.warning(f"No array task logs found for job {batch_id} in {latest_submission}")
