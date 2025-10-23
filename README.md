@@ -76,13 +76,13 @@ This generates 3 × 3 = 9 simulation configurations automatically.
 Comprehensive documentation is available in the `docs/` folder:
 
 - **[Installation Guide](docs/installation.md)** - Detailed setup instructions
+- **[Deployment Guide](docs/deployment.md)** - Running on HPC systems
 - **[Quick Start Tutorial](docs/quickstart.md)** - Get started in minutes
 - **[User Guide](docs/user-guide/index.md)** - Complete usage documentation
-  - [Configuration](docs/user-guide/configuration.md)
+  - [Base Experiments](docs/user-guide/base-experiments.md)
   - [Parameter Sweeps](docs/user-guide/parameter-sweeps.md)
-  - [Branches](docs/user-guide/branches.md)
-  - [Workflow Management](docs/user-guide/workflow-management.md)
-  - [Examples](docs/user-guide/examples.md)
+- **[Analysis & Visualization](docs/analysis-and-visualization.md)** - Post-processing guide
+- **[Job Monitoring](docs/job-monitoring.md)** - Monitor running jobs
 - **[CLI Reference](docs/cli-reference.md)** - Command-line interface documentation
 - **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
 - **[API Reference](docs/api/index.md)** - Python API documentation
@@ -230,7 +230,7 @@ snakemake --profile .config/slurm --config experiment_name=shocktube_phase2 -n
 snakemake --profile .config/slurm --config experiment_name=shocktube_phase2
 ```
 
-More examples in the [User Guide](docs/user-guide/examples.md).
+More examples in the [User Guide](docs/user-guide/index.md).
 
 ## Contributing
 

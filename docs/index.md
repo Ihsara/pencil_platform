@@ -20,9 +20,11 @@ The core concept is to separate **configuration** (what you want to run) from **
 ## Quick Links
 
 - [Installation Guide](installation.md)
+- [Deployment Guide](deployment.md) - Running on HPC systems
 - [Quick Start Tutorial](quickstart.md)
 - [User Guide](user-guide/index.md)
 - [Analysis and Visualization](analysis-and-visualization.md)
+- [Job Monitoring](job-monitoring.md)
 - [CLI Reference](cli-reference.md)
 - [API Reference](api/index.md)
 - [Troubleshooting](troubleshooting.md)
@@ -35,6 +37,7 @@ The core concept is to separate **configuration** (what you want to run) from **
 :caption: Getting Started
 
 installation
+deployment
 quickstart
 ```
 
@@ -49,9 +52,10 @@ user-guide/parameter-sweeps
 
 ```{toctree}
 :maxdepth: 2
-:caption: Analysis & Reference
+:caption: Analysis & Operations
 
 analysis-and-visualization
+job-monitoring
 cli-reference
 api/index
 troubleshooting
@@ -62,16 +66,14 @@ troubleshooting
 :caption: Development
 
 contributing
-changelog
-license
 ```
 
 ## Getting Help
 
 - Check the [Troubleshooting Guide](troubleshooting.md)
-- Review [Examples](user-guide/examples.md)
+- Review the [Deployment Guide](deployment.md) for HPC-specific issues
 - Report issues on the project's issue tracker
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](license.md) file for details.
+This project is licensed under the MIT License - see the LICENSE file in the repository root for details.
