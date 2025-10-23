@@ -396,13 +396,15 @@ def _fallback_short_name(experiment_name: str) -> str:
     Fallback method to create a shortened name when intelligent decoding fails.
     Simply truncates long names with ellipsis.
     
+    Optimized for 72-character terminal width to ensure table readability.
+    
     Args:
         experiment_name: Raw experiment name
     
     Returns:
         Truncated name if too long, otherwise original name
     """
-    max_length = 45
+    max_length = 30  # Optimized for 72-char terminal width
     if len(experiment_name) <= max_length:
         return experiment_name
     return experiment_name[:max_length] + "..."
