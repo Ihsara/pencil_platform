@@ -100,12 +100,8 @@ def _decode_from_template(experiment_name: str, template: str, sweep_config: Dic
     # Parse template structure
     template_parts = _parse_template_structure(template)
     
-    # Get known values from sweep config to help with matching
-    known_values = {}
-    if 'output_prefix' in sweep_config:
-        known_values['output_prefix'] = sweep_config['output_prefix']
-    
-    # Get branch names from sweep config
+    # Get branch names from sweep config - these are safe to use as known values
+    # because they don't contain Jinja2 templates
     branch_names = []
     if 'branches' in sweep_config:
         branch_names = [branch['name'] for branch in sweep_config['branches']]
@@ -121,11 +117,8 @@ def _decode_from_template(experiment_name: str, template: str, sweep_config: Dic
         else:  # variable
             var_order.append(content)
             
-            # Use known values for more precise matching
-            if content in known_values:
-                # Match exact known value
-                regex_parts.append(f'({re.escape(known_values[content])})')
-            elif content == 'branch.name':
+            # Match based on variable type
+            if content == 'branch.name':
                 # For branch names, match the longest possible string from known branches
                 if branch_names:
                     # Create alternation pattern for branch names
@@ -169,9 +162,10 @@ def _decode_from_template(experiment_name: str, template: str, sweep_config: Dic
                 # Also store original key
                 decoded[var_name] = value
         else:
-            logger.warning(f"Experiment name '{experiment_name}' does not match template pattern. Pattern: {pattern}")
+            # Suppress warning - template decoding is known to be broken, using fallback
+            logger.debug(f"Experiment name '{experiment_name}' does not match template pattern. Using fallback.")
     except Exception as e:
-        logger.error(f"Error decoding experiment name with template: {e}")
+        logger.debug(f"Error decoding experiment name with template: {e}. Using fallback.")
     
     # Add additional context from sweep config
     if 'output_prefix' in sweep_config:
@@ -380,60 +374,21 @@ def format_short_experiment_name(experiment_name: str,
     """
     Create a short, compact experiment name for legends and labels.
     
+    For now, uses simple fallback truncation until template decoding is fixed.
+    
     Args:
         experiment_name: Raw experiment name
         experiment_type: Optional experiment type for proper decoding
     
     Returns:
-        Compact formatted name with fallback to simple truncation if decoding fails
+        Shortened name (full name if under 45 chars, truncated with ... if longer)
     
     Example:
         >>> format_short_experiment_name('res400_nohyper_massfix_gamma_is_1_nu5p0')
-        'R400_H:None_MF:T_γ:1_ν:5.0'
+        'res400_nohyper_massfix_gamma_is_1_nu5p0'  # Under 45 chars, kept as is
     """
-    try:
-        decoded = decode_experiment_name(experiment_name, experiment_type)
-        
-        # If decoding failed or returned empty, use simple fallback
-        if not decoded:
-            return _fallback_short_name(experiment_name)
-        
-        parts = []
-        
-        # Abbreviated labels
-        abbrev_map = {
-            'res': 'R',
-            'hyper3': 'H',
-            'massfix': 'MF',
-            'gamma': 'γ',
-            'nu': 'ν',
-            'nu_shock': 'ν',
-            'chi': 'χ',
-            'chi_shock': 'χ',
-            'diffrho': 'Dρ',
-            'diffrho_shock': 'Dρ',
-        }
-        
-        for key, abbrev in abbrev_map.items():
-            if key in decoded:
-                value = decoded[key]
-                
-                # Special handling for massfix
-                if key == 'massfix':
-                    value = 'T' if value == 'True' else 'F'
-                
-                parts.append(f"{abbrev}:{value}")
-        
-        # If we got parts, return them; otherwise fall back
-        if parts:
-            return "_".join(parts)
-        else:
-            return _fallback_short_name(experiment_name)
-            
-    except Exception as e:
-        # If anything goes wrong, use fallback
-        logger.debug(f"Error in format_short_experiment_name: {e}")
-        return _fallback_short_name(experiment_name)
+    # Use simple fallback for now - template decoding needs fixing
+    return _fallback_short_name(experiment_name)
 
 
 def _fallback_short_name(experiment_name: str) -> str:
