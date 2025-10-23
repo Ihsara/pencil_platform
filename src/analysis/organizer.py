@@ -314,14 +314,14 @@ class AnalysisOrganizer:
         """
         Complete organization workflow:
         1. Create new structure
-        2. Migrate existing files
+        Note: Migration logic removed - files are now created in correct structure from the start
         """
         logger.info("=" * 80)
         logger.info("ORGANIZING ANALYSIS FOLDER STRUCTURE")
         logger.info("=" * 80)
         
         self.create_structure()
-        self.migrate_existing_files()
+        # Migration no longer needed - Phase 3 now creates files directly in error/norms/
         
         logger.success("=" * 80)
         logger.success("FOLDER ORGANIZATION COMPLETE")

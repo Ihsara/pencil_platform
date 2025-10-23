@@ -468,14 +468,20 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
         logger.info(f"     └─ ✓ Created top 3 overlay video")
     
     # ============================================================
+    # Initialize organizer early to use correct directory structure
+    # ============================================================
+    organizer = AnalysisOrganizer(experiment_name, analysis_dir)
+    organizer.create_structure()
+    
+    # ============================================================
     # PHASE 3: Calculate L1/L2 error norms (reusing loaded data)
     # ============================================================
     logger.info("\n" + "=" * 80)
     logger.info("PHASE 3: Calculating error norms")
     logger.info("=" * 80)
     
-    # Use metrics from configuration
-    error_norms_dir = analysis_dir / "error_norms"
+    # Use correct directory structure from organizer
+    error_norms_dir = organizer.error_norms_dir
     plots_dir = error_norms_dir / "plots"
     
     # Clear old error norm results before creating new ones
@@ -571,18 +577,10 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                             combined_scores, metrics, error_norms_dir, experiment_name)
     
     # ============================================================
-    # PHASE 6: Organize folder structure and create "best" folders
+    # PHASE 6: Populate best performers folders
     # ============================================================
     logger.info("\n" + "=" * 80)
-    logger.info("PHASE 6: Organizing folder structure")
-    logger.info("=" * 80)
-    
-    organizer = AnalysisOrganizer(experiment_name, analysis_dir)
-    organizer.organize()
-    
-    # Populate best performers folders
-    logger.info("\n" + "=" * 80)
-    logger.info("PHASE 7: Populating best performers folders")
+    logger.info("PHASE 6: Populating best performers folders")
     logger.info("=" * 80)
     
     organizer.populate_best_performers(
