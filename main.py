@@ -24,6 +24,24 @@ def find_available_experiments() -> list:
 def main():
     """Main entry point for the script."""
     configure_logging()
+    
+    # Detect if running from Windows - warn user
+    import platform
+    if platform.system() == "Windows":
+        logger.warning("=" * 70)
+        logger.warning("⚠️  DETECTED: Running from Windows")
+        logger.warning("=" * 70)
+        logger.warning("This platform is designed to run ON the HPC system (Mahti).")
+        logger.warning("Running from Windows will cause monitoring to show incorrect status.")
+        logger.warning("")
+        logger.warning("RECOMMENDED: SSH to Mahti and run commands there:")
+        logger.warning("  1. ssh mahti.csc.fi")
+        logger.warning("  2. cd /scratch/project_2008296/chau/pencil_platform")
+        logger.warning("  3. python main.py <experiment> [options]")
+        logger.warning("")
+        logger.warning("See docs/IMPORTANT-RUN-ON-HPC.md for details.")
+        logger.warning("=" * 70)
+        logger.warning("")
 
     parser = argparse.ArgumentParser(
         description="Pencil Code Experiment Suite Generator and Manager.",
