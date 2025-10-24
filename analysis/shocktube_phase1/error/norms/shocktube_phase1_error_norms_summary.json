@@ -3,7 +3,7 @@
   "metrics_used": [
     "l1"
   ],
-  "total_runs_analyzed": 12,
+  "total_runs_analyzed": 2,
   "top_5_overall": [
     {
       "rank": 1,
@@ -16,38 +16,11 @@
     },
     {
       "rank": 2,
-      "run_name": "res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5",
-      "combined_score": 0.04905032270293694,
-      "branch": "massfix_gamma_is_1",
-      "per_metric_scores": {
-        "l1": 0.04905032270293694
-      }
-    },
-    {
-      "rank": 3,
       "run_name": "res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1",
       "combined_score": 0.05153380752051144,
       "branch": "massfix_default_gamma",
       "per_metric_scores": {
         "l1": 0.05153380752051144
-      }
-    },
-    {
-      "rank": 4,
-      "run_name": "res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1",
-      "combined_score": 0.05153380752051144,
-      "branch": "massfix_gamma_is_1",
-      "per_metric_scores": {
-        "l1": 0.05153380752051144
-      }
-    },
-    {
-      "rank": 5,
-      "run_name": "res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0",
-      "combined_score": 0.052388538489036594,
-      "branch": "massfix_default_gamma",
-      "per_metric_scores": {
-        "l1": 0.052388538489036594
       }
     }
   ],
@@ -57,20 +30,6 @@
       "combined_score": 0.04905032270293694,
       "per_metric_scores": {
         "l1": 0.04905032270293694
-      }
-    },
-    "massfix_gamma_is_1": {
-      "run_name": "res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5",
-      "combined_score": 0.04905032270293694,
-      "per_metric_scores": {
-        "l1": 0.04905032270293694
-      }
-    },
-    "nomassfix": {
-      "run_name": "res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0",
-      "combined_score": 0.07163690128501166,
-      "per_metric_scores": {
-        "l1": 0.07163690128501166
       }
     }
   },
@@ -87,76 +46,6 @@
       "branch": "massfix_default_gamma",
       "per_metric_scores": {
         "l1": 0.04905032270293694
-      }
-    },
-    "res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0": {
-      "combined_score": 0.052388538489036594,
-      "branch": "massfix_default_gamma",
-      "per_metric_scores": {
-        "l1": 0.052388538489036594
-      }
-    },
-    "res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0": {
-      "combined_score": 0.0801414333574618,
-      "branch": "massfix_default_gamma",
-      "per_metric_scores": {
-        "l1": 0.0801414333574618
-      }
-    },
-    "res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1": {
-      "combined_score": 0.05153380752051144,
-      "branch": "massfix_gamma_is_1",
-      "per_metric_scores": {
-        "l1": 0.05153380752051144
-      }
-    },
-    "res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5": {
-      "combined_score": 0.04905032270293694,
-      "branch": "massfix_gamma_is_1",
-      "per_metric_scores": {
-        "l1": 0.04905032270293694
-      }
-    },
-    "res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0": {
-      "combined_score": 0.052388538489036594,
-      "branch": "massfix_gamma_is_1",
-      "per_metric_scores": {
-        "l1": 0.052388538489036594
-      }
-    },
-    "res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0": {
-      "combined_score": 0.0801414333574618,
-      "branch": "massfix_gamma_is_1",
-      "per_metric_scores": {
-        "l1": 0.0801414333574618
-      }
-    },
-    "res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1": {
-      "combined_score": 0.07465542584895565,
-      "branch": "nomassfix",
-      "per_metric_scores": {
-        "l1": 0.07465542584895565
-      }
-    },
-    "res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5": {
-      "combined_score": 0.07265570938109871,
-      "branch": "nomassfix",
-      "per_metric_scores": {
-        "l1": 0.07265570938109871
-      }
-    },
-    "res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0": {
-      "combined_score": 0.07163690128501166,
-      "branch": "nomassfix",
-      "per_metric_scores": {
-        "l1": 0.07163690128501166
-      }
-    },
-    "res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0": {
-      "combined_score": 0.07805167550215175,
-      "branch": "nomassfix",
-      "per_metric_scores": {
-        "l1": 0.07805167550215175
       }
     }
   }

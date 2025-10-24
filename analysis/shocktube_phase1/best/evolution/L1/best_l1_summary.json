@@ -8,13 +8,8 @@
     },
     {
       "rank": 2,
-      "run_name": "res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1",
-      "score": 0.23875535398473957
-    },
-    {
-      "rank": 3,
-      "run_name": "res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1",
-      "score": 0.26595745919170694
+      "run_name": "res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5",
+      "score": 0.28935815578299395
     }
   ]
 }
