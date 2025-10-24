@@ -247,8 +247,8 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     analyze_variables = error_config.get('analyze_variables', ['rho', 'ux', 'pp', 'ee'])
     
     # Load config loader to get variable configurations
-    config_loader = create_config_loader()
-    analysis_config = config_loader.load_analysis_config(experiment_name)
+    config_loader = create_config_loader(experiment_name, DIRS.config)
+    analysis_config = config_loader.load_analysis_config()
     variables_config = analysis_config.get('variables', {})
     
     logger.info(f"Error analysis configuration:")
@@ -286,12 +286,16 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     
     # Organize runs by branch
     runs_per_branch = {branch: [] for branch in branch_names}
+    runs_per_branch['default'] = []  # Always include default for unmatched runs
+    
     for run_name in run_names:
+        matched = False
         for branch_name in branch_names:
             if branch_name in run_name:
                 runs_per_branch[branch_name].append(run_name)
+                matched = True
                 break
-        else:
+        if not matched:
             runs_per_branch['default'].append(run_name)
     
     # ============================================================
