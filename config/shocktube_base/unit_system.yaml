@@ -1,0 +1,35 @@
+# Standard hydrodynamic unit system
+# Shared by all shocktube experiments
+
+base_units:
+  - density
+  - velocity
+  - length
+
+base_defaults:
+  density: 1.0
+  velocity: 1.0
+  length: 1.0
+
+derived_units:
+  time:
+    divide: ['length', 'velocity']
+  
+  pressure:
+    multiply: ['density', 'velocity', 'velocity']
+  
+  specific_energy:
+    power: ['velocity', 2]
+  
+  energy_density:
+    multiply: ['density', 'velocity', 'velocity']
+
+physical_labels:
+  density: 'g cm⁻³'
+  velocity: 'cm s⁻¹'
+  length: 'cm'
+  time: 's'
+  pressure: 'dyn cm⁻²'
+  specific_energy: 'erg g⁻¹'
+  energy_density: 'erg cm⁻³'
+  dimensionless: ''

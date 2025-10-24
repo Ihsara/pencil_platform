@@ -1,0 +1,16 @@
+# Standard Sod shock tube analytical solution
+# Shared by all shocktube experiments
+
+module: 'pencil.calc.shocktube'
+function: 'sod'
+
+variables: ['rho', 'ux', 'pp', 'ee']
+
+required_params: ['rho0', 'cs0']
+
+param_defaults:
+  rho0: 1.0
+  cs0: 1.0
+
+kwargs:
+  magic: ['ee']

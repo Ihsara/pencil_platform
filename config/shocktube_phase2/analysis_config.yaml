@@ -1,0 +1,40 @@
+# Phase 2 analysis configuration
+# Inherits from shocktube_base
+
+# Inheritance
+base_config: 'shocktube_base'  # Look in this base first
+
+# Reference base files (if not overridden locally)
+unit_system: 'unit_system.yaml'      # Will use base version
+analytical_solution: 'analytical.yaml'  # Will use base version
+
+# Variable definitions (same as phase1)
+variables:
+  rho:
+    unit_type: 'density'
+    plot_label: r'$\rho$'
+  
+  ux:
+    unit_type: 'velocity'
+    plot_label: r'$u_x$'
+  
+  pp:
+    unit_type: 'pressure'
+    plot_label: r'$p$'
+  
+  ee:
+    unit_type: 'specific_energy'
+    plot_label: r'$e$'
+  
+  x:
+    unit_type: 'length'
+  
+  t:
+    unit_type: 'time'
+
+# Error analysis (phase-specific: all metrics)
+error_analysis:
+  metrics: ['l1', 'l2', 'linf']  # Phase 2: all metrics
+  use_code_units: true
+  combine_in_videos: true
+  analyze_variables: ['rho', 'ux', 'pp', 'ee']
