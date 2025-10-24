@@ -92,26 +92,14 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         
         logger.info(f"Loading all {len(var_files)} VAR files from {run_path}")
         
-        # OPTIMIZATION: Read grid, params, dim, and index ONCE before the loop
-        # These don't change between VAR files, so we can reuse them
-        params = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
-        # Grid must be read WITHOUT trim because varfile.py line 358 reads it untrimmed
-        grid = read.grid(datadir=str(data_dir), quiet=True, trim=False)
-        dim = read.dim(str(data_dir), proc=-1)
-        index = read.index(datadir=str(data_dir))
-        
-        # Despite varfile.py bug that re-reads these at line 351-358,
-        # calling them once here can help with OS-level disk caching
-        
         all_data = []
         for var_file in var_files:
             try:
-                # Call read.var with datadir - grid/param/dim/index will be re-read
-                # but should benefit from OS disk cache
-                var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=True)
+                # Read VAR file with all associated data (grid, params, etc.)
+                var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=False)
                 
                 density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
-                cp, gamma = params.cp, params.gamma
+                cp, gamma = var.param.cp, var.param.gamma
                 cv = cp / gamma
                 
                 if not hasattr(var, 'ss'):
@@ -127,15 +115,15 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
                                              (gamma * np.log(density)) - ((gamma - 1.0) * lnrho0))
                 internal_energy = pressure / (density * (gamma - 1.0)) if gamma > 1.0 else np.zeros_like(density)
                 
-                # Use grid.x from the pre-loaded grid object
+                # Use grid from VAR file (includes ghost zones)
                 all_data.append({
-                    "x": np.squeeze(grid.x), 
+                    "x": np.squeeze(var.x), 
                     "rho": np.squeeze(density), 
                     "ux": np.squeeze(var.ux),
                     "pp": np.squeeze(pressure), 
                     "ee": np.squeeze(internal_energy), 
                     "t": var.t, 
-                    "params": params,
+                    "params": var.param,
                     "var_file": var_file.name
                 })
             except Exception as e:
