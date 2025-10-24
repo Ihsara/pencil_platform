@@ -98,8 +98,8 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         all_data = []
         for var_file in var_files:
             try:
-                # Read VAR file with all associated data (preserves ghost zones)
-                var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=False)
+                # Read VAR file with trimall=True to remove ghost zones for 1D data
+                var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=True)
                 
                 density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
                 cp, gamma = params.cp, params.gamma
