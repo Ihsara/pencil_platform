@@ -1,0 +1,46 @@
+2025-10-20 17:38:18.995 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/generation/shocktube_phase1_highres/2025-10-20_17-38-18_generation.log
+2025-10-20 17:38:18.995 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/generation/shocktube_phase1_highres
+2025-10-20 17:38:18.995 | INFO     | src.experiment.generator:run_suite:104 - Loading experiment plan from: /scratch/project_2008296/chau/pencil_platform/config/shocktube_phase1_highres/plan/sweep.yaml
+2025-10-20 17:38:19.099 | INFO     | src.experiment.generator:run_suite:110 - Loaded 7 config file(s) from base experiment 'shocktube_base'
+2025-10-20 17:38:19.199 | INFO     | src.experiment.generator:run_suite:118 - Loaded 7 config file(s) from specific experiment 'shocktube_phase1_highres'
+2025-10-20 17:38:19.199 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'video_in.yaml': base + specific overrides
+2025-10-20 17:38:19.200 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'run_in.yaml': base + specific overrides
+2025-10-20 17:38:19.200 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'print_in.yaml': base + specific overrides
+2025-10-20 17:38:19.200 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'start_in.yaml': base + specific overrides
+2025-10-20 17:38:19.200 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'Makefile_local.yaml': base + specific overrides
+2025-10-20 17:38:19.201 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'yzaver_in.yaml': base + specific overrides
+2025-10-20 17:38:19.201 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'cparam_local.yaml': base + specific overrides
+2025-10-20 17:38:19.201 | WARNING  | src.experiment.generator:run_suite:151 - AUTOMATIC REBUILD ENACTED. Reason: Plan modifies 'cparam_local.yaml'.
+2025-10-20 17:38:19.226 | INFO     | src.experiment.generator:run_suite:207 - Removing existing experiment directory: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1_highres
+2025-10-20 17:38:19.682 | SUCCESS  | src.experiment.generator:run_suite:216 - Generated config files for 12 run(s) in '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1_highres/generated_configs'
+2025-10-20 17:38:19.684 | SUCCESS  | src.experiment.generator:run_suite:220 - Generated run manifest at '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1_highres/run_manifest.txt'
+2025-10-20 17:38:19.706 | SUCCESS  | src.experiment.generator:run_suite:235 - Generated submission script at '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1_highres/submit_suite.sh'
+2025-10-20 17:38:19.706 | INFO     | src.experiment.generator:run_suite:236 - --- Experiment Summary ---
+Total Simulations to Generate: 12
+2025-10-20 17:38:19.714 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/submission/shocktube_phase1_highres/2025-10-20_17-38-19_submission.log
+2025-10-20 17:38:19.715 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/submission/shocktube_phase1_highres
+2025-10-20 17:38:19.715 | INFO     | src.experiment.job_manager:submit_suite:20 - Attempting to submit job to SLURM...
+2025-10-20 17:38:19.742 | INFO     | src.experiment.job_manager:submit_suite:32 - ==================================================
+2025-10-20 17:38:19.742 | INFO     | src.experiment.job_manager:submit_suite:33 -            JOB SUBMITTED SUCCESSFULLY
+2025-10-20 17:38:19.743 | INFO     | src.experiment.job_manager:submit_suite:34 - ==================================================
+2025-10-20 17:38:19.743 | INFO     | src.experiment.job_manager:submit_suite:35 -   Submission Script: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1_highres/submit_suite.sh
+2025-10-20 17:38:19.743 | INFO     | src.experiment.job_manager:submit_suite:36 -   HPC Run Directory: /scratch/project_2008296/chau/runs/shocktube_phase1_highres
+2025-10-20 17:38:19.744 | INFO     | src.experiment.job_manager:submit_suite:37 -   SLURM Batch Job ID: 5291788
+2025-10-20 17:38:19.744 | INFO     | src.experiment.job_manager:submit_suite:38 -   You can check the status with: python main.py shocktube_phase1_highres --check
+2025-10-20 17:38:19.745 | INFO     | __main__:main:170 - Auto-check enabled, checking job status...
+2025-10-20 17:38:19.754 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/status/shocktube_phase1_highres/2025-10-20_17-38-19_status.log
+2025-10-20 17:38:19.755 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/status/shocktube_phase1_highres
+2025-10-20 17:38:19.755 | INFO     | src.experiment.job_manager:check_suite_status:63 - --- STATUS CHECK MODE for 'shocktube_phase1_highres' ---
+2025-10-20 17:38:19.757 | INFO     | src.experiment.job_manager:check_suite_status:81 - Querying SLURM for batch job ID: 5291788
+2025-10-20 17:38:19.773 | WARNING  | src.experiment.job_manager:check_suite_status:113 - No active or recent job tasks found for Job ID 5291788.
+2025-10-20 17:38:19.773 | WARNING  | src.experiment.job_manager:check_suite_status:114 - This usually means the job array has completed successfully and is no longer in the recent accounting database.
+2025-10-20 17:38:19.774 | INFO     | src.experiment.job_manager:check_suite_status:135 - --- Job Status Summary ---
+2025-10-20 17:38:19.775 | INFO     | src.experiment.job_manager:check_suite_status:136 -   Total Simulations: 12
+2025-10-20 17:38:19.775 | INFO     | src.experiment.job_manager:check_suite_status:137 -   Completed: 12
+2025-10-20 17:38:19.775 | INFO     | src.experiment.job_manager:check_suite_status:138 -   Failed/Cancelled: 0
+2025-10-20 17:38:19.775 | INFO     | src.experiment.job_manager:check_suite_status:139 -   Running: 0
+2025-10-20 17:38:19.776 | INFO     | src.experiment.job_manager:check_suite_status:140 -   Pending: 0
+2025-10-20 17:38:19.776 | INFO     | __main__:main:174 - Auto-postprocessing enabled.
+2025-10-20 17:38:19.778 | INFO     | __main__:main:175 - Note: Postprocessing should be run after jobs complete.
+2025-10-20 17:38:19.778 | INFO     | __main__:main:176 - To run analysis: python main.py shocktube_phase1_highres --analyze
+2025-10-20 17:38:19.778 | INFO     | __main__:main:177 - To run visualization: python main.py shocktube_phase1_highres --viz

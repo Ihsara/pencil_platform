@@ -1,0 +1,143 @@
+2025-10-20 17:59:54.382 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/analysis/shocktube_phase1/2025-10-20_17-59-54_analysis.log
+2025-10-20 17:59:54.383 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/analysis/shocktube_phase1
+2025-10-20 17:59:54.383 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:228 - ================================================================================
+2025-10-20 17:59:54.383 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:229 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase1'
+2025-10-20 17:59:54.383 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:231 - Combined error video generation ENABLED.
+2025-10-20 17:59:54.383 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:232 - ================================================================================
+2025-10-20 17:59:54.391 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:243 - Error analysis configuration:
+2025-10-20 17:59:54.391 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:244 -   ├─ Metrics to calculate: L1
+2025-10-20 17:59:54.391 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:245 -   └─ Combine in videos: True
+2025-10-20 17:59:54.391 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:260 - Clearing old visualization directories...
+2025-10-20 17:59:54.392 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution
+2025-10-20 17:59:54.397 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution
+2025-10-20 17:59:54.403 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/frames
+2025-10-20 17:59:54.405 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:269 - Total experiments to process: 12
+2025-10-20 17:59:54.405 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:288 - 
+================================================================================
+2025-10-20 17:59:54.405 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:289 - PHASE 1: Loading data and creating individual videos
+2025-10-20 17:59:54.405 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:290 - ================================================================================
+2025-10-20 17:59:54.406 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: massfix_default_gamma (4 runs)
+2025-10-20 17:59:54.406 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [1/12] (8.3%) | Branch: [1/4] (25.0%) | Run: res4000_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-20 17:59:54.408 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1/data
+2025-10-20 17:59:54.408 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.409 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [2/12] (16.7%) | Branch: [2/4] (50.0%) | Run: res4000_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-20 17:59:54.410 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5/data
+2025-10-20 17:59:54.410 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.411 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [3/12] (25.0%) | Branch: [3/4] (75.0%) | Run: res4000_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0
+2025-10-20 17:59:54.412 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0/data
+2025-10-20 17:59:54.412 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.413 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [4/12] (33.3%) | Branch: [4/4] (100.0%) | Run: res4000_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0
+2025-10-20 17:59:54.414 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0/data
+2025-10-20 17:59:54.414 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.415 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: massfix_gamma_is_1 (4 runs)
+2025-10-20 17:59:54.415 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [5/12] (41.7%) | Branch: [1/4] (25.0%) | Run: res4000_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1
+2025-10-20 17:59:54.416 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1/data
+2025-10-20 17:59:54.417 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.417 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [6/12] (50.0%) | Branch: [2/4] (50.0%) | Run: res4000_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5
+2025-10-20 17:59:54.418 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5/data
+2025-10-20 17:59:54.419 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.419 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [7/12] (58.3%) | Branch: [3/4] (75.0%) | Run: res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0
+2025-10-20 17:59:54.420 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/data
+2025-10-20 17:59:54.421 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.421 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [8/12] (66.7%) | Branch: [4/4] (100.0%) | Run: res4000_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0
+2025-10-20 17:59:54.422 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0/data
+2025-10-20 17:59:54.423 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.423 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: nomassfix (4 runs)
+2025-10-20 17:59:54.423 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [9/12] (75.0%) | Branch: [1/4] (25.0%) | Run: res4000_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1
+2025-10-20 17:59:54.425 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1/data
+2025-10-20 17:59:54.425 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.425 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [10/12] (83.3%) | Branch: [2/4] (50.0%) | Run: res4000_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5
+2025-10-20 17:59:54.427 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5/data
+2025-10-20 17:59:54.427 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.427 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [11/12] (91.7%) | Branch: [3/4] (75.0%) | Run: res4000_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0
+2025-10-20 17:59:54.429 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0/data
+2025-10-20 17:59:54.429 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.429 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [12/12] (100.0%) | Branch: [4/4] (100.0%) | Run: res4000_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0
+2025-10-20 17:59:54.431 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:89 - No VAR files found in /scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0/data
+2025-10-20 17:59:54.431 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-20 17:59:54.431 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:376 - 
+================================================================================
+2025-10-20 17:59:54.432 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:377 - PHASE 2: Creating overlay videos
+2025-10-20 17:59:54.432 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:378 - ================================================================================
+2025-10-20 17:59:54.432 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:398 - 
+🏆 Finding best performers in each branch...
+2025-10-20 17:59:54.432 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:411 - 
+🎬 Creating branch overlay videos...
+2025-10-20 17:59:54.432 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:416 -   ├─ Branch: massfix_default_gamma (4 runs)
+2025-10-20 17:59:54.433 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:416 -   ├─ Branch: massfix_gamma_is_1 (4 runs)
+2025-10-20 17:59:54.433 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:416 -   ├─ Branch: nomassfix (4 runs)
+2025-10-20 17:59:54.433 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:440 - 
+🏆 Finding top 3 best performers overall...
+2025-10-20 17:59:54.433 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:448 - 
+🎬 Creating top 3 overlay video...
+2025-10-20 17:59:54.434 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:473 - 
+================================================================================
+2025-10-20 17:59:54.434 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:474 - PHASE 3: Calculating error norms
+2025-10-20 17:59:54.434 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:475 - ================================================================================
+2025-10-20 17:59:54.434 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:482 - Clearing old error norm directories...
+2025-10-20 17:59:54.435 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:488 - Calculating error norms for 0 runs...
+2025-10-20 17:59:54.436 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:505 - 
+Calculating combined scores (using DENSITY only)...
+2025-10-20 17:59:54.436 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:544 - 
+================================================================================
+2025-10-20 17:59:54.436 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:545 - PHASE 4: Creating error norm visualizations
+2025-10-20 17:59:54.436 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:546 - ================================================================================
+2025-10-20 17:59:54.437 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:548 -   ├─ Combined scores comparison...
+2025-10-20 17:59:55.041 | INFO     | src.visualization.plots:create_combined_scores_plot:137 -        └─ Saved to shocktube_phase1_combined_scores.png
+2025-10-20 17:59:55.042 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:551 -   ├─ Per-metric comparisons...
+2025-10-20 17:59:55.604 | INFO     | src.visualization.plots:create_per_metric_plots:184 -        └─ Saved L1 comparison to shocktube_phase1_l1_comparison.png
+2025-10-20 17:59:55.604 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:554 -   ├─ Top 5 detailed view...
+2025-10-20 17:59:56.663 | INFO     | src.visualization.plots:create_best_performers_plot:231 -        └─ Saved top 5 detailed comparison to shocktube_phase1_top5_detailed.png
+2025-10-20 17:59:56.663 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:557 -   ├─ Branch comparison...
+2025-10-20 17:59:56.670 | ERROR    | __main__:main:182 - An unexpected error occurred: attempt to get argmin of an empty sequence
+Traceback (most recent call last):
+
+  File "/scratch/project_2008296/chau/pencil_platform/main.py", line 186, in <module>
+    main()
+    └ <function main at 0x7f2969914a40>
+
+> File "/scratch/project_2008296/chau/pencil_platform/main.py", line 101, in main
+    analyze_suite_videos_only(experiment_name, combined_video=True)
+    │                         └ 'shocktube_phase1'
+    └ <function analyze_suite_videos_only at 0x7f2969914400>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/workflows/analysis_pipeline.py", line 558, in analyze_suite_videos_only
+    create_branch_comparison_plot(branch_best, runs_per_branch, combined_scores, plots_dir, experiment_name)
+    │                             │            │                │                │          └ 'shocktube_phase1'
+    │                             │            │                │                └ PosixPath('/scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error_norms/plots')
+    │                             │            │                └ {}
+    │                             │            └ {'massfix_default_gamma': ['res4000_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1', 'res4000_nohyper_massfix_default_...
+    │                             └ {}
+    └ <function create_branch_comparison_plot at 0x7f296a696200>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/visualization/plots.py", line 249, in create_branch_comparison_plot
+    min_idx = np.argmin(best_scores)
+              │  │      └ []
+              │  └ <function argmin at 0x7f29aa350670>
+              └ <module 'numpy' from '/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/__init__.py'>
+
+  File "/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/_core/fromnumeric.py", line 1439, in argmin
+    return _wrapfunc(a, 'argmin', axis=axis, out=out, **kwds)
+           │         │                 │         │      └ {}
+           │         │                 │         └ None
+           │         │                 └ None
+           │         └ []
+           └ <function _wrapfunc at 0x7f29aa331760>
+  File "/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/_core/fromnumeric.py", line 54, in _wrapfunc
+    return _wrapit(obj, method, *args, **kwds)
+           │       │    │        │       └ {'axis': None, 'out': None}
+           │       │    │        └ ()
+           │       │    └ 'argmin'
+           │       └ []
+           └ <function _wrapit at 0x7f29aa331800>
+  File "/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/_core/fromnumeric.py", line 46, in _wrapit
+    result = getattr(arr, method)(*args, **kwds)
+                     │    │        │       └ {'axis': None, 'out': None}
+                     │    │        └ ()
+                     │    └ 'argmin'
+                     └ array([], dtype=float64)
+
+ValueError: attempt to get argmin of an empty sequence

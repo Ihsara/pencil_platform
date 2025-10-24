@@ -1,0 +1,550 @@
+2025-10-15 17:50:12.563 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/analysis/shocktube_phase1/2025-10-15_17-50-12_analysis.log
+2025-10-15 17:50:12.563 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/analysis/shocktube_phase1
+2025-10-15 17:50:12.563 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:228 - ================================================================================
+2025-10-15 17:50:12.563 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:229 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase1'
+2025-10-15 17:50:12.564 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:231 - Combined error video generation ENABLED.
+2025-10-15 17:50:12.564 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:232 - ================================================================================
+2025-10-15 17:50:12.572 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:243 - Error analysis configuration:
+2025-10-15 17:50:12.572 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:244 -   ├─ Metrics to calculate: L1
+2025-10-15 17:50:12.572 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:245 -   └─ Combine in videos: True
+2025-10-15 17:50:12.573 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:260 - Clearing old visualization directories...
+2025-10-15 17:50:12.573 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution
+2025-10-15 17:50:12.579 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution
+2025-10-15 17:50:12.585 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/frames
+2025-10-15 17:50:12.600 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:269 - Total experiments to process: 12
+2025-10-15 17:50:12.600 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:288 - 
+================================================================================
+2025-10-15 17:50:12.600 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:289 - PHASE 1: Loading data and creating individual videos
+2025-10-15 17:50:12.600 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:290 - ================================================================================
+2025-10-15 17:50:12.601 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: massfix_default_gamma (4 runs)
+2025-10-15 17:50:12.601 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [1/12] (8.3%) | Branch: [1/4] (25.0%) | Run: res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:50:12.604 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 11 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:50:53.976 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 11 timesteps using method: absolute
+2025-10-15 17:50:53.977 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:50:54.269 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:50:54.276 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:50:54.276 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 11 individual frames...
+2025-10-15 17:50:54.299 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:50:56.453 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:50:57.639 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:50:59.048 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:00.230 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:01.435 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:02.893 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:04.083 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:05.119 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:06.186 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:07.578 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:08.654 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 11 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:51:15.894 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1_var_evolution.gif
+2025-10-15 17:51:15.895 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:51:15.896 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:51:15.896 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:51:15.935 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:15.943 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:51:15.944 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 11 spatial error evolution frames...
+2025-10-15 17:51:15.968 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:16.765 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:17.788 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:18.549 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:19.315 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:20.077 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:20.832 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:21.601 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:22.354 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:23.110 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:23.880 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:51:24.940 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 11 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:51:31.369 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1_error_evolution.gif
+2025-10-15 17:51:31.370 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:51:31.370 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [2/12] (16.7%) | Branch: [2/4] (50.0%) | Run: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:51:31.373 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 7 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:51:58.198 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 7 timesteps using method: absolute
+2025-10-15 17:51:58.199 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:51:58.239 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:51:58.247 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:51:58.248 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 7 individual frames...
+2025-10-15 17:51:58.271 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:51:59.738 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:00.916 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:02.102 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:03.592 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:04.775 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:05.965 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:07.422 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 7 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:52:12.026 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5_var_evolution.gif
+2025-10-15 17:52:12.027 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:52:12.027 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:52:12.028 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:52:12.073 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:12.080 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:52:12.081 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 7 spatial error evolution frames...
+2025-10-15 17:52:12.104 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:12.845 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:13.586 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:14.845 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:15.597 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:16.349 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:17.609 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:52:18.322 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 7 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:52:22.280 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5_error_evolution.gif
+2025-10-15 17:52:22.281 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:52:22.281 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [3/12] (25.0%) | Branch: [3/4] (75.0%) | Run: res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:52:22.283 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 6 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:52:45.436 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 6 timesteps using method: absolute
+2025-10-15 17:52:45.437 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:52:45.477 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:45.485 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:52:45.486 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 6 individual frames...
+2025-10-15 17:52:45.510 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:46.917 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:48.096 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:49.291 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:50.808 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:51.991 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:53.150 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 6 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:52:57.075 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0_var_evolution.gif
+2025-10-15 17:52:57.075 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:52:57.076 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:52:57.077 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:52:57.118 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:57.126 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:52:57.127 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 6 spatial error evolution frames...
+2025-10-15 17:52:57.152 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:58.118 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:58.843 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:52:59.574 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:53:00.306 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:53:01.037 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:53:01.753 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 6 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:53:05.269 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0_error_evolution.gif
+2025-10-15 17:53:05.269 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:53:05.270 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [4/12] (33.3%) | Branch: [4/4] (100.0%) | Run: res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:53:05.272 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 3 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:53:17.843 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 3 timesteps using method: absolute
+2025-10-15 17:53:17.843 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:53:17.884 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:53:17.892 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:53:17.892 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 3 individual frames...
+2025-10-15 17:53:17.916 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:53:19.075 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:53:20.263 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:53:21.687 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 3 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:53:23.736 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0_var_evolution.gif
+2025-10-15 17:53:23.737 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:53:23.737 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:53:23.739 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:53:23.778 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:53:23.785 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:53:23.786 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 3 spatial error evolution frames...
+2025-10-15 17:53:23.809 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:53:24.546 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:53:25.275 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:53:26.017 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 3 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:53:27.753 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0_error_evolution.gif
+2025-10-15 17:53:27.753 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:53:27.754 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: massfix_gamma_is_1 (4 runs)
+2025-10-15 17:53:27.754 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [5/12] (41.7%) | Branch: [1/4] (25.0%) | Run: res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:53:27.756 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 11 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:54:09.553 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 11 timesteps using method: absolute
+2025-10-15 17:54:09.554 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:54:09.595 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:09.611 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:54:09.611 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 11 individual frames...
+2025-10-15 17:54:09.634 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:10.999 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:12.198 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:13.393 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:14.922 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:16.114 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:17.302 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:18.494 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:19.911 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:20.966 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:22.083 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:23.519 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 11 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:54:30.481 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1_var_evolution.gif
+2025-10-15 17:54:30.482 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:54:30.483 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:54:30.483 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:54:30.523 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:30.531 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:54:30.531 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 11 spatial error evolution frames...
+2025-10-15 17:54:30.556 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:31.330 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:32.098 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:32.864 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:33.637 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:34.410 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:35.547 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:36.323 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:37.095 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:37.861 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:38.626 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:54:39.368 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 11 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:54:45.653 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1_error_evolution.gif
+2025-10-15 17:54:45.654 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:54:45.654 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [6/12] (50.0%) | Branch: [2/4] (50.0%) | Run: res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:54:45.656 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 7 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:55:12.923 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 7 timesteps using method: absolute
+2025-10-15 17:55:12.924 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:55:12.966 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:12.973 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:55:12.973 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 7 individual frames...
+2025-10-15 17:55:12.997 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:14.219 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:15.637 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:16.854 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:18.061 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:19.583 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:20.776 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:21.939 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 7 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:55:26.610 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5_var_evolution.gif
+2025-10-15 17:55:26.611 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:55:26.611 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:55:26.612 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:55:26.652 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:26.660 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:55:26.660 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 7 spatial error evolution frames...
+2025-10-15 17:55:26.684 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:27.802 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:28.554 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:29.296 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:30.036 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:30.788 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:31.527 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:55:32.252 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 7 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:55:36.251 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5_error_evolution.gif
+2025-10-15 17:55:36.252 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:55:36.252 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [7/12] (58.3%) | Branch: [3/4] (75.0%) | Run: res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:55:36.255 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 6 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:56:01.087 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 6 timesteps using method: absolute
+2025-10-15 17:56:01.088 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:56:01.386 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:01.393 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:56:01.393 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 6 individual frames...
+2025-10-15 17:56:01.416 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:02.852 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:04.296 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:05.501 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:06.707 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:08.229 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:09.331 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 6 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:56:13.090 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0_var_evolution.gif
+2025-10-15 17:56:13.091 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:56:13.091 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:56:13.092 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:56:13.143 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:13.150 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:56:13.151 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 6 spatial error evolution frames...
+2025-10-15 17:56:13.174 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:13.960 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:14.669 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:15.360 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:16.054 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:16.985 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:56:17.657 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 6 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:56:20.888 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0_error_evolution.gif
+2025-10-15 17:56:20.888 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:56:20.889 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [8/12] (66.7%) | Branch: [4/4] (100.0%) | Run: res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:56:20.891 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 3 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:56:33.211 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 3 timesteps using method: absolute
+2025-10-15 17:56:33.212 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:56:33.251 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:56:33.258 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:56:33.258 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 3 individual frames...
+2025-10-15 17:56:33.282 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:56:34.483 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:56:35.769 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:56:36.872 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 3 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:56:38.812 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0_var_evolution.gif
+2025-10-15 17:56:38.812 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:56:38.813 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:56:38.814 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:56:38.851 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:56:38.859 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:56:38.859 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 3 spatial error evolution frames...
+2025-10-15 17:56:38.882 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:56:39.566 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:56:40.489 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 17:56:41.150 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 3 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:56:42.747 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0_error_evolution.gif
+2025-10-15 17:56:42.748 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:56:42.748 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: nomassfix (4 runs)
+2025-10-15 17:56:42.749 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [9/12] (75.0%) | Branch: [1/4] (25.0%) | Run: res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:56:42.751 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 11 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:57:24.266 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 11 timesteps using method: absolute
+2025-10-15 17:57:24.266 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:57:24.306 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:24.329 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:57:24.330 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 11 individual frames...
+2025-10-15 17:57:24.354 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:25.466 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:26.585 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:27.846 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:28.974 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:30.101 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:31.396 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:32.530 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:33.656 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:34.838 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:35.888 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:36.908 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 11 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:57:43.563 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1_var_evolution.gif
+2025-10-15 17:57:43.564 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:57:43.564 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:57:43.565 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:57:43.606 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:43.613 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:57:43.614 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 11 spatial error evolution frames...
+2025-10-15 17:57:43.637 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:44.336 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:45.248 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:45.945 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:46.643 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:47.339 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:48.038 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:48.737 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:49.442 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:50.142 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:51.018 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1'
+2025-10-15 17:57:51.751 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 11 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1
+2025-10-15 17:57:57.665 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1_error_evolution.gif
+2025-10-15 17:57:57.666 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:57:57.666 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [10/12] (83.3%) | Branch: [2/4] (50.0%) | Run: res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:57:57.669 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 9 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:58:31.905 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 9 timesteps using method: absolute
+2025-10-15 17:58:31.906 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:58:31.945 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:31.952 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:58:31.953 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 9 individual frames...
+2025-10-15 17:58:31.978 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:33.156 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:34.284 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:35.559 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:36.691 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:37.830 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:39.145 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:40.281 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:41.325 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:42.282 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 9 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:58:47.989 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5_var_evolution.gif
+2025-10-15 17:58:47.998 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:58:47.998 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:58:47.999 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:58:48.036 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:48.044 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:58:48.044 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 9 spatial error evolution frames...
+2025-10-15 17:58:48.068 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:48.790 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:49.509 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:50.224 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:50.942 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:51.669 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:52.381 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:53.102 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:54.016 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5'
+2025-10-15 17:58:54.707 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 9 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5
+2025-10-15 17:58:59.751 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5_error_evolution.gif
+2025-10-15 17:58:59.751 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:58:59.751 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [11/12] (91.7%) | Branch: [3/4] (75.0%) | Run: res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:58:59.754 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 7 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:59:26.539 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 7 timesteps using method: absolute
+2025-10-15 17:59:26.540 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 17:59:26.580 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:26.587 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 17:59:26.588 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 7 individual frames...
+2025-10-15 17:59:26.611 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:27.968 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:29.101 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:30.231 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:31.539 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:32.675 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:33.806 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:35.154 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 7 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:59:39.380 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0_var_evolution.gif
+2025-10-15 17:59:39.380 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 17:59:39.381 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 17:59:39.382 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 17:59:39.419 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:39.426 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 17:59:39.426 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 7 spatial error evolution frames...
+2025-10-15 17:59:39.453 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:40.147 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:40.844 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:41.584 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:42.360 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:43.137 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:43.907 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0'
+2025-10-15 17:59:45.092 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 7 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0
+2025-10-15 17:59:49.204 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0_error_evolution.gif
+2025-10-15 17:59:49.204 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 17:59:49.205 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [12/12] (100.0%) | Branch: [4/4] (100.0%) | Run: res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0
+2025-10-15 17:59:49.207 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 5 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0
+2025-10-15 18:00:08.890 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 5 timesteps using method: absolute
+2025-10-15 18:00:08.891 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-15 18:00:08.933 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:08.940 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-15 18:00:08.941 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 5 individual frames...
+2025-10-15 18:00:08.965 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:12.580 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:14.002 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:15.196 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:16.404 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:17.953 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 5 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0
+2025-10-15 18:00:21.534 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0_var_evolution.gif
+2025-10-15 18:00:21.535 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-15 18:00:21.535 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-15 18:00:21.536 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 18:00:21.643 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:21.651 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-15 18:00:21.651 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 5 spatial error evolution frames...
+2025-10-15 18:00:21.674 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:22.494 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:23.246 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:24.002 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:24.769 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:00:25.883 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 5 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0
+2025-10-15 18:00:28.919 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0_error_evolution.gif
+2025-10-15 18:00:28.919 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-15 18:00:28.920 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:376 - 
+================================================================================
+2025-10-15 18:00:28.920 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:377 - PHASE 2: Creating overlay videos
+2025-10-15 18:00:28.920 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:378 - ================================================================================
+2025-10-15 18:00:28.927 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1: avg L2 error = 3.779933e+03
+2025-10-15 18:00:28.928 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5: avg L2 error = 1.914430e+03
+2025-10-15 18:00:28.928 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0: avg L2 error = 1.924369e+03
+2025-10-15 18:00:28.929 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0: avg L2 error = 2.107442e+03
+2025-10-15 18:00:28.930 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1: avg L2 error = 3.779933e+03
+2025-10-15 18:00:28.930 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5: avg L2 error = 1.914430e+03
+2025-10-15 18:00:28.931 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0: avg L2 error = 1.924369e+03
+2025-10-15 18:00:28.931 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0: avg L2 error = 2.107442e+03
+2025-10-15 18:00:28.932 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1: avg L2 error = 3.538134e+03
+2025-10-15 18:00:28.932 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5: avg L2 error = 2.899880e+03
+2025-10-15 18:00:28.933 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0: avg L2 error = 2.835628e+03
+2025-10-15 18:00:28.933 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:396 -   res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0: avg L2 error = 2.253253e+03
+2025-10-15 18:00:28.934 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:399 - 
+🏆 Finding best performers in each branch...
+2025-10-15 18:00:28.934 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:409 -   ├─ massfix_default_gamma: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5 (L2=1.914430e+03)
+2025-10-15 18:00:28.934 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:409 -   ├─ massfix_gamma_is_1: res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5 (L2=1.914430e+03)
+2025-10-15 18:00:28.934 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:409 -   ├─ nomassfix: res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0 (L2=2.253253e+03)
+2025-10-15 18:00:28.934 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:412 - 
+🎬 Creating branch overlay videos...
+2025-10-15 18:00:28.934 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:417 -   ├─ Branch: massfix_default_gamma (4 runs)
+2025-10-15 18:00:28.935 | WARNING  | src.visualization.videos:create_overlay_error_evolution_video:603 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 18:00:39.928 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/shocktube_phase1_massfix_default_gamma_overlay_error_evolution.gif
+2025-10-15 18:00:39.929 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:438 -      └─ ✓ Created overlay for massfix_default_gamma
+2025-10-15 18:00:39.929 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:417 -   ├─ Branch: massfix_gamma_is_1 (4 runs)
+2025-10-15 18:00:39.930 | WARNING  | src.visualization.videos:create_overlay_error_evolution_video:603 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 18:00:50.711 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/shocktube_phase1_massfix_gamma_is_1_overlay_error_evolution.gif
+2025-10-15 18:00:50.712 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:438 -      └─ ✓ Created overlay for massfix_gamma_is_1
+2025-10-15 18:00:50.712 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:417 -   ├─ Branch: nomassfix (4 runs)
+2025-10-15 18:00:50.714 | WARNING  | src.visualization.videos:create_overlay_error_evolution_video:603 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 18:01:00.896 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/shocktube_phase1_nomassfix_overlay_error_evolution.gif
+2025-10-15 18:01:00.915 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:438 -      └─ ✓ Created overlay for nomassfix
+2025-10-15 18:01:00.915 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:441 - 
+🏆 Finding top 3 best performers overall...
+2025-10-15 18:01:00.915 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:446 -   ├─ #1: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5 (L2=1.914430e+03)
+2025-10-15 18:01:00.916 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:446 -   ├─ #2: res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5 (L2=1.914430e+03)
+2025-10-15 18:01:00.916 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:446 -   ├─ #3: res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0 (L2=1.924369e+03)
+2025-10-15 18:01:00.916 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:449 - 
+🎬 Creating top 3 overlay video...
+2025-10-15 18:01:00.917 | WARNING  | src.visualization.videos:create_overlay_error_evolution_video:603 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-15 18:01:07.248 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/shocktube_phase1_top3_best_performers_overlay_error_evolution.gif
+2025-10-15 18:01:07.249 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:469 -      └─ ✓ Created top 3 overlay video
+2025-10-15 18:01:07.249 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:474 - 
+================================================================================
+2025-10-15 18:01:07.249 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:475 - PHASE 3: Calculating error norms
+2025-10-15 18:01:07.250 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:476 - ================================================================================
+2025-10-15 18:01:07.251 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:483 - Clearing old error norm directories...
+2025-10-15 18:01:07.253 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:489 - Calculating error norms for 12 runs...
+2025-10-15 18:01:07.253 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1: calculating L1...
+2025-10-15 18:01:07.253 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 11 timesteps
+2025-10-15 18:01:07.295 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5: calculating L1...
+2025-10-15 18:01:07.295 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 7 timesteps
+2025-10-15 18:01:07.296 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_massfix_default_gamma_nu1p0_chi1p0_diffrho1p0: calculating L1...
+2025-10-15 18:01:07.296 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 6 timesteps
+2025-10-15 18:01:07.297 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0: calculating L1...
+2025-10-15 18:01:07.297 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 3 timesteps
+2025-10-15 18:01:07.297 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_massfix_gamma_is_1_nu0p1_chi0p1_diffrho0p1: calculating L1...
+2025-10-15 18:01:07.298 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 11 timesteps
+2025-10-15 18:01:07.299 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5: calculating L1...
+2025-10-15 18:01:07.299 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 7 timesteps
+2025-10-15 18:01:07.300 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0: calculating L1...
+2025-10-15 18:01:07.300 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 6 timesteps
+2025-10-15 18:01:07.301 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0: calculating L1...
+2025-10-15 18:01:07.301 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 3 timesteps
+2025-10-15 18:01:07.302 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_nomassfix_nu0p1_chi0p1_diffrho0p1: calculating L1...
+2025-10-15 18:01:07.302 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 11 timesteps
+2025-10-15 18:01:07.303 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_nomassfix_nu0p5_chi0p5_diffrho0p5: calculating L1...
+2025-10-15 18:01:07.303 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 9 timesteps
+2025-10-15 18:01:07.304 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_nomassfix_nu1p0_chi1p0_diffrho1p0: calculating L1...
+2025-10-15 18:01:07.304 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 7 timesteps
+2025-10-15 18:01:07.305 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:495 -   ├─ res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0: calculating L1...
+2025-10-15 18:01:07.305 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 5 timesteps
+2025-10-15 18:01:07.306 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:506 - 
+Calculating combined scores...
+2025-10-15 18:01:07.307 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:549 - 
+================================================================================
+2025-10-15 18:01:07.307 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:550 - PHASE 4: Creating error norm visualizations
+2025-10-15 18:01:07.307 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:551 - ================================================================================
+2025-10-15 18:01:07.307 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:553 -   ├─ Combined scores comparison...
+2025-10-15 18:01:08.672 | INFO     | src.visualization.plots:create_combined_scores_plot:137 -        └─ Saved to shocktube_phase1_combined_scores.png
+2025-10-15 18:01:08.672 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:556 -   ├─ Per-metric comparisons...
+2025-10-15 18:01:12.081 | INFO     | src.visualization.plots:create_per_metric_plots:184 -        └─ Saved L1 comparison to shocktube_phase1_l1_comparison.png
+2025-10-15 18:01:12.082 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:559 -   ├─ Top 5 detailed view...
+2025-10-15 18:01:14.028 | INFO     | src.visualization.plots:create_best_performers_plot:231 -        └─ Saved top 5 detailed comparison to shocktube_phase1_top5_detailed.png
+2025-10-15 18:01:14.029 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:562 -   ├─ Branch comparison...
+2025-10-15 18:01:14.086 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:01:14.095 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:01:14.103 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_nohyper_nomassfix_nu5p0_chi5p0_diffrho5p0'
+2025-10-15 18:01:14.889 | INFO     | src.visualization.plots:create_branch_comparison_plot:272 -        └─ Saved branch comparison to shocktube_phase1_branch_best.png
+2025-10-15 18:01:14.890 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:565 -   └─ Error evolution plots...
+2025-10-15 18:01:16.711 | INFO     | src.visualization.plots:create_error_evolution_plots:314 -        └─ Saved L1 evolution to shocktube_phase1_top3_l1_evolution.png
+2025-10-15 18:01:16.712 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:571 - 
+================================================================================
+2025-10-15 18:01:16.712 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:572 - PHASE 5: Generating reports
+2025-10-15 18:01:16.712 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:573 - ================================================================================
+2025-10-15 18:01:16.717 | INFO     | src.workflows.analysis_pipeline:save_error_norms_summary:928 -        ├─ Saved JSON summary to shocktube_phase1_error_norms_summary.json
+2025-10-15 18:01:16.717 | INFO     | src.workflows.analysis_pipeline:save_error_norms_summary:929 -        └─ Saved Markdown report to shocktube_phase1_error_norms_summary.md
+2025-10-15 18:01:16.717 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:581 - 
+================================================================================
+2025-10-15 18:01:16.717 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:582 - PHASE 6: Organizing folder structure
+2025-10-15 18:01:16.718 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:583 - ================================================================================
+2025-10-15 18:01:16.718 | INFO     | src.analysis.organizer:organize:324 - ================================================================================
+2025-10-15 18:01:16.718 | INFO     | src.analysis.organizer:organize:325 - ORGANIZING ANALYSIS FOLDER STRUCTURE
+2025-10-15 18:01:16.719 | INFO     | src.analysis.organizer:organize:326 - ================================================================================
+2025-10-15 18:01:16.719 | INFO     | src.analysis.organizer:create_structure:61 - Creating organized folder structure...
+2025-10-15 18:01:16.721 | SUCCESS  | src.analysis.organizer:create_structure:72 - ✓ Created organized folder structure
+2025-10-15 18:01:16.721 | INFO     | src.analysis.organizer:migrate_existing_files:90 - Migrating existing files to new structure...
+2025-10-15 18:01:16.722 | INFO     | src.analysis.organizer:migrate_existing_files:102 -   ├─ Migrating error_norms/ → error/norms/
+2025-10-15 18:01:16.729 | INFO     | src.analysis.organizer:migrate_existing_files:117 -      └─ Removed old directory: error_norms/
+2025-10-15 18:01:16.730 | SUCCESS  | src.analysis.organizer:migrate_existing_files:119 - ✓ Migration complete
+2025-10-15 18:01:16.730 | SUCCESS  | src.analysis.organizer:organize:331 - ================================================================================
+2025-10-15 18:01:16.730 | SUCCESS  | src.analysis.organizer:organize:332 - FOLDER ORGANIZATION COMPLETE
+2025-10-15 18:01:16.731 | SUCCESS  | src.analysis.organizer:organize:333 - ================================================================================
+2025-10-15 18:01:16.731 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:589 - 
+================================================================================
+2025-10-15 18:01:16.731 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:590 - PHASE 7: Populating best performers folders
+2025-10-15 18:01:16.731 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:591 - ================================================================================
+2025-10-15 18:01:16.732 | INFO     | src.analysis.organizer:populate_best_performers:168 - Populating best performers (top 3 for each metric)...
+2025-10-15 18:01:16.732 | INFO     | src.analysis.organizer:create_best_performers_structure:132 - Creating best performers structure...
+2025-10-15 18:01:16.733 | SUCCESS  | src.analysis.organizer:create_best_performers_structure:147 - ✓ Created best performers folder structure
+2025-10-15 18:01:16.733 | INFO     | src.analysis.organizer:populate_best_performers:177 -   ├─ Processing L1 metric...
+2025-10-15 18:01:16.734 | INFO     | src.analysis.organizer:populate_best_performers:202 -      ├─ #1: res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0 (score: 6.342493e+02)
+2025-10-15 18:01:16.754 | INFO     | src.analysis.organizer:populate_best_performers:202 -      ├─ #2: res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0 (score: 6.342493e+02)
+2025-10-15 18:01:16.759 | INFO     | src.analysis.organizer:populate_best_performers:202 -      ├─ #3: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5 (score: 6.576742e+02)
+2025-10-15 18:01:16.765 | INFO     | src.analysis.organizer:populate_best_performers:218 -      └─ ✓ Copied top 3 performers for L1
+2025-10-15 18:01:16.765 | INFO     | src.analysis.organizer:populate_best_performers:221 -   ├─ Processing Combined scores...
+2025-10-15 18:01:16.765 | INFO     | src.analysis.organizer:populate_best_performers:227 -      ├─ #1: res400_nohyper_massfix_default_gamma_nu5p0_chi5p0_diffrho5p0 (score: 6.342493e+02)
+2025-10-15 18:01:16.770 | INFO     | src.analysis.organizer:populate_best_performers:227 -      ├─ #2: res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0 (score: 6.342493e+02)
+2025-10-15 18:01:16.774 | INFO     | src.analysis.organizer:populate_best_performers:227 -      ├─ #3: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5 (score: 6.576742e+02)
+2025-10-15 18:01:16.780 | INFO     | src.analysis.organizer:populate_best_performers:243 -      └─ ✓ Copied top 3 performers for Combined
+2025-10-15 18:01:16.784 | SUCCESS  | src.analysis.organizer:populate_best_performers:249 - ✓ Best performers populated
+2025-10-15 18:01:16.784 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:600 - 
+================================================================================
+2025-10-15 18:01:16.784 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:601 - FINAL SUMMARY
+2025-10-15 18:01:16.784 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:602 - ================================================================================

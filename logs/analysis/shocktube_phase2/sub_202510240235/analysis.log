@@ -1,0 +1,89 @@
+2025-10-24 02:35:29.484 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/analysis/shocktube_phase2/sub_202510240235/analysis.log
+2025-10-24 02:35:29.485 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/analysis/shocktube_phase2/sub_202510240235
+2025-10-24 02:35:29.485 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:243 - ================================================================================
+2025-10-24 02:35:29.485 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:244 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase2'
+2025-10-24 02:35:29.485 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:246 - Combined error video generation ENABLED.
+2025-10-24 02:35:29.486 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:247 - ================================================================================
+2025-10-24 02:35:29.493 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:258 - Error analysis configuration:
+2025-10-24 02:35:29.493 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:259 -   ├─ Metrics to calculate: L1
+2025-10-24 02:35:29.494 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:260 -   └─ Combine in videos: True
+2025-10-24 02:35:29.494 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:275 - Clearing old visualization directories...
+2025-10-24 02:35:29.495 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution
+2025-10-24 02:35:29.496 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution
+2025-10-24 02:35:29.497 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/frames
+2025-10-24 02:35:29.499 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:284 - Total experiments to process: 24
+2025-10-24 02:35:29.499 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:303 - 
+================================================================================
+2025-10-24 02:35:29.499 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:304 - PHASE 1: Loading data and creating individual videos
+2025-10-24 02:35:29.500 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:305 - ================================================================================
+2025-10-24 02:35:29.500 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:315 - 
+📂 Processing branch: r1_nu0.5_dg (8 runs)
+2025-10-24 02:35:29.501 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:322 -   ├─ [1/24] (4.2%) | Branch: [1/8] (12.5%) | Run: res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg
+2025-10-24 02:35:29.502 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 36 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg
+2025-10-24 02:37:43.909 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 36 timesteps using method: absolute
+2025-10-24 02:37:43.911 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:353 -      ├─ Creating var evolution video and frames...
+2025-10-24 02:37:44.477 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:44.485 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-24 02:37:44.486 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 36 individual frames...
+2025-10-24 02:37:44.510 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:47.174 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:48.901 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:50.382 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:51.854 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:53.661 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:55.113 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:56.876 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:58.327 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:37:59.779 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:01.578 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:03.027 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:04.094 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:05.494 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:06.533 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:07.618 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:09.022 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:10.122 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:11.220 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:12.320 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:13.744 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:14.846 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:15.949 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:17.359 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:18.459 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:19.565 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:20.979 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:22.081 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:23.213 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:24.361 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:25.780 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:26.891 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:27.920 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:29.269 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:30.303 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:31.333 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:32.713 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 36 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg
+2025-10-24 02:38:57.268 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg_var_evolution.gif
+2025-10-24 02:38:57.269 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:359 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-24 02:38:57.269 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:380 -      ├─ Creating single error evolution video and frames...
+2025-10-24 02:38:57.310 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:57.318 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-24 02:38:57.318 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 36 spatial error evolution frames...
+2025-10-24 02:38:57.342 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:58.146 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:58.906 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:38:59.667 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:00.433 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:01.188 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:02.512 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:03.264 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:04.028 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:04.785 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:05.536 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:06.285 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:07.037 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:07.785 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:08.919 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:09.672 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:10.429 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:11.189 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'
+2025-10-24 02:39:11.944 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg'

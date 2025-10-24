@@ -1,0 +1,16 @@
+2025-10-15 18:11:24.811 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/status/shocktube_phase2/2025-10-15_18-11-24_status.log
+2025-10-15 18:11:24.812 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/status/shocktube_phase2
+2025-10-15 18:11:24.812 | INFO     | src.experiment.job_manager:check_suite_status:63 - --- STATUS CHECK MODE for 'shocktube_phase2' ---
+2025-10-15 18:11:24.814 | INFO     | src.experiment.job_manager:check_suite_status:81 - Querying SLURM for batch job ID: 5253682
+2025-10-15 18:11:24.829 | WARNING  | src.experiment.job_manager:check_suite_status:113 - No active or recent job tasks found for Job ID 5253682.
+2025-10-15 18:11:24.830 | WARNING  | src.experiment.job_manager:check_suite_status:114 - This usually means the job array has completed successfully and is no longer in the recent accounting database.
+2025-10-15 18:11:24.830 | INFO     | src.experiment.job_manager:check_suite_status:135 - --- Job Status Summary ---
+2025-10-15 18:11:24.831 | INFO     | src.experiment.job_manager:check_suite_status:136 -   Total Simulations: 24
+2025-10-15 18:11:24.831 | INFO     | src.experiment.job_manager:check_suite_status:137 -   Completed: 24
+2025-10-15 18:11:24.832 | INFO     | src.experiment.job_manager:check_suite_status:138 -   Failed/Cancelled: 0
+2025-10-15 18:11:24.832 | INFO     | src.experiment.job_manager:check_suite_status:139 -   Running: 0
+2025-10-15 18:11:24.832 | INFO     | src.experiment.job_manager:check_suite_status:140 -   Pending: 0
+2025-10-15 18:11:24.833 | INFO     | __main__:main:174 - Auto-postprocessing enabled.
+2025-10-15 18:11:24.833 | INFO     | __main__:main:175 - Note: Postprocessing should be run after jobs complete.
+2025-10-15 18:11:24.833 | INFO     | __main__:main:176 - To run analysis: python main.py shocktube_phase2 --analyze
+2025-10-15 18:11:24.834 | INFO     | __main__:main:177 - To run visualization: python main.py shocktube_phase2 --viz

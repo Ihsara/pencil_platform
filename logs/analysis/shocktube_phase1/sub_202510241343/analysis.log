@@ -1,0 +1,55 @@
+2025-10-24 13:43:34.569 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/analysis/shocktube_phase1/sub_202510241343/analysis.log
+2025-10-24 13:43:34.570 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/analysis/shocktube_phase1/sub_202510241343
+2025-10-24 13:43:34.570 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:240 - ================================================================================
+2025-10-24 13:43:34.570 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:241 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase1'
+2025-10-24 13:43:34.570 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:243 - Combined error video generation ENABLED.
+2025-10-24 13:43:34.570 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:244 - ================================================================================
+2025-10-24 13:43:34.598 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:255 - Error analysis configuration:
+2025-10-24 13:43:34.599 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:256 -   ├─ Metrics to calculate: L1
+2025-10-24 13:43:34.599 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:257 -   └─ Combine in videos: True
+2025-10-24 13:43:34.599 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:272 - Clearing old visualization directories...
+2025-10-24 13:43:34.599 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution
+2025-10-24 13:43:34.605 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution
+2025-10-24 13:43:34.622 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/frames
+2025-10-24 13:43:34.634 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:281 - Total experiments to process: 12
+2025-10-24 13:43:34.635 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+================================================================================
+2025-10-24 13:43:34.635 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:301 - PHASE 1: Loading data and creating individual videos
+2025-10-24 13:43:34.635 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:302 - ================================================================================
+2025-10-24 13:43:34.635 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:312 - 
+📂 Processing branch: massfix_default_gamma (4 runs)
+2025-10-24 13:43:34.636 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:319 -   ├─ [1/12] (8.3%) | Branch: [1/4] (25.0%) | Run: res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-24 13:43:34.639 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:93 - Loading all 101 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-24 13:49:49.671 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 101 timesteps using method: absolute
+2025-10-24 13:49:49.705 | ERROR    | __main__:main:225 - An unexpected error occurred: operands could not be broadcast together with shapes (400,) (406,) 
+Traceback (most recent call last):
+
+  File "/scratch/project_2008296/chau/pencil_platform/main.py", line 229, in <module>
+    main()
+    └ <function main at 0x7f2bd51c1440>
+
+> File "/scratch/project_2008296/chau/pencil_platform/main.py", line 129, in main
+    analyze_suite_videos_only(experiment_name, combined_video=True)
+    │                         └ 'shocktube_phase1'
+    └ <function analyze_suite_videos_only at 0x7f2bd51c0c20>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/workflows/analysis_pipeline.py", line 335, in analyze_suite_videos_only
+    spatial_errors_abs = calculate_spatial_errors(all_sim_data, all_analytical_data, error_method='absolute')
+                         │                        │             └ [{'rho': array([1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   ,
+                         │                        │                      1.   , 1.   , 1.   , 1.   , 1.   , 1.  ...
+                         │                        └ [{'x': array([-0.50751877, -0.5050125 , -0.50250626, -0.5       , -0.49749374,
+                         │                                 -0.49498746, -0.4924812 , -0.48997495, ...
+                         └ <function calculate_spatial_errors at 0x7f2bd610ae80>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/analysis/errors.py", line 131, in calculate_spatial_errors
+    error = np.abs(sim_data[var] - analytical_data[var])
+            │  │   │        │      │               └ 'rho'
+            │  │   │        │      └ {'rho': array([1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   ,
+            │  │   │        │               1.   , 1.   , 1.   , 1.   , 1.   , 1.   ...
+            │  │   │        └ 'rho'
+            │  │   └ {'x': array([-0.50751877, -0.5050125 , -0.50250626, -0.5       , -0.49749374,
+            │  │            -0.49498746, -0.4924812 , -0.48997495, -...
+            │  └ <ufunc 'absolute'>
+            └ <module 'numpy' from '/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/__init__.py'>
+
+ValueError: operands could not be broadcast together with shapes (400,) (406,) 

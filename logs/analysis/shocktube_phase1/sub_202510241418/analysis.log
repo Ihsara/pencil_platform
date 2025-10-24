@@ -1,0 +1,312 @@
+2025-10-24 14:18:48.595 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/analysis/shocktube_phase1/sub_202510241418/analysis.log
+2025-10-24 14:18:48.595 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/analysis/shocktube_phase1/sub_202510241418
+2025-10-24 14:18:48.595 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:228 - ================================================================================
+2025-10-24 14:18:48.595 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:229 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase1'
+2025-10-24 14:18:48.595 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:231 - Combined error video generation ENABLED.
+2025-10-24 14:18:48.596 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:232 - ================================================================================
+2025-10-24 14:18:48.611 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:243 - Error analysis configuration:
+2025-10-24 14:18:48.611 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:244 -   ├─ Metrics to calculate: L1
+2025-10-24 14:18:48.611 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:245 -   └─ Combine in videos: True
+2025-10-24 14:18:48.612 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:260 - Clearing old visualization directories...
+2025-10-24 14:18:48.612 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution
+2025-10-24 14:18:48.617 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution
+2025-10-24 14:18:48.623 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/frames
+2025-10-24 14:18:48.637 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:269 - Total experiments to process: 2
+2025-10-24 14:18:48.637 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:288 - 
+================================================================================
+2025-10-24 14:18:48.637 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:289 - PHASE 1: Loading data and creating individual videos
+2025-10-24 14:18:48.637 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:290 - ================================================================================
+2025-10-24 14:18:48.637 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: massfix_default_gamma (2 runs)
+2025-10-24 14:18:48.638 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [1/2] (50.0%) | Branch: [1/2] (50.0%) | Run: res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-24 14:18:48.640 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:93 - Loading all 101 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-24 14:18:52.338 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR0: 'DataCube' object has no attribute 'param'
+2025-10-24 14:18:55.941 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR1: 'DataCube' object has no attribute 'param'
+2025-10-24 14:18:59.573 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR2: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:03.189 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR3: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:06.812 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR4: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:10.449 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR5: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:14.067 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR6: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:17.683 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR7: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:21.307 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR8: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:24.998 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR9: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:28.617 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR10: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:32.219 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR11: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:35.841 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR12: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:39.455 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR13: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:43.151 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR14: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:46.764 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR15: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:50.383 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR16: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:54.023 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR17: 'DataCube' object has no attribute 'param'
+2025-10-24 14:19:57.632 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR18: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:01.342 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR19: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:05.104 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR20: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:08.771 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR21: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:12.381 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR22: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:15.994 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR23: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:19.611 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR24: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:23.234 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR25: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:26.902 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR26: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:30.526 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR27: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:34.145 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR28: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:37.763 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR29: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:41.386 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR30: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:45.082 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR31: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:48.704 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR32: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:52.319 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR33: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:55.936 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR34: 'DataCube' object has no attribute 'param'
+2025-10-24 14:20:59.547 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR35: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:03.218 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR36: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:06.843 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR37: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:10.489 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR38: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:14.142 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR39: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:17.776 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR40: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:21.426 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR41: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:25.072 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR42: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:28.846 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR43: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:32.480 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR44: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:36.122 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR45: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:39.736 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR46: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:43.369 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR47: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:47.016 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR48: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:50.653 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR49: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:54.295 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR50: 'DataCube' object has no attribute 'param'
+2025-10-24 14:21:57.922 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR51: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:01.563 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR52: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:05.203 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR53: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:08.904 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR54: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:12.535 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR55: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:16.167 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR56: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:19.791 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR57: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:23.444 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR58: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:27.078 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR59: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:30.761 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR60: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:34.404 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR61: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:38.096 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR62: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:41.715 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR63: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:45.366 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR64: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:49.067 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR65: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:52.699 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR66: 'DataCube' object has no attribute 'param'
+2025-10-24 14:22:56.378 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR67: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:00.006 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR68: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:03.642 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR69: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:07.271 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR70: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:10.916 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR71: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:14.546 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR72: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:18.211 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR73: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:21.930 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR74: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:25.561 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR75: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:29.197 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR76: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:32.829 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR77: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:36.555 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR78: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:40.306 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR79: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:43.947 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR80: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:47.581 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR81: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:51.204 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR82: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:54.816 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR83: 'DataCube' object has no attribute 'param'
+2025-10-24 14:23:58.487 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR84: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:02.101 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR85: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:05.721 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR86: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:09.343 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR87: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:13.094 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR88: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:16.809 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR89: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:20.436 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR90: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:24.151 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR91: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:27.978 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR92: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:31.660 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR93: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:35.302 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR94: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:38.919 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR95: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:42.538 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR96: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:46.163 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR97: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:49.786 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR98: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:53.492 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR99: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:57.212 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR100: 'DataCube' object has no attribute 'param'
+2025-10-24 14:24:57.213 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-24 14:24:57.213 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [2/2] (100.0%) | Branch: [2/2] (100.0%) | Run: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-24 14:24:57.216 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:93 - Loading all 101 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-24 14:25:00.939 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR0: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:04.560 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR1: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:08.203 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR2: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:11.829 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR3: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:15.461 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR4: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:19.067 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR5: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:22.710 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR6: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:26.316 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR7: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:29.963 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR8: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:33.629 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR9: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:37.360 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR10: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:40.979 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR11: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:44.577 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR12: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:48.182 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR13: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:51.778 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR14: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:55.409 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR15: 'DataCube' object has no attribute 'param'
+2025-10-24 14:25:59.042 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR16: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:02.743 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR17: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:06.390 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR18: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:09.969 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR19: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:13.556 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR20: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:17.238 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR21: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:20.821 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR22: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:24.405 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR23: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:27.999 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR24: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:31.606 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR25: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:35.405 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR26: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:39.111 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR27: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:42.706 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR28: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:46.308 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR29: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:49.917 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR30: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:53.534 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR31: 'DataCube' object has no attribute 'param'
+2025-10-24 14:26:57.283 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR32: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:00.956 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR33: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:04.571 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR34: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:08.430 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR35: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:12.085 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR36: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:15.745 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR37: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:19.375 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR38: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:23.019 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR39: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:26.642 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR40: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:30.292 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR41: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:33.966 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR42: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:37.603 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR43: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:41.258 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR44: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:44.998 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR45: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:48.653 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR46: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:52.325 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR47: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:55.952 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR48: 'DataCube' object has no attribute 'param'
+2025-10-24 14:27:59.595 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR49: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:03.247 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR50: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:06.890 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR51: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:10.524 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR52: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:14.171 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR53: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:17.829 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR54: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:21.548 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR55: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:25.177 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR56: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:28.820 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR57: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:32.465 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR58: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:36.107 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR59: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:39.728 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR60: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:43.349 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR61: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:46.981 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR62: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:50.616 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR63: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:54.400 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR64: 'DataCube' object has no attribute 'param'
+2025-10-24 14:28:58.137 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR65: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:01.862 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR66: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:05.491 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR67: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:09.117 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR68: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:12.740 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR69: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:16.367 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR70: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:20.019 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR71: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:23.671 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR72: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:27.307 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR73: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:30.972 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR74: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:34.642 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR75: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:38.306 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR76: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:42.005 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR77: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:45.749 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR78: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:49.413 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR79: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:53.049 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR80: 'DataCube' object has no attribute 'param'
+2025-10-24 14:29:56.686 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR81: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:00.330 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR82: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:04.006 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR83: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:07.733 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR84: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:11.355 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR85: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:14.985 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR86: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:18.731 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR87: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:22.355 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR88: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:26.048 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR89: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:29.659 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR90: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:33.288 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR91: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:36.909 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR92: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:40.523 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR93: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:44.158 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR94: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:47.799 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR95: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:51.427 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR96: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:55.058 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR97: 'DataCube' object has no attribute 'param'
+2025-10-24 14:30:58.748 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR98: 'DataCube' object has no attribute 'param'
+2025-10-24 14:31:02.387 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR99: 'DataCube' object has no attribute 'param'
+2025-10-24 14:31:06.186 | WARNING  | src.workflows.analysis_pipeline:load_all_var_files:130 - Failed to load VAR100: 'DataCube' object has no attribute 'param'
+2025-10-24 14:31:06.187 | WARNING  | src.workflows.analysis_pipeline:analyze_suite_videos_only:314 -      └─ ✗ Failed to load VAR files
+2025-10-24 14:31:06.188 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:376 - 
+================================================================================
+2025-10-24 14:31:06.188 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:377 - PHASE 2: Creating overlay videos
+2025-10-24 14:31:06.188 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:378 - ================================================================================
+2025-10-24 14:31:06.189 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:398 - 
+🏆 Finding best performers in each branch...
+2025-10-24 14:31:06.189 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:411 - 
+🎬 Creating branch overlay videos...
+2025-10-24 14:31:06.189 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:416 -   ├─ Branch: massfix_default_gamma (2 runs)
+2025-10-24 14:31:06.189 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:440 - 
+🏆 Finding top 3 best performers overall...
+2025-10-24 14:31:06.190 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:448 - 
+🎬 Creating top 3 overlay video...
+2025-10-24 14:31:06.190 | INFO     | src.analysis.organizer:create_structure:61 - Creating organized folder structure...
+2025-10-24 14:31:06.192 | SUCCESS  | src.analysis.organizer:create_structure:72 - ✓ Created organized folder structure
+2025-10-24 14:31:06.192 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:479 - 
+================================================================================
+2025-10-24 14:31:06.192 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:480 - PHASE 3: Calculating error norms
+2025-10-24 14:31:06.192 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:481 - ================================================================================
+2025-10-24 14:31:06.193 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:488 - Clearing old error norm directories...
+2025-10-24 14:31:06.193 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/norms
+2025-10-24 14:31:06.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 - Calculating error norms for 0 runs...
+2025-10-24 14:31:06.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:511 - 
+Calculating combined scores (using DENSITY only)...
+2025-10-24 14:31:06.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:550 - 
+================================================================================
+2025-10-24 14:31:06.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:551 - PHASE 4: Creating error norm visualizations
+2025-10-24 14:31:06.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:552 - ================================================================================
+2025-10-24 14:31:06.201 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:554 -   ├─ Combined scores comparison...
+2025-10-24 14:31:09.782 | INFO     | src.visualization.plots:create_combined_scores_plot:137 -        └─ Saved to shocktube_phase1_combined_scores.png
+2025-10-24 14:31:09.782 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:557 -   ├─ Per-metric comparisons...
+2025-10-24 14:31:10.414 | INFO     | src.visualization.plots:create_per_metric_plots:184 -        └─ Saved L1 comparison to shocktube_phase1_l1_comparison.png
+2025-10-24 14:31:10.414 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:560 -   ├─ Top 5 detailed view...
+2025-10-24 14:31:11.524 | INFO     | src.visualization.plots:create_best_performers_plot:231 -        └─ Saved top 5 detailed comparison to shocktube_phase1_top5_detailed.png
+2025-10-24 14:31:11.525 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:563 -   ├─ Branch comparison...
+2025-10-24 14:31:11.556 | ERROR    | __main__:main:225 - An unexpected error occurred: attempt to get argmin of an empty sequence
+Traceback (most recent call last):
+
+  File "/scratch/project_2008296/chau/pencil_platform/main.py", line 229, in <module>
+    main()
+    └ <function main at 0x7feef5765440>
+
+> File "/scratch/project_2008296/chau/pencil_platform/main.py", line 129, in main
+    analyze_suite_videos_only(experiment_name, combined_video=True)
+    │                         └ 'shocktube_phase1'
+    └ <function analyze_suite_videos_only at 0x7feef5764c20>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/workflows/analysis_pipeline.py", line 564, in analyze_suite_videos_only
+    create_branch_comparison_plot(branch_best, runs_per_branch, combined_scores, plots_dir, experiment_name)
+    │                             │            │                │                │          └ 'shocktube_phase1'
+    │                             │            │                │                └ PosixPath('/scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/norms/plots')
+    │                             │            │                └ {}
+    │                             │            └ {'massfix_default_gamma': ['res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1', 'res400_nohyper_massfix_default_ga...
+    │                             └ {}
+    └ <function create_branch_comparison_plot at 0x7feef66e2a20>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/visualization/plots.py", line 249, in create_branch_comparison_plot
+    min_idx = np.argmin(best_scores)
+              │  │      └ []
+              │  └ <function argmin at 0x7fef6f7c0bb0>
+              └ <module 'numpy' from '/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/__init__.py'>
+
+  File "/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/_core/fromnumeric.py", line 1439, in argmin
+    return _wrapfunc(a, 'argmin', axis=axis, out=out, **kwds)
+           │         │                 │         │      └ {}
+           │         │                 │         └ None
+           │         │                 └ None
+           │         └ []
+           └ <function _wrapfunc at 0x7fef6f7ad760>
+  File "/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/_core/fromnumeric.py", line 54, in _wrapfunc
+    return _wrapit(obj, method, *args, **kwds)
+           │       │    │        │       └ {'axis': None, 'out': None}
+           │       │    │        └ ()
+           │       │    └ 'argmin'
+           │       └ []
+           └ <function _wrapit at 0x7fef6f7ad800>
+  File "/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/_core/fromnumeric.py", line 46, in _wrapit
+    result = getattr(arr, method)(*args, **kwds)
+                     │    │        │       └ {'axis': None, 'out': None}
+                     │    │        └ ()
+                     │    └ 'argmin'
+                     └ array([], dtype=float64)
+
+ValueError: attempt to get argmin of an empty sequence

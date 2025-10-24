@@ -1,0 +1,199 @@
+Found config file </scratch/project_2008296/chau/pencil-code/config/compilers/GNU-GCC.conf>
+Files will be linked to the root code directory '/scratch/project_2008296/chau/pencil-code'.
+Linking job submission/execution scripts.
+Linked root Makefile.
+Linking files in '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'.
+No such file: /scratch/project_2008296/chau/pencil-code/src/Makefile.machine
+No such file: /scratch/project_2008296/chau/pencil-code/src/.cvsignore
+Linking files in '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src/pre_and_post_processing'.
+Linking files in '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src/magnetic'.
+Rebuilding Makefile from Makefile.src.
+(cd src; make FROM_PARENT=src/ -f Makefile.src cleann)
+make[1]: Entering directory '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'
+Compiler: gfortran
+GCC version: 11.2.0
+Makefile.src:2916: GCC version > 9 ==> allowing argument mismatch in nompicomm.f90, noparticles_mpicomm.f90, syscalls.f90 and fftpack.f90.
+Makefile.src:3591: warning: overriding recipe for target 'nompicomm.o'
+Makefile.src:3327: warning: ignoring old recipe for target 'nompicomm.o'
+rm -f *.o *.a *.mod
+rm -f experimental/*.o experimental/*.mod
+rm -f initial_condition/*.o initial_condition/*.mod
+rm -f magnetic/*.o magnetic/*.mod
+rm -f pre_and_post_processing/*.o
+rm -f special/*.o special/*.mod
+rm -f test_methods/*.o test_methods/*.mod
+rm -f *.x *.d cparam*.inc* pencil_init.inc file_io_common.inc *.il *.so
+rm -f pre_and_post_processing/*.x
+rm -f .current-precision
+rm -f *.dot *.ps  # Dependency diagram files
+rm -f work.pc work.pcl .build* .moduleinfo
+rm -f .sentinel astaroth/PC_modulesources.h astaroth/PC_moduleflags.h  astaroth/PC_module_parfuncs.h astaroth/PC_modulepars.h # for GPU
+rm -f nompicomm_*.f90 mpicomm_*.f90 # temporary workaround to remove old "mpicomm_double.f90"
+rm -f astaroth/Makefile.vendor
+rm -f astaroth/Makefile.module_info
+rm -f *_c.h && ln -s /scratch/project_2008296/chau/pencil-code/src/headers_c.h .
+rm -f Makefile Makefile_inc TAGS exit_mn.h
+rm -rf semiauto-conf_tmp f90_qnd_log_dir
+make  -f Makefile.src Makefile
+make[2]: Entering directory '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'
+Compiler: gfortran
+GCC version: 11.2.0
+Makefile.src:2916: GCC version > 9 ==> allowing argument mismatch in nompicomm.f90, noparticles_mpicomm.f90, syscalls.f90 and fftpack.f90.
+Makefile.src:3591: warning: overriding recipe for target 'nompicomm.o'
+Makefile.src:3327: warning: ignoring old recipe for target 'nompicomm.o'
+scripts/check-mkfile Makefile.local Makefile.src
+env ADAPT_MKFILE= scripts/adapt-mkfile Makefile.src Makefile
+make[2]: Leaving directory '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'
+make[1]: Leaving directory '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'
+Found config file </scratch/project_2008296/chau/pencil-code/config/compilers/GNU-GCC.conf>
+Running make '-j' 'FFLAGS_DOUBLE=-fdefault-real-8 -fdefault-double-8' 'CFLAGS_DOUBLE=-DDOUBLE_PRECISION' 'LD_MPI=' 'CFLAGS_FFTW3=' 'FFLAGS_FFTW3=' 'LD_FFTW3=' 'CFLAGS_FFTW2=' 'FFLAGS_FFTW2=' 'LD_FFTW2=' 'FC=gfortran' 'F77=$(FC)' 'FFLAGS=-O' 'LDFLAGS_HELPER=-dynamic' 'OMPFFLAGS=-fopenmp' 'OMPLFLAGS=-lgomp' 'PPFLAGS=-cpp' 'FSTD_95=-std=f95' 'FSTD_2003=-std=f2003' 'MODULE_PREFIX=__' 'MODULE_INFIX=_MOD_' 'MODULE_SUFFIX=' 'CC=gcc' 'CFLAGS=-DFUNDERSC=1' 'default_to_be'
+MAKING src/Makefile.inc
+precision-check: No such file src/.current-precision -- creating new one at ./src/scripts/precision-check line 36.
+touch src/.build-history
+echo tranchau"@"`hostname` "("`date`")" >> src/.build-history
+( cd src && \
+  echo "===== " make FROM_PARENT=src/ -f Makefile.src code "====="; \
+  make FROM_PARENT=src/ -f Makefile.src default_to_be \
+)
+=====  make FROM_PARENT=src/ -f Makefile.src code =====
+make[1]: Entering directory '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'
+Compiler: gfortran
+GCC version: 11.2.0
+Makefile.src:2916: GCC version > 9 ==> allowing argument mismatch in nompicomm.f90, noparticles_mpicomm.f90, syscalls.f90 and fftpack.f90.
+Makefile.src:3591: warning: overriding recipe for target 'nompicomm.o'
+Makefile.src:3327: warning: ignoring old recipe for target 'nompicomm.o'
+scripts/mkcparam -b noascalar.f90 noborder_profiles.f90 nochemistry.f90 nochiral.f90 nocosmicray.f90 nocosmicrayflux.f90 density.f90 deriv.f90 nodetonate.f90 nodustdensity.f90 nodustvelocity.f90 entropy.f90 eos_idealgas.f90 nofixed_point.f90 noforcing.f90 nogravity.f90 nogpu.f90 grid.f90 noheatflux.f90 hydro.f90 nohyperresi_strict.f90 nohypervisc_strict.f90 noimplicit_diffusion.f90 noimplicit_physics.f90 noinitial_condition.f90 nointerstellar.f90 nolorenz_gauge.f90 nomagnetic.f90 magnetic/nomeanfield.f90 magnetic/nomeanfield_demfdt.f90 nompicomm.f90 noneutraldensity.f90 noneutralvelocity.f90 noNSCBC.f90 noopacity.f90 noparticles.f90 noparticles_adaptation.f90 noparticles_coagulation.f90 noparticles_condensation.f90  noparticles_collisions.f90 noparticles_map.f90 noparticles_density.f90  noparticles_mass.f90 noparticles_number.f90 noparticles_radius.f90 noparticles_potential.f90 noparticles_grad.f90 noparticles_selfgravity.f90 noparticles_sink.f90 noparticles_drag.f90 noparticles_spin.f90 noparticles_stalker.f90 noparticles_lyapunov.f90 noparticles_caustics.f90 noparticles_tetrad.f90 noparticles_stirring.f90 noparticles_diagnos_dv.f90 noparticles_diagnos_state.f90 noparticles_persistence.f90 noparticles_temperature.f90 noparticles_adsorbed.f90 noparticles_surfspec.f90 noparticles_chemistry.f90 nopointmasses.f90 nopoisson.f90 nopolymer.f90 nopower_spectrum.f90 nopython.f90 nopscalar.f90 noradiation.f90 noselfgravity.f90 noSGS_hydro.f90 noshear.f90 shock_highorder.f90 nosignal_handling.f90 nosolid_cells.f90 nostreamlines.f90  notestfield.f90 notestflow.f90 notestscalar.f90 notimeavg.f90 notraining.f90 viscosity.f90 cparam.local nospecial.f90
+${PENCIL_HOME}/utils/pc_identify_revision --reset
+make -f Makefile.src  start.o run.o start.x run.x
+make[2]: Entering directory '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'
+Compiler: gfortran
+GCC version: 11.2.0
+Makefile.src:2916: GCC version > 9 ==> allowing argument mismatch in nompicomm.f90, noparticles_mpicomm.f90, syscalls.f90 and fftpack.f90.
+Makefile.src:3591: warning: overriding recipe for target 'nompicomm.o'
+Makefile.src:3327: warning: ignoring old recipe for target 'nompicomm.o'
+gfortran -O    -std=f2003 -o cparam.o -c cparam.f90
+gcc -DFUNDERSC=1     -o syscalls_ansi.o -c syscalls_ansi.c
+gcc -DFUNDERSC=1     -o morton_helper.o -c morton_helper.c
+scripts/mkdummyinc -d file_io_common.f90 -s file_io_f95.f90 -o file_io_common.inc
+scripts/mkdummyinc -d noeos.f90 -s eos_idealgas.f90 -o eos_dummies.inc
+gcc -DFUNDERSC=1     -o nogsl.o -c nogsl.c
+scripts/mkdummyinc -d noentropy.f90 -s entropy.f90 -o energy_dummies.inc
+gcc -DFUNDERSC=1     -o nogpu_astaroth_ansi.o -c nogpu_astaroth_ansi.c
+morton_helper.c:1:9: warning: #pragma once in main file
+    1 | #pragma once
+      |         ^~~~
+gfortran -O    -std=f2003 -o cdata.o -c cdata.f90
+gfortran   -O  -c geometrical_types.f90 -o geometrical_types.o
+gfortran -O    -std=f2003 -fallow-argument-mismatch -o syscalls.o -c syscalls.f90
+gfortran -O    -std=f2003 -o particles_cdata.o -c particles_cdata.f90
+syscalls.f90:463:21:
+
+  463 |     call copy_addr_c(var,caddr)
+      |                     1
+......
+  472 |     call copy_addr_c(var,caddr)
+      |                     2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(4)/TYPE(torus_rect)).
+gfortran -O    -o general.o -c general.f90
+gfortran -O    -std=f2003 -o noyinyang.o -c noyinyang.f90
+gfortran -O    -std=f2003 -o nodebug.o -c nodebug.f90
+gfortran -O    -std=f2003 -o noweno_transport.o -c noweno_transport.f90
+gfortran -O    -std=f2003 -o nopython.o -c nopython.f90
+gfortran -O    -std=f2003 -o notestperturb.o -c notestperturb.f90
+gfortran -O     -fallow-argument-mismatch -o nompicomm.o -c nompicomm.f90
+gfortran -O    -std=f2003 -o messages.o -c messages.f90
+gfortran -O    -std=f2003 -o ghost_check.o -c ghost_check.f90
+gfortran -O    -std=f2003 -o nosolid_cells_mpicomm.o -c nosolid_cells_mpicomm.f90
+gfortran -O    -std=f2003 -o shared_variables.o -c shared_variables.f90
+gfortran -O    -std=f2003 -o deriv.o -c deriv.f90
+gfortran -O    -o file_io_f95.o -c file_io_f95.f90
+gfortran -O    -o slices_methods.o -c slices_methods.f90
+gfortran -O    -std=f2003 -o noyinyang_mpi.o -c noyinyang_mpi.f90
+gfortran -O    -std=f2003 -o debug_io_dist.o -c debug_io_dist.f90
+gfortran -O    -std=f2003 -o nofarray_alloc.o -c nofarray_alloc.f90
+gfortran -O    -std=f2003 -o noimplicit_diffusion.o -c noimplicit_diffusion.f90
+gfortran -O    -std=f2003 -o nosolid_cells.o -c nosolid_cells.f90
+gfortran -O    -std=f2003 -o nohdf5_io.o -c nohdf5_io.f90
+gfortran -O    -std=f2003 -o farray.o -c farray.f90
+gfortran -O    -o io_dist.o -c io_dist.f90
+gfortran -O    -std=f2003 -o sub.o -c sub.f90
+gfortran -O    -std=f2003 -o noborder_profiles.o -c noborder_profiles.f90
+gfortran -O    -std=f2003 -o diagnostics.o -c diagnostics.f90
+gfortran -O    -std=f2003 -o nofourier.o -c nofourier.f90
+gfortran -O    -std=f2003 -o grid.o -c grid.f90
+gfortran -O    -std=f2003 -o nostreamlines.o -c nostreamlines.f90
+gfortran -O    -std=f2003 -o nolorenz_gauge.o -c nolorenz_gauge.f90
+gfortran -O    -std=f2003 -o nosignal_handling.o -c nosignal_handling.f90
+gfortran -O    -std=f2003 -o nofixed_point.o -c nofixed_point.f90
+gfortran -O    -std=f2003 -o noghostfold.o -c noghostfold.f90
+gfortran -O    -std=f2003 -o nopoisson.o -c nopoisson.f90
+gfortran -O    -std=f2003 -o nohyperresi_strict.o -c nohyperresi_strict.f90
+gfortran -O    -std=f2003 -o nohypervisc_strict.o -c nohypervisc_strict.f90
+gfortran -O    -std=f2003 -o density_methods.o -c density_methods.f90
+gfortran -O    -std=f2003 -o nogravity.o -c nogravity.f90
+gfortran -O    -std=f2003 -o noshear.o -c noshear.f90
+gfortran -O    -std=f2003 -o nospecial.o -c nospecial.f90
+gfortran -O    -std=f2003 -o magnetic/nomeanfield_demfdt.o -c magnetic/nomeanfield_demfdt.f90
+gfortran -O    -std=f2003 -o noinitial_condition.o -c noinitial_condition.f90
+gfortran -O    -std=f2003 -o noopacity.o -c noopacity.f90
+gfortran -O    -std=f2003 -o noparticles_main.o -c noparticles_main.f90
+gfortran -O    -o nostruct_func.o -c nostruct_func.f90
+gfortran -O    -std=f2003 -o notimeavg.o -c notimeavg.f90
+gfortran -O    -std=f2003 -o magnetic/nomeanfield.o -c magnetic/nomeanfield.f90
+gfortran -O    -std=f2003 -o nopointmasses.o -c nopointmasses.f90
+ar: creating noparticles_main.a
+gfortran -O    -std=f2003 -o eos_idealgas.o -c eos_idealgas.f90
+gfortran -O    -std=f2003 -o boundcond.o -c boundcond.f90
+gfortran -O    -std=f2003 -o initcond.o -c initcond.f90
+gfortran -O    -std=f2003 -o noheatflux.o -c noheatflux.f90
+gfortran -O    -std=f2003 -o noselfgravity.o -c noselfgravity.f90
+gfortran -O    -std=f2003 -o filter.o -c filter.f90
+gfortran -O    -std=f2003 -o nogpu.o -c nogpu.f90
+gfortran -O    -std=f2003 -o nodetonate.o -c nodetonate.f90
+gfortran -O    -std=f2003 -o noSGS_hydro.o -c noSGS_hydro.f90
+gfortran -O    -std=f2003 -o nointerstellar.o -c nointerstellar.f90
+gfortran -O    -std=f2003 -o notraining.o -c notraining.f90
+gfortran -O    -std=f2003 -o viscosity.o -c viscosity.f90
+gfortran -O    -std=f2003 -o nochemistry.o -c nochemistry.f90
+gfortran -O    -std=f2003 -o nochiral.o -c nochiral.f90
+gfortran -O    -std=f2003 -o nocosmicray.o -c nocosmicray.f90
+gfortran -O    -std=f2003 -o density.o -c density.f90
+gfortran -O    -std=f2003 -o noneutraldensity.o -c noneutraldensity.f90
+gfortran -O    -std=f2003 -o nopolymer.o -c nopolymer.f90
+gfortran -O    -std=f2003 -o noradiation.o -c noradiation.f90
+gfortran -O    -std=f2003 -o noascalar.o -c noascalar.f90
+gfortran -O    -std=f2003 -o nocosmicrayflux.o -c nocosmicrayflux.f90
+gfortran -O    -std=f2003 -o noneutralvelocity.o -c noneutralvelocity.f90
+gfortran -O    -std=f2003 -o nolsode_for_chemistry.o -c nolsode_for_chemistry.f90
+gfortran -O    -std=f2003 -o noNSCBC.o -c noNSCBC.f90
+gfortran -O    -std=f2003 -o nopscalar.o -c nopscalar.f90
+gfortran -O    -std=f2003 -o noforcing.o -c noforcing.f90
+gfortran -O    -std=f2003 -o nodustvelocity.o -c nodustvelocity.f90
+gfortran -O    -std=f2003 -o entropy.o -c entropy.f90
+gfortran -O    -std=f2003 -o nomagnetic.o -c nomagnetic.f90
+gfortran -O    -std=f2003 -o shock_highorder.o -c shock_highorder.f90
+gfortran -O    -std=f2003 -o hydro.o -c hydro.f90
+gfortran -O    -std=f2003 -o nopower_spectrum.o -c nopower_spectrum.f90
+ar: creating magnetic.a
+gfortran -O    -std=f2003 -o nodustdensity.o -c nodustdensity.f90
+gfortran -O    -std=f2003 -o noimplicit_physics.o -c noimplicit_physics.f90
+gfortran -O    -std=f2003 -o notestfield.o -c notestfield.f90
+gfortran -O    -std=f2003 -o notestflow.o -c notestflow.f90
+gfortran -O    -std=f2003 -o notestscalar.o -c notestscalar.f90
+gfortran -O    -std=f2003 -o persist.o -c persist.f90
+gfortran -O    -std=f2003 -o slices.o -c slices.f90
+gfortran -O    -std=f2003 -o snapshot.o -c snapshot.f90
+gfortran -O    -std=f2003 -o equ.o -c equ.f90
+gfortran -O    -std=f2003 -o timestep.o -c timestep.f90
+gfortran -O    -std=f2003 -o pencil_check.o -c pencil_check.f90
+gfortran -O    -o param_io.o -c param_io.f90
+gfortran -O    -std=f2003 -o register.o -c register.f90
+gfortran -O    -std=f2003 -o start.o -c start.f90
+gfortran -O    -std=f2003 -o run.o -c run.f90
+gfortran cparam.o cdata.o nompicomm.o noborder_profiles.o boundcond.o nodebug.o debug_io_dist.o deriv.o diagnostics.o nofarray_alloc.o farray.o filter.o nofixed_point.o nofourier.o general.o geometrical_types.o ghost_check.o noghostfold.o grid.o nogsl.o noimplicit_diffusion.o initcond.o noinitial_condition.o nohdf5_io.o   io_dist.o file_io_f95.o nolsode_for_chemistry.o messages.o noNSCBC.o param_io.o persist.o nopower_spectrum.o nopython.o register.o shared_variables.o nosignal_handling.o slices.o slices_methods.o snapshot.o nosolid_cells_mpicomm.o nosolid_cells.o nostreamlines.o nostruct_func.o sub.o syscalls.o  syscalls_ansi.o notestperturb.o notimeavg.o noweno_transport.o noyinyang.o noyinyang_mpi.o magnetic.a noparticles_main.a morton_helper.o  nochemistry.o nochiral.o nocosmicray.o nocosmicrayflux.o density.o density_methods.o nodetonate.o nodustdensity.o nodustvelocity.o entropy.o eos_idealgas.o noforcing.o nogravity.o noheatflux.o hydro.o nohyperresi_strict.o nohypervisc_strict.o noimplicit_physics.o nointerstellar.o nolorenz_gauge.o noneutraldensity.o noneutralvelocity.o noopacity.o nopointmasses.o nopoisson.o nopolymer.o nopscalar.o noradiation.o noselfgravity.o noSGS_hydro.o noshear.o shock_highorder.o nospecial.o noascalar.o  notestfield.o notestflow.o notestscalar.o viscosity.o nogpu.o nogpu_astaroth_ansi.o notraining.o start.o -ldl     -o start.x
+gfortran cparam.o cdata.o nompicomm.o noborder_profiles.o boundcond.o nodebug.o debug_io_dist.o deriv.o diagnostics.o nofarray_alloc.o farray.o filter.o nofixed_point.o nofourier.o general.o geometrical_types.o ghost_check.o noghostfold.o grid.o nogsl.o noimplicit_diffusion.o initcond.o noinitial_condition.o nohdf5_io.o   io_dist.o file_io_f95.o nolsode_for_chemistry.o messages.o noNSCBC.o param_io.o persist.o nopower_spectrum.o nopython.o register.o shared_variables.o nosignal_handling.o slices.o slices_methods.o snapshot.o nosolid_cells_mpicomm.o nosolid_cells.o nostreamlines.o nostruct_func.o sub.o syscalls.o  syscalls_ansi.o notestperturb.o notimeavg.o noweno_transport.o noyinyang.o noyinyang_mpi.o magnetic.a noparticles_main.a morton_helper.o  nochemistry.o nochiral.o nocosmicray.o nocosmicrayflux.o density.o density_methods.o nodetonate.o nodustdensity.o nodustvelocity.o entropy.o eos_idealgas.o noforcing.o nogravity.o noheatflux.o hydro.o nohyperresi_strict.o nohypervisc_strict.o noimplicit_physics.o nointerstellar.o nolorenz_gauge.o noneutraldensity.o noneutralvelocity.o noopacity.o nopointmasses.o nopoisson.o nopolymer.o nopscalar.o noradiation.o noselfgravity.o noSGS_hydro.o noshear.o shock_highorder.o nospecial.o noascalar.o  notestfield.o notestflow.o notestscalar.o viscosity.o nogpu.o  timestep.o notraining.o equ.o pencil_check.o run.o -ldl       -o run.x
+make[2]: Leaving directory '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'
+${PENCIL_HOME}/utils/pc_identify_revision --write
+/scratch/project_2008296/chau/pencil-code/utils/pc_identify_revision: line 97: git: command not found
+/scratch/project_2008296/chau/pencil-code/utils/pc_identify_revision: line 97: git: command not found
+make[1]: Leaving directory '/scratch/project_2008296/chau/runs/shocktube_phase1/res4000_nohyper_massfix_gamma_is_1_nu1p0_chi1p0_diffrho1p0/src'

@@ -1,0 +1,27 @@
+2025-10-21 03:22:21.684 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/submission/shocktube_phase1/sub_202510210322/submission.log
+2025-10-21 03:22:21.685 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/submission/shocktube_phase1/sub_202510210322
+2025-10-21 03:22:21.685 | INFO     | src.experiment.job_manager:submit_suite:20 - Attempting to submit job to SLURM...
+2025-10-21 03:22:21.714 | INFO     | src.experiment.job_manager:submit_suite:32 - ==================================================
+2025-10-21 03:22:21.714 | INFO     | src.experiment.job_manager:submit_suite:33 -            JOB SUBMITTED SUCCESSFULLY
+2025-10-21 03:22:21.714 | INFO     | src.experiment.job_manager:submit_suite:34 - ==================================================
+2025-10-21 03:22:21.715 | INFO     | src.experiment.job_manager:submit_suite:35 -   Submission Script: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1/submit_suite.sh
+2025-10-21 03:22:21.715 | INFO     | src.experiment.job_manager:submit_suite:36 -   HPC Run Directory: /scratch/project_2008296/chau/runs/shocktube_phase1
+2025-10-21 03:22:21.716 | INFO     | src.experiment.job_manager:submit_suite:37 -   SLURM Batch Job ID: 5293657
+2025-10-21 03:22:21.716 | INFO     | src.experiment.job_manager:submit_suite:38 -   You can check the status with: python main.py shocktube_phase1 --check
+2025-10-21 03:22:21.716 | INFO     | __main__:main:174 - Auto-check enabled, checking job status...
+2025-10-21 03:22:21.725 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/status/shocktube_phase1/sub_202510210322/status.log
+2025-10-21 03:22:21.726 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/status/shocktube_phase1/sub_202510210322
+2025-10-21 03:22:21.726 | INFO     | src.experiment.job_manager:check_suite_status:63 - --- STATUS CHECK MODE for 'shocktube_phase1' ---
+2025-10-21 03:22:21.729 | INFO     | src.experiment.job_manager:check_suite_status:81 - Querying SLURM for batch job ID: 5293657
+2025-10-21 03:22:21.744 | WARNING  | src.experiment.job_manager:check_suite_status:113 - No active or recent job tasks found for Job ID 5293657.
+2025-10-21 03:22:21.744 | WARNING  | src.experiment.job_manager:check_suite_status:114 - This usually means the job array has completed successfully and is no longer in the recent accounting database.
+2025-10-21 03:22:21.745 | INFO     | src.experiment.job_manager:check_suite_status:135 - --- Job Status Summary ---
+2025-10-21 03:22:21.745 | INFO     | src.experiment.job_manager:check_suite_status:136 -   Total Simulations: 12
+2025-10-21 03:22:21.745 | INFO     | src.experiment.job_manager:check_suite_status:137 -   Completed: 12
+2025-10-21 03:22:21.746 | INFO     | src.experiment.job_manager:check_suite_status:138 -   Failed/Cancelled: 0
+2025-10-21 03:22:21.746 | INFO     | src.experiment.job_manager:check_suite_status:139 -   Running: 0
+2025-10-21 03:22:21.746 | INFO     | src.experiment.job_manager:check_suite_status:140 -   Pending: 0
+2025-10-21 03:22:21.747 | INFO     | __main__:main:178 - Auto-postprocessing enabled.
+2025-10-21 03:22:21.747 | INFO     | __main__:main:179 - Note: Postprocessing should be run after jobs complete.
+2025-10-21 03:22:21.747 | INFO     | __main__:main:180 - To run analysis: python main.py shocktube_phase1 --analyze
+2025-10-21 03:22:21.748 | INFO     | __main__:main:181 - To run visualization: python main.py shocktube_phase1 --viz

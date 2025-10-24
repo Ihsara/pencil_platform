@@ -1,0 +1,108 @@
+/scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_gamma_is_1_nu5p0_chi5p0_diffrho5p0
+1 CPUs
+HOSTNAME = c3202
+USER = tranchau
+Simple Linux Utility for Resource Management (SLURM) job
+SLURM_NODELIST = c3202
+SLURM_TASKS_PER_NODE = 1
+Mahti - CSC, Kajaani, Finland
+Running job: 5311843
+Non-MPI version
+datadir = data
+-- DEBUG CONFIG --
+$mpi            =  <0>
+$ncpus          =  <1>
+$npops          =  <>
+$local_disc     =  <0>
+$one_local_disc =  <0>
+$remote_top     =  <0>
+$local_binary   =  <0>
+$datadir        =  <data>
+$SCRATCH_DIR    =  </scratch/pencil-3970389>
+$hn             =  <c3202.mahti.csc.fi>
+$masterhost     =  <>
+$mpirun         =  <>
+$mpirunops      =  <>
+$mpirunops2     =  <>
+$x_ops          =  <>
+$NODELIST       =  <c3202>
+$SSH            =  <ssh>
+$SCP            =  <scp>
+$PARENT_PID     =  <3970389>
+$copysnapshots  =  <copy-snapshots>
+$particles      =  <0>
+$pointmasses    =  <0>
+--
+Revision: 7f27b5023
+ M python/pencil/read/varfile.py
+Thu Oct 23 15:50:15 EEST 2025
+    src/start.x 
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) 9a97ecc83          
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+SVN: -------            v.         (                   ) $Id$
+ nxgrid, nygrid, nzgrid=         400           1           1
+ WARNING: meshRe3max diagnostic(s) in print.in undefined or multiply defined!
+
+ ------------------------------------------------------
+ W A R N I N G
+ warning_lperi: inconsistency, j=           1 , lperi(j)= F
+ bc=p      p      p      p      p      
+ any(bc=='p'.or. bc=='she'), .not.lperi(j) =  T T
+ any(bcx/='p'.and.bcx/='she'), lperi(j) =  T T
+ check_consistency_of_lperi(run.in): you better stop and check!
+ ------------------------------------------------------
+
+ units_general: unit_velocity=   97781.229948950713     
+ units_general: unit_density=   1.6737235999999999E-024
+ units_general: unit_length=   3.0856775800000002E+021
+ units_general: unit_magnetic=   4.4843790064030054E-007
+ units_eos: unit_temperature=   68.996576501564562     
+ units_eos: cp, lnTT0, cs0, pp0, Rgas=   1.50000000       1.19209282E-07   1.00000000      0.600000083      0.600000024    
+ alpha_fine =   7.2973525643000000E-003
+ sigma_Thomson_cgs =   6.6524587321600003E-025
+ diffusion: nothing (i.e. no mass diffusion)
+ initialize_density: no need to read initial stratification for lanti_shockdiffusion=F.
+ select_eos_variable: Using rho and ss
+ initialize_energy: nheatc_max,iheatcond=           4 nothing                                 nothing                                 nothing                                 nothing                                 
+ heat conduction: nothing
+ init_uu: nothing
+ init_lnrho: initlnrho(1) = xjump
+ init_lnrho: cs2bot,cs2top=   1.00000000       1.00000000    
+ init_energy: initss(1) = xjump
+ Maximum used memory per cpu [MBytes] =     6.973
+ Maximum used memory [MBytes] =        6.973
+
+
+ start.x has completed successfully
+
+0.010u 0.025s 0:00.07 42.8%	0+0k 0+1832io 0pf+0w
+
+Thu Oct 23 15:50:15 EEST 2025

@@ -1,0 +1,10 @@
+2025-10-20 18:22:25.670 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/status/shocktube_phase1/2025-10-20_18-22-25_status.log
+2025-10-20 18:22:25.671 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/status/shocktube_phase1
+2025-10-20 18:22:25.671 | INFO     | src.experiment.job_manager:check_suite_status:63 - --- STATUS CHECK MODE for 'shocktube_phase1' ---
+2025-10-20 18:22:25.672 | INFO     | src.experiment.job_manager:check_suite_status:81 - Querying SLURM for batch job ID: 5292001
+2025-10-20 18:22:25.691 | INFO     | src.experiment.job_manager:check_suite_status:135 - --- Job Status Summary ---
+2025-10-20 18:22:25.691 | INFO     | src.experiment.job_manager:check_suite_status:136 -   Total Simulations: 12
+2025-10-20 18:22:25.691 | INFO     | src.experiment.job_manager:check_suite_status:137 -   Completed: 12
+2025-10-20 18:22:25.692 | INFO     | src.experiment.job_manager:check_suite_status:138 -   Failed/Cancelled: 0
+2025-10-20 18:22:25.692 | INFO     | src.experiment.job_manager:check_suite_status:139 -   Running: 0
+2025-10-20 18:22:25.692 | INFO     | src.experiment.job_manager:check_suite_status:140 -   Pending: 0

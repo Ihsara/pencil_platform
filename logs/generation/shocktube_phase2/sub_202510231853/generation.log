@@ -1,0 +1,46 @@
+2025-10-23 18:53:09.171 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/generation/shocktube_phase2/sub_202510231853/generation.log
+2025-10-23 18:53:09.172 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/generation/shocktube_phase2/sub_202510231853
+2025-10-23 18:53:09.172 | INFO     | src.experiment.generator:run_suite:104 - Loading experiment plan from: /scratch/project_2008296/chau/pencil_platform/config/shocktube_phase2/plan/sweep.yaml
+2025-10-23 18:53:09.306 | INFO     | src.experiment.generator:run_suite:110 - Loaded 7 config file(s) from base experiment 'shocktube_base'
+2025-10-23 18:53:09.418 | INFO     | src.experiment.generator:run_suite:118 - Loaded 7 config file(s) from specific experiment 'shocktube_phase2'
+2025-10-23 18:53:09.418 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'video_in.yaml': base + specific overrides
+2025-10-23 18:53:09.418 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'run_in.yaml': base + specific overrides
+2025-10-23 18:53:09.418 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'print_in.yaml': base + specific overrides
+2025-10-23 18:53:09.419 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'start_in.yaml': base + specific overrides
+2025-10-23 18:53:09.419 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'Makefile_local.yaml': base + specific overrides
+2025-10-23 18:53:09.420 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'yzaver_in.yaml': base + specific overrides
+2025-10-23 18:53:09.421 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'cparam_local.yaml': base + specific overrides
+2025-10-23 18:53:09.466 | INFO     | src.experiment.generator:run_suite:232 - Removing existing experiment directory: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2
+2025-10-23 18:53:10.331 | SUCCESS  | src.experiment.generator:run_suite:241 - Generated config files for 24 run(s) in '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2/generated_configs'
+2025-10-23 18:53:10.333 | SUCCESS  | src.experiment.generator:run_suite:245 - Generated run manifest at '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2/run_manifest.txt'
+2025-10-23 18:53:10.339 | SUCCESS  | src.experiment.generator:run_suite:260 - Generated submission script at '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2/submit_suite.sh'
+2025-10-23 18:53:10.339 | INFO     | src.experiment.generator:run_suite:261 - --- Experiment Summary ---
+Total Simulations to Generate: 24
+2025-10-23 18:53:10.348 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/submission/shocktube_phase2/sub_202510231853/submission.log
+2025-10-23 18:53:10.349 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/submission/shocktube_phase2/sub_202510231853
+2025-10-23 18:53:10.349 | INFO     | src.experiment.job_manager:submit_suite:21 - Attempting to submit job to SLURM...
+2025-10-23 18:53:10.376 | INFO     | src.experiment.job_manager:submit_suite:33 - ==================================================
+2025-10-23 18:53:10.377 | INFO     | src.experiment.job_manager:submit_suite:34 -            JOB SUBMITTED SUCCESSFULLY
+2025-10-23 18:53:10.377 | INFO     | src.experiment.job_manager:submit_suite:35 - ==================================================
+2025-10-23 18:53:10.377 | INFO     | src.experiment.job_manager:submit_suite:36 -   Submission Script: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2/submit_suite.sh
+2025-10-23 18:53:10.377 | INFO     | src.experiment.job_manager:submit_suite:37 -   HPC Run Directory: /scratch/project_2008296/chau/runs/shocktube_phase2
+2025-10-23 18:53:10.378 | INFO     | src.experiment.job_manager:submit_suite:38 -   SLURM Batch Job ID: 5312827
+2025-10-23 18:53:10.378 | INFO     | src.experiment.job_manager:submit_suite:39 -   You can check the status with: python main.py shocktube_phase2 --check
+2025-10-23 18:53:10.379 | INFO     | __main__:main:198 - Auto-check enabled, checking job status...
+2025-10-23 18:53:10.387 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/status/shocktube_phase2/sub_202510231853/status.log
+2025-10-23 18:53:10.388 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/status/shocktube_phase2/sub_202510231853
+2025-10-23 18:53:10.389 | INFO     | src.experiment.job_manager:check_suite_status:66 - --- STATUS CHECK MODE for 'shocktube_phase2' ---
+2025-10-23 18:53:10.391 | INFO     | src.experiment.job_manager:check_suite_status:85 - Querying SLURM for batch job ID: 5312827
+2025-10-23 18:53:10.428 | INFO     | src.experiment.job_manager:check_suite_status:123 - Job 5312827 is queued or just starting (not yet in sacct)
+2025-10-23 18:53:10.429 | INFO     | src.experiment.job_manager:check_suite_status:154 - --- Job Status Summary ---
+2025-10-23 18:53:10.429 | INFO     | src.experiment.job_manager:check_suite_status:155 -   Total Simulations: 24
+2025-10-23 18:53:10.429 | INFO     | src.experiment.job_manager:check_suite_status:156 -   Completed: 0
+2025-10-23 18:53:10.430 | INFO     | src.experiment.job_manager:check_suite_status:157 -   Failed/Cancelled: 0
+2025-10-23 18:53:10.430 | INFO     | src.experiment.job_manager:check_suite_status:158 -   Running: 0
+2025-10-23 18:53:10.431 | INFO     | src.experiment.job_manager:check_suite_status:159 -   Pending: 24
+2025-10-23 18:53:10.431 | INFO     | __main__:main:203 - Waiting for job completion...
+2025-10-23 18:53:10.432 | INFO     | __main__:main:205 - (Use Ctrl+C to exit, then run with --monitor to check progress)
+2025-10-23 18:55:16.130 | INFO     | src.experiment.job_manager:monitor_job_progress:364 - Found 24 job ID(s) with 24 total array task(s)
+2025-10-23 18:56:17.048 | INFO     | src.experiment.job_manager:monitor_job_progress:364 - Found 24 job ID(s) with 24 total array task(s)
+2025-10-23 18:56:17.848 | SUCCESS  | src.experiment.job_manager:wait_for_completion:574 - Job array completed successfully!
+2025-10-23 18:56:17.848 | SUCCESS  | __main__:main:212 - Job completed!

@@ -1,0 +1,45 @@
+2025-10-15 23:31:32.342 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/generation/shocktube_phase2/2025-10-15_23-31-32_generation.log
+2025-10-15 23:31:32.343 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/generation/shocktube_phase2
+2025-10-15 23:31:32.343 | INFO     | src.experiment.generator:run_suite:104 - Loading experiment plan from: /scratch/project_2008296/chau/pencil_platform/config/shocktube_phase2/plan/sweep.yaml
+2025-10-15 23:31:32.361 | INFO     | src.experiment.generator:run_suite:110 - Loaded 7 config file(s) from base experiment 'shocktube_base'
+2025-10-15 23:31:32.445 | INFO     | src.experiment.generator:run_suite:118 - Loaded 7 config file(s) from specific experiment 'shocktube_phase2'
+2025-10-15 23:31:32.445 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'video_in.yaml': base + specific overrides
+2025-10-15 23:31:32.445 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'run_in.yaml': base + specific overrides
+2025-10-15 23:31:32.445 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'print_in.yaml': base + specific overrides
+2025-10-15 23:31:32.446 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'start_in.yaml': base + specific overrides
+2025-10-15 23:31:32.446 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'Makefile_local.yaml': base + specific overrides
+2025-10-15 23:31:32.447 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'yzaver_in.yaml': base + specific overrides
+2025-10-15 23:31:32.447 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'cparam_local.yaml': base + specific overrides
+2025-10-15 23:31:32.478 | INFO     | src.experiment.generator:run_suite:197 - Removing existing experiment directory: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2
+2025-10-15 23:31:33.180 | SUCCESS  | src.experiment.generator:run_suite:206 - Generated config files for 24 run(s) in '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2/generated_configs'
+2025-10-15 23:31:33.182 | SUCCESS  | src.experiment.generator:run_suite:210 - Generated run manifest at '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2/run_manifest.txt'
+2025-10-15 23:31:33.188 | SUCCESS  | src.experiment.generator:run_suite:225 - Generated submission script at '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2/submit_suite.sh'
+2025-10-15 23:31:33.189 | INFO     | src.experiment.generator:run_suite:226 - --- Experiment Summary ---
+Total Simulations to Generate: 24
+2025-10-15 23:31:33.197 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/submission/shocktube_phase2/2025-10-15_23-31-33_submission.log
+2025-10-15 23:31:33.198 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/submission/shocktube_phase2
+2025-10-15 23:31:33.198 | INFO     | src.experiment.job_manager:submit_suite:20 - Attempting to submit job to SLURM...
+2025-10-15 23:31:33.225 | INFO     | src.experiment.job_manager:submit_suite:32 - ==================================================
+2025-10-15 23:31:33.225 | INFO     | src.experiment.job_manager:submit_suite:33 -            JOB SUBMITTED SUCCESSFULLY
+2025-10-15 23:31:33.225 | INFO     | src.experiment.job_manager:submit_suite:34 - ==================================================
+2025-10-15 23:31:33.225 | INFO     | src.experiment.job_manager:submit_suite:35 -   Submission Script: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase2/submit_suite.sh
+2025-10-15 23:31:33.226 | INFO     | src.experiment.job_manager:submit_suite:36 -   HPC Run Directory: /scratch/project_2008296/chau/runs/shocktube_phase2
+2025-10-15 23:31:33.226 | INFO     | src.experiment.job_manager:submit_suite:37 -   SLURM Batch Job ID: 5254319
+2025-10-15 23:31:33.226 | INFO     | src.experiment.job_manager:submit_suite:38 -   You can check the status with: python main.py shocktube_phase2 --check
+2025-10-15 23:31:33.227 | INFO     | __main__:main:170 - Auto-check enabled, checking job status...
+2025-10-15 23:31:33.236 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/status/shocktube_phase2/2025-10-15_23-31-33_status.log
+2025-10-15 23:31:33.236 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/status/shocktube_phase2
+2025-10-15 23:31:33.237 | INFO     | src.experiment.job_manager:check_suite_status:63 - --- STATUS CHECK MODE for 'shocktube_phase2' ---
+2025-10-15 23:31:33.239 | INFO     | src.experiment.job_manager:check_suite_status:81 - Querying SLURM for batch job ID: 5254319
+2025-10-15 23:31:33.252 | WARNING  | src.experiment.job_manager:check_suite_status:113 - No active or recent job tasks found for Job ID 5254319.
+2025-10-15 23:31:33.253 | WARNING  | src.experiment.job_manager:check_suite_status:114 - This usually means the job array has completed successfully and is no longer in the recent accounting database.
+2025-10-15 23:31:33.253 | INFO     | src.experiment.job_manager:check_suite_status:135 - --- Job Status Summary ---
+2025-10-15 23:31:33.253 | INFO     | src.experiment.job_manager:check_suite_status:136 -   Total Simulations: 24
+2025-10-15 23:31:33.254 | INFO     | src.experiment.job_manager:check_suite_status:137 -   Completed: 24
+2025-10-15 23:31:33.255 | INFO     | src.experiment.job_manager:check_suite_status:138 -   Failed/Cancelled: 0
+2025-10-15 23:31:33.255 | INFO     | src.experiment.job_manager:check_suite_status:139 -   Running: 0
+2025-10-15 23:31:33.256 | INFO     | src.experiment.job_manager:check_suite_status:140 -   Pending: 0
+2025-10-15 23:31:33.256 | INFO     | __main__:main:174 - Auto-postprocessing enabled.
+2025-10-15 23:31:33.257 | INFO     | __main__:main:175 - Note: Postprocessing should be run after jobs complete.
+2025-10-15 23:31:33.257 | INFO     | __main__:main:176 - To run analysis: python main.py shocktube_phase2 --analyze
+2025-10-15 23:31:33.257 | INFO     | __main__:main:177 - To run visualization: python main.py shocktube_phase2 --viz

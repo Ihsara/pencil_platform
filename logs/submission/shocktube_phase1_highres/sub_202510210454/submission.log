@@ -1,0 +1,26 @@
+2025-10-21 04:54:39.460 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/submission/shocktube_phase1_highres/sub_202510210454/submission.log
+2025-10-21 04:54:39.461 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/submission/shocktube_phase1_highres/sub_202510210454
+2025-10-21 04:54:39.461 | INFO     | src.experiment.job_manager:submit_suite:20 - Attempting to submit job to SLURM...
+2025-10-21 04:54:39.493 | INFO     | src.experiment.job_manager:submit_suite:32 - ==================================================
+2025-10-21 04:54:39.493 | INFO     | src.experiment.job_manager:submit_suite:33 -            JOB SUBMITTED SUCCESSFULLY
+2025-10-21 04:54:39.493 | INFO     | src.experiment.job_manager:submit_suite:34 - ==================================================
+2025-10-21 04:54:39.493 | INFO     | src.experiment.job_manager:submit_suite:35 -   Submission Script: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1_highres/submit_suite.sh
+2025-10-21 04:54:39.494 | INFO     | src.experiment.job_manager:submit_suite:36 -   HPC Run Directory: /scratch/project_2008296/chau/runs/shocktube_phase1_highres
+2025-10-21 04:54:39.494 | INFO     | src.experiment.job_manager:submit_suite:37 -   SLURM Batch Job ID: 5293961
+2025-10-21 04:54:39.494 | INFO     | src.experiment.job_manager:submit_suite:38 -   You can check the status with: python main.py shocktube_phase1_highres --check
+2025-10-21 04:54:39.494 | INFO     | __main__:main:180 - Auto-check enabled, checking job status...
+2025-10-21 04:54:39.503 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/status/shocktube_phase1_highres/sub_202510210454/status.log
+2025-10-21 04:54:39.504 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/status/shocktube_phase1_highres/sub_202510210454
+2025-10-21 04:54:39.504 | INFO     | src.experiment.job_manager:check_suite_status:65 - --- STATUS CHECK MODE for 'shocktube_phase1_highres' ---
+2025-10-21 04:54:39.507 | INFO     | src.experiment.job_manager:check_suite_status:84 - Querying SLURM for batch job ID: 5293961
+2025-10-21 04:54:39.545 | INFO     | src.experiment.job_manager:check_suite_status:122 - Job 5293961 is queued or just starting (not yet in sacct)
+2025-10-21 04:54:39.545 | INFO     | src.experiment.job_manager:check_suite_status:153 - --- Job Status Summary ---
+2025-10-21 04:54:39.545 | INFO     | src.experiment.job_manager:check_suite_status:154 -   Total Simulations: 12
+2025-10-21 04:54:39.546 | INFO     | src.experiment.job_manager:check_suite_status:155 -   Completed: 0
+2025-10-21 04:54:39.546 | INFO     | src.experiment.job_manager:check_suite_status:156 -   Failed/Cancelled: 0
+2025-10-21 04:54:39.546 | INFO     | src.experiment.job_manager:check_suite_status:157 -   Running: 0
+2025-10-21 04:54:39.547 | INFO     | src.experiment.job_manager:check_suite_status:158 -   Pending: 12
+2025-10-21 04:54:39.547 | INFO     | __main__:main:185 - Waiting for job completion...
+2025-10-21 04:54:39.547 | INFO     | __main__:main:187 - (Use Ctrl+C to exit, then run with --monitor to check progress)
+2025-10-21 04:56:45.555 | WARNING  | src.experiment.job_manager:wait_for_completion:552 - Job array completed with 12 failures
+2025-10-21 04:56:45.555 | ERROR    | __main__:main:196 - Job did not complete successfully

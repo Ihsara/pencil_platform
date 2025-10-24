@@ -1,0 +1,540 @@
+2025-10-24 15:22:26.198 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/analysis/shocktube_phase1/sub_202510241522/analysis.log
+2025-10-24 15:22:26.199 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/analysis/shocktube_phase1/sub_202510241522
+2025-10-24 15:22:26.199 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:231 - ================================================================================
+2025-10-24 15:22:26.199 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:232 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase1'
+2025-10-24 15:22:26.199 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:234 - Combined error video generation ENABLED.
+2025-10-24 15:22:26.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:235 - ================================================================================
+2025-10-24 15:22:26.207 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:246 - Error analysis configuration:
+2025-10-24 15:22:26.207 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:247 -   ├─ Metrics to calculate: L1
+2025-10-24 15:22:26.207 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:248 -   └─ Combine in videos: True
+2025-10-24 15:22:26.208 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:263 - Clearing old visualization directories...
+2025-10-24 15:22:26.208 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution
+2025-10-24 15:22:26.211 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution
+2025-10-24 15:22:26.213 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/frames
+2025-10-24 15:22:26.215 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:272 - Total experiments to process: 2
+2025-10-24 15:22:26.215 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:291 - 
+================================================================================
+2025-10-24 15:22:26.215 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:292 - PHASE 1: Loading data and creating individual videos
+2025-10-24 15:22:26.215 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:293 - ================================================================================
+2025-10-24 15:22:26.216 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:303 - 
+📂 Processing branch: massfix_default_gamma (2 runs)
+2025-10-24 15:22:26.216 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:310 -   ├─ [1/2] (50.0%) | Branch: [1/2] (50.0%) | Run: res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-24 15:22:26.218 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:93 - Loading all 101 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-24 15:28:33.654 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 101 timesteps using method: absolute
+2025-10-24 15:28:33.657 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:341 -      ├─ Creating var evolution video and frames...
+2025-10-24 15:28:33.865 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:33.873 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-24 15:28:33.874 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 101 individual frames...
+2025-10-24 15:28:33.897 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:35.325 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:36.463 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:37.730 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:38.864 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:40.004 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:41.286 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:42.412 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:43.532 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:44.818 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:45.945 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:47.071 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:48.199 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:49.508 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:50.630 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:51.754 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:53.038 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:54.172 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:55.296 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:56.585 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:57.711 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:28:58.837 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:00.136 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:01.265 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:02.394 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:03.533 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:04.863 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:05.997 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:07.132 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:08.436 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:09.598 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:10.767 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:12.118 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:13.258 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:14.396 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:15.536 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:16.868 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:18.005 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:19.163 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:20.471 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:21.610 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:22.759 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:24.090 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:25.244 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:26.402 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:27.601 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:28.968 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:30.128 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:31.291 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:32.643 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:33.853 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:35.086 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:36.420 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:37.564 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:38.714 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:39.854 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:41.198 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:42.354 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:43.505 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:44.821 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:45.968 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:47.133 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:48.474 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:49.613 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:50.758 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:51.919 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:53.262 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:54.421 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:55.584 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:56.903 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:58.067 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:29:59.223 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:00.566 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:01.728 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:02.904 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:04.098 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:05.518 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:06.685 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:07.839 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:09.188 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:10.343 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:11.508 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:12.855 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:14.012 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:15.188 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:16.344 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:17.725 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:18.884 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:20.034 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:21.380 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:22.540 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:23.698 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:25.021 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:26.170 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:27.340 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:28.528 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:29.897 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:31.084 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:32.231 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:33.551 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:34.706 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:30:35.828 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 101 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-24 15:31:36.895 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1_var_evolution.gif
+2025-10-24 15:31:36.896 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:347 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-24 15:31:36.896 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:368 -      ├─ Creating single error evolution video and frames...
+2025-10-24 15:31:36.897 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-24 15:31:36.935 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:36.943 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-24 15:31:36.944 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 101 spatial error evolution frames...
+2025-10-24 15:31:36.968 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:38.040 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:38.791 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:39.549 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:40.311 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:41.076 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:41.842 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:42.609 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:43.367 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:44.503 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:45.284 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:46.069 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:46.849 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:47.624 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:48.403 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:49.179 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:49.958 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:50.725 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:51.782 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:52.573 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:53.344 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:54.111 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:54.888 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:55.654 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:56.439 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:57.200 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:58.139 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:58.912 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:31:59.661 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:00.412 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:01.181 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:01.952 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:02.710 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:03.465 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:04.225 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:05.201 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:05.966 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:06.730 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:07.499 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:08.266 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:09.025 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:09.788 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:10.550 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:11.492 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:12.259 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:13.021 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:13.784 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:14.546 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:15.298 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:16.055 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:16.815 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:17.565 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:18.495 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:19.244 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:19.977 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:20.714 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:21.454 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:22.176 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:22.895 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:23.628 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:24.542 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:25.277 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:26.018 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:26.749 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:27.487 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:28.218 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:28.948 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:29.677 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:30.393 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:31.328 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:32.067 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:32.803 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:33.540 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:34.272 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:35.005 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:35.737 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:36.477 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:37.433 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:38.166 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:38.892 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:39.623 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:40.356 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:41.088 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:41.812 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:42.538 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:43.276 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:44.244 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:45.132 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:45.904 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:46.670 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:47.408 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:48.134 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:48.870 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:49.648 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:50.431 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:51.419 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:52.163 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:52.919 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:53.691 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:54.453 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:55.225 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1'
+2025-10-24 15:32:55.983 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 101 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1
+2025-10-24 15:33:55.938 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1_error_evolution.gif
+2025-10-24 15:33:55.939 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:373 -      └─ ✓ Created error evolution video
+2025-10-24 15:33:55.939 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:310 -   ├─ [2/2] (100.0%) | Branch: [2/2] (100.0%) | Run: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-24 15:33:55.941 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:93 - Loading all 101 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase1/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-24 15:40:07.927 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 101 timesteps using method: absolute
+2025-10-24 15:40:07.929 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:341 -      ├─ Creating var evolution video and frames...
+2025-10-24 15:40:07.972 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:07.980 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-24 15:40:07.981 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 101 individual frames...
+2025-10-24 15:40:08.006 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:09.131 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:10.393 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:11.529 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:12.676 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:13.820 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:15.161 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:16.302 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:17.431 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:18.746 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:19.904 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:21.040 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:22.358 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:23.501 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:24.640 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:25.783 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:27.123 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:28.266 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:29.400 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:30.721 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:31.867 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:33.076 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:34.637 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:35.846 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:37.082 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:38.301 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:39.875 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:41.069 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:42.271 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:43.815 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:45.008 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:46.215 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:47.773 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:48.980 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:50.183 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:51.408 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:52.964 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:54.173 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:55.378 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:56.962 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:58.161 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:40:59.357 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:00.912 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:02.114 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:03.309 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:04.850 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:06.055 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:07.252 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:08.454 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:10.030 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:11.222 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:12.423 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:13.956 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:15.155 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:16.357 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:17.890 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:19.101 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:20.301 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:21.502 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:23.091 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:24.288 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:25.496 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:27.048 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:28.249 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:29.443 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:31.041 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:32.295 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:33.489 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:34.692 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:36.268 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:37.465 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:38.668 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:40.199 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:41.396 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:42.603 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:44.142 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:45.341 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:46.541 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:47.742 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:49.328 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:50.531 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:51.731 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:53.271 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:54.474 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:55.676 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:57.224 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:58.431 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:41:59.631 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:00.835 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:02.428 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:03.628 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:04.834 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:06.379 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:07.580 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:08.788 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:10.332 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:11.536 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:12.746 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:13.946 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:15.534 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:16.741 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:42:17.915 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 101 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/frames/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-24 15:43:20.578 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/var/evolution/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5_var_evolution.gif
+2025-10-24 15:43:20.579 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:347 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-24 15:43:20.579 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:368 -      ├─ Creating single error evolution video and frames...
+2025-10-24 15:43:20.580 | WARNING  | src.visualization.videos:create_error_evolution_video:294 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-24 15:43:21.150 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:21.158 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-24 15:43:21.159 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 101 spatial error evolution frames...
+2025-10-24 15:43:21.183 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:21.928 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:22.680 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:23.424 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:24.175 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:24.934 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:25.686 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:26.436 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:27.203 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:28.292 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:29.041 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:29.785 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:30.531 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:31.283 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:32.027 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:32.777 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:33.533 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:34.627 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:35.377 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:36.123 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:36.876 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:37.624 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:38.370 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:39.124 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:39.869 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:40.613 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:41.737 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:42.503 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:43.280 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:44.065 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:44.850 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:45.621 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:46.397 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:47.145 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:48.069 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:48.779 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:49.491 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:50.224 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:50.932 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:51.640 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:52.350 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:53.058 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:53.766 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:54.705 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:55.435 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:56.141 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:56.887 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:57.651 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:58.396 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:59.135 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:43:59.843 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:00.738 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:01.444 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:02.183 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:02.946 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:03.698 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:04.450 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:05.204 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:05.962 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:06.719 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:07.849 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:08.602 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:09.359 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:10.111 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:10.863 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:11.630 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:12.408 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:13.162 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:14.273 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:15.027 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:15.777 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:16.529 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:17.282 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:18.030 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:18.776 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:19.551 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:20.303 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:21.435 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:22.185 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:22.932 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:23.685 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:24.434 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:25.191 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:25.937 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:26.683 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:27.435 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:28.542 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:29.292 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:30.040 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:30.790 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:31.540 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:32.302 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:33.086 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:33.860 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:35.040 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:35.822 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:36.615 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:37.404 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:38.183 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:38.968 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:39.744 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:44:40.477 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 101 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/error_frames/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5
+2025-10-24 15:45:42.345 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5_error_evolution.gif
+2025-10-24 15:45:42.346 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:373 -      └─ ✓ Created error evolution video
+2025-10-24 15:45:42.346 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:379 - 
+================================================================================
+2025-10-24 15:45:42.346 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:380 - PHASE 2: Creating overlay videos
+2025-10-24 15:45:42.347 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:381 - ================================================================================
+2025-10-24 15:45:42.348 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:398 -   res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1: avg L2 error (rho only) = 3.359428e-02
+2025-10-24 15:45:42.350 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:398 -   res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5: avg L2 error (rho only) = 3.329963e-02
+2025-10-24 15:45:42.350 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:401 - 
+🏆 Finding best performers in each branch...
+2025-10-24 15:45:42.350 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:411 -   ├─ massfix_default_gamma: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5 (L2=3.329963e-02)
+2025-10-24 15:45:42.351 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:414 - 
+🎬 Creating branch overlay videos...
+2025-10-24 15:45:42.352 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:419 -   ├─ Branch: massfix_default_gamma (2 runs)
+2025-10-24 15:45:42.353 | WARNING  | src.visualization.videos:create_overlay_error_evolution_video:603 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-24 15:46:52.026 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/shocktube_phase1_massfix_default_gamma_overlay_error_evolution.gif
+2025-10-24 15:46:52.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:440 -      └─ ✓ Created overlay for massfix_default_gamma
+2025-10-24 15:46:52.201 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:443 - 
+🏆 Finding top 3 best performers overall...
+2025-10-24 15:46:52.201 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:448 -   ├─ #1: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5 (L2=3.329963e-02)
+2025-10-24 15:46:52.202 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:448 -   ├─ #2: res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1 (L2=3.359428e-02)
+2025-10-24 15:46:52.202 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:451 - 
+🎬 Creating top 3 overlay video...
+2025-10-24 15:46:52.203 | WARNING  | src.visualization.videos:create_overlay_error_evolution_video:603 - Invalid unit_length value (3.08567758e+21). Using 1.0 instead.
+2025-10-24 15:48:03.979 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/evolution/shocktube_phase1_top3_best_performers_overlay_error_evolution.gif
+2025-10-24 15:48:04.125 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:471 -      └─ ✓ Created top 3 overlay video
+2025-10-24 15:48:04.126 | INFO     | src.analysis.organizer:create_structure:61 - Creating organized folder structure...
+2025-10-24 15:48:04.128 | SUCCESS  | src.analysis.organizer:create_structure:72 - ✓ Created organized folder structure
+2025-10-24 15:48:04.128 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:482 - 
+================================================================================
+2025-10-24 15:48:04.128 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:483 - PHASE 3: Calculating error norms
+2025-10-24 15:48:04.128 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:484 - ================================================================================
+2025-10-24 15:48:04.128 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:491 - Clearing old error norm directories...
+2025-10-24 15:48:04.128 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase1/error/norms
+2025-10-24 15:48:04.135 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:497 - Calculating error norms for 2 runs...
+2025-10-24 15:48:04.135 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:503 -   ├─ res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1: calculating L1...
+2025-10-24 15:48:04.135 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 101 timesteps
+2025-10-24 15:48:04.144 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:503 -   ├─ res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5: calculating L1...
+2025-10-24 15:48:04.144 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 101 timesteps
+2025-10-24 15:48:04.152 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:514 - 
+Calculating combined scores (using DENSITY only)...
+2025-10-24 15:48:04.153 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:553 - 
+================================================================================
+2025-10-24 15:48:04.153 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:554 - PHASE 4: Creating error norm visualizations
+2025-10-24 15:48:04.153 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:555 - ================================================================================
+2025-10-24 15:48:04.154 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:557 -   ├─ Combined scores comparison...
+2025-10-24 15:48:05.451 | INFO     | src.visualization.plots:create_combined_scores_plot:137 -        └─ Saved to shocktube_phase1_combined_scores.png
+2025-10-24 15:48:05.451 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:560 -   ├─ Per-metric comparisons...
+2025-10-24 15:48:08.259 | INFO     | src.visualization.plots:create_per_metric_plots:184 -        └─ Saved L1 comparison to shocktube_phase1_l1_comparison.png
+2025-10-24 15:48:08.260 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:563 -   ├─ Top 5 detailed view...
+2025-10-24 15:48:09.837 | INFO     | src.visualization.plots:create_best_performers_plot:231 -        └─ Saved top 5 detailed comparison to shocktube_phase1_top5_detailed.png
+2025-10-24 15:48:09.838 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:566 -   ├─ Branch comparison...
+2025-10-24 15:48:09.849 | DEBUG    | src.experiment.naming:decode_experiment_name:224 - Using legacy hardcoded decoder for 'res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5'
+2025-10-24 15:48:10.324 | INFO     | src.visualization.plots:create_branch_comparison_plot:272 -        └─ Saved branch comparison to shocktube_phase1_branch_best.png
+2025-10-24 15:48:10.324 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:569 -   └─ Error evolution plots...
+2025-10-24 15:48:12.198 | INFO     | src.visualization.plots:create_error_evolution_plots:314 -        └─ Saved L1 evolution to shocktube_phase1_top3_l1_evolution.png
+2025-10-24 15:48:12.198 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:575 - 
+================================================================================
+2025-10-24 15:48:12.198 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:576 - PHASE 5: Generating reports
+2025-10-24 15:48:12.198 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:577 - ================================================================================
+2025-10-24 15:48:12.202 | INFO     | src.workflows.analysis_pipeline:save_error_norms_summary:920 -        ├─ Saved JSON summary to shocktube_phase1_error_norms_summary.json
+2025-10-24 15:48:12.203 | INFO     | src.workflows.analysis_pipeline:save_error_norms_summary:921 -        └─ Saved Markdown report to shocktube_phase1_error_norms_summary.md
+2025-10-24 15:48:12.203 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:585 - 
+================================================================================
+2025-10-24 15:48:12.203 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:586 - PHASE 6: Populating best performers folders
+2025-10-24 15:48:12.203 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:587 - ================================================================================
+2025-10-24 15:48:12.203 | INFO     | src.analysis.organizer:populate_best_performers:168 - Populating best performers (top 3 for each metric)...
+2025-10-24 15:48:12.203 | INFO     | src.analysis.organizer:create_best_performers_structure:132 - Creating best performers structure...
+2025-10-24 15:48:12.204 | SUCCESS  | src.analysis.organizer:create_best_performers_structure:147 - ✓ Created best performers folder structure
+2025-10-24 15:48:12.204 | INFO     | src.analysis.organizer:populate_best_performers:177 -   ├─ Processing L1 metric...
+2025-10-24 15:48:12.204 | INFO     | src.analysis.organizer:populate_best_performers:197 -      ├─ #1: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5 (score: 4.905032e-02)
+2025-10-24 15:48:12.227 | INFO     | src.analysis.organizer:populate_best_performers:197 -      ├─ #2: res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1 (score: 5.153381e-02)
+2025-10-24 15:48:12.266 | INFO     | src.analysis.organizer:populate_best_performers:213 -      └─ ✓ Copied top 2 performers for L1
+2025-10-24 15:48:12.267 | INFO     | src.analysis.organizer:populate_best_performers:216 -   ├─ Processing Combined scores...
+2025-10-24 15:48:12.267 | INFO     | src.analysis.organizer:populate_best_performers:222 -      ├─ #1: res400_nohyper_massfix_default_gamma_nu0p5_chi0p5_diffrho0p5 (score: 4.905032e-02)
+2025-10-24 15:48:12.288 | INFO     | src.analysis.organizer:populate_best_performers:222 -      ├─ #2: res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1 (score: 5.153381e-02)
+2025-10-24 15:48:12.310 | INFO     | src.analysis.organizer:populate_best_performers:238 -      └─ ✓ Copied top 2 performers for Combined
+2025-10-24 15:48:12.313 | SUCCESS  | src.analysis.organizer:populate_best_performers:244 - ✓ Best performers populated
+2025-10-24 15:48:12.313 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:596 - 
+================================================================================
+2025-10-24 15:48:12.313 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:597 - FINAL SUMMARY
+2025-10-24 15:48:12.313 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:598 - ================================================================================

@@ -1,0 +1,22 @@
+2025-10-24 02:34:16.399 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/analysis/shocktube_phase2/sub_202510240234/analysis.log
+2025-10-24 02:34:16.399 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/analysis/shocktube_phase2/sub_202510240234
+2025-10-24 02:34:16.399 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:243 - ================================================================================
+2025-10-24 02:34:16.399 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:244 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase2'
+2025-10-24 02:34:16.399 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:246 - Combined error video generation ENABLED.
+2025-10-24 02:34:16.400 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:247 - ================================================================================
+2025-10-24 02:34:16.407 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:258 - Error analysis configuration:
+2025-10-24 02:34:16.407 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:259 -   ├─ Metrics to calculate: L1
+2025-10-24 02:34:16.407 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:260 -   └─ Combine in videos: True
+2025-10-24 02:34:16.408 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:275 - Clearing old visualization directories...
+2025-10-24 02:34:16.408 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution
+2025-10-24 02:34:16.428 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution
+2025-10-24 02:34:16.449 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/frames
+2025-10-24 02:34:16.451 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:284 - Total experiments to process: 24
+2025-10-24 02:34:16.451 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:303 - 
+================================================================================
+2025-10-24 02:34:16.451 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:304 - PHASE 1: Loading data and creating individual videos
+2025-10-24 02:34:16.451 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:305 - ================================================================================
+2025-10-24 02:34:16.452 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:315 - 
+📂 Processing branch: r1_nu0.5_dg (8 runs)
+2025-10-24 02:34:16.452 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:322 -   ├─ [1/24] (4.2%) | Branch: [1/8] (12.5%) | Run: res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg
+2025-10-24 02:34:16.455 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 36 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg

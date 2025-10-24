@@ -1,0 +1,55 @@
+2025-10-24 15:05:12.211 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/analysis/shocktube_phase2/sub_202510241505/analysis.log
+2025-10-24 15:05:12.212 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/analysis/shocktube_phase2/sub_202510241505
+2025-10-24 15:05:12.212 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:231 - ================================================================================
+2025-10-24 15:05:12.212 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:232 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase2'
+2025-10-24 15:05:12.213 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:234 - Combined error video generation ENABLED.
+2025-10-24 15:05:12.213 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:235 - ================================================================================
+2025-10-24 15:05:12.232 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:246 - Error analysis configuration:
+2025-10-24 15:05:12.232 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:247 -   ├─ Metrics to calculate: L1
+2025-10-24 15:05:12.232 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:248 -   └─ Combine in videos: True
+2025-10-24 15:05:12.232 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:263 - Clearing old visualization directories...
+2025-10-24 15:05:12.233 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution
+2025-10-24 15:05:12.261 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution
+2025-10-24 15:05:12.292 | INFO     | src.workflows.analysis_pipeline:clear_directory:56 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/frames
+2025-10-24 15:05:12.321 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:272 - Total experiments to process: 24
+2025-10-24 15:05:12.321 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:291 - 
+================================================================================
+2025-10-24 15:05:12.321 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:292 - PHASE 1: Loading data and creating individual videos
+2025-10-24 15:05:12.321 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:293 - ================================================================================
+2025-10-24 15:05:12.322 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:303 - 
+📂 Processing branch: r1_nu0.5_dg (8 runs)
+2025-10-24 15:05:12.322 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:310 -   ├─ [1/24] (4.2%) | Branch: [1/8] (12.5%) | Run: res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg
+2025-10-24 15:05:12.325 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:93 - Loading all 36 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg
+2025-10-24 15:07:24.052 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 36 timesteps using method: absolute
+2025-10-24 15:07:24.074 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:341 -      ├─ Creating var evolution video and frames...
+2025-10-24 15:07:24.320 | ERROR    | __main__:main:225 - An unexpected error occurred: all the input arrays must have same number of dimensions, but the array at index 0 has 3 dimension(s) and the array at index 1 has 1 dimension(s)
+Traceback (most recent call last):
+
+  File "/scratch/project_2008296/chau/pencil_platform/main.py", line 229, in <module>
+    main()
+    └ <function main at 0x7fa166e35440>
+
+> File "/scratch/project_2008296/chau/pencil_platform/main.py", line 129, in main
+    analyze_suite_videos_only(experiment_name, combined_video=True)
+    │                         └ 'shocktube_phase2'
+    └ <function analyze_suite_videos_only at 0x7fa166e34c20>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/workflows/analysis_pipeline.py", line 342, in analyze_suite_videos_only
+    create_var_evolution_video(
+    └ <function create_var_evolution_video at 0x7fa167b89620>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/visualization/videos.py", line 92, in create_var_evolution_video
+    all_vals = np.concatenate([np.concatenate(all_sim_vals), np.concatenate(all_anal_vals)])
+               │  │            │  │           │              │  │           └ [array([1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   ,
+               │  │            │  │           │              │  │                    1.   , 1.   , 1.   , 1.   , 1.   , 1.   , 1.   ...
+               │  │            │  │           │              │  └ <function concatenate at 0x7fa1a783c930>
+               │  │            │  │           │              └ <module 'numpy' from '/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/__init__.py'>
+               │  │            │  │           └ [array([[[0.125, 0.125, 0.125, ..., 1.   , 1.   , 1.   ],
+               │  │            │  │                     [0.125, 0.125, 0.125, ..., 1.   , 1.   , 1.   ],
+               │  │            │  │                     [0...
+               │  │            │  └ <function concatenate at 0x7fa1a783c930>
+               │  │            └ <module 'numpy' from '/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/__init__.py'>
+               │  └ <function concatenate at 0x7fa1a783c930>
+               └ <module 'numpy' from '/scratch/project_2008296/chau/pencil_platform/.venv/lib/python3.13/site-packages/numpy/__init__.py'>
+
+ValueError: all the input arrays must have same number of dimensions, but the array at index 0 has 3 dimension(s) and the array at index 1 has 1 dimension(s)

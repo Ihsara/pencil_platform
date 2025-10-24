@@ -1,0 +1,728 @@
+2025-10-20 03:22:23.417 | INFO     | src.core.logging:setup_file_logging:61 - 📝 Logging to file: logs/analysis/shocktube_phase2/2025-10-20_03-22-23_analysis.log
+2025-10-20 03:22:23.417 | DEBUG    | src.core.logging:setup_file_logging:62 - Log directory: logs/analysis/shocktube_phase2
+2025-10-20 03:22:23.417 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:228 - ================================================================================
+2025-10-20 03:22:23.417 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:229 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase2'
+2025-10-20 03:22:23.418 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:231 - Combined error video generation ENABLED.
+2025-10-20 03:22:23.418 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:232 - ================================================================================
+2025-10-20 03:22:23.425 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:243 - Error analysis configuration:
+2025-10-20 03:22:23.425 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:244 -   ├─ Metrics to calculate: L1
+2025-10-20 03:22:23.426 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:245 -   └─ Combine in videos: True
+2025-10-20 03:22:23.426 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:260 - Clearing old visualization directories...
+2025-10-20 03:22:23.426 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution
+2025-10-20 03:22:23.436 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution
+2025-10-20 03:22:23.448 | INFO     | src.workflows.analysis_pipeline:clear_directory:55 - Clearing existing directory: /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/frames
+2025-10-20 03:22:23.464 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:269 - Total experiments to process: 24
+2025-10-20 03:22:23.465 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:288 - 
+================================================================================
+2025-10-20 03:22:23.465 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:289 - PHASE 1: Loading data and creating individual videos
+2025-10-20 03:22:23.465 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:290 - ================================================================================
+2025-10-20 03:22:23.465 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: best_l1_rank1_nu0p5_default_gamma (8 runs)
+2025-10-20 03:22:23.466 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [1/24] (4.2%) | Branch: [1/8] (12.5%) | Run: res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:22:23.468 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 4 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:22:39.360 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 4 timesteps using method: absolute
+2025-10-20 03:22:39.361 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:22:39.405 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:39.412 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:22:39.413 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 4 individual frames...
+2025-10-20 03:22:39.436 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:40.861 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:42.306 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:43.317 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:44.260 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 4 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:22:47.177 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma_var_evolution.gif
+2025-10-20 03:22:47.178 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:22:47.178 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:22:47.214 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:47.222 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:22:47.222 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 4 spatial error evolution frames...
+2025-10-20 03:22:47.245 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:47.944 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:48.638 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:49.332 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:22:50.012 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 4 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:22:52.077 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma_error_evolution.gif
+2025-10-20 03:22:52.078 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:22:52.078 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [2/24] (8.3%) | Branch: [2/8] (25.0%) | Run: res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:22:52.080 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 4 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:23:08.077 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 4 timesteps using method: absolute
+2025-10-20 03:23:08.077 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:23:08.116 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:08.123 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:23:08.124 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 4 individual frames...
+2025-10-20 03:23:08.146 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:09.458 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:10.812 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:11.931 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:12.861 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 4 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:23:15.542 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma_var_evolution.gif
+2025-10-20 03:23:15.543 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:23:15.543 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:23:15.583 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:15.590 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:23:15.590 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 4 spatial error evolution frames...
+2025-10-20 03:23:15.613 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:16.305 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:17.005 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:17.865 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:18.534 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 4 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:23:20.638 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma_error_evolution.gif
+2025-10-20 03:23:20.639 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:23:20.639 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [3/24] (12.5%) | Branch: [3/8] (37.5%) | Run: res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:23:20.641 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 4 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:23:36.611 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 4 timesteps using method: absolute
+2025-10-20 03:23:36.611 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:23:36.650 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:36.657 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:23:36.658 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 4 individual frames...
+2025-10-20 03:23:36.680 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:38.121 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:39.474 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:40.480 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:41.575 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 4 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:23:44.255 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma_var_evolution.gif
+2025-10-20 03:23:44.255 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:23:44.256 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:23:44.293 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:44.300 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:23:44.301 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 4 spatial error evolution frames...
+2025-10-20 03:23:44.323 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:45.018 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:45.712 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:46.413 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:23:47.089 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 4 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:23:49.244 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma_error_evolution.gif
+2025-10-20 03:23:49.244 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:23:49.245 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [4/24] (16.7%) | Branch: [4/8] (50.0%) | Run: res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:23:49.247 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 4 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:05.364 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 4 timesteps using method: absolute
+2025-10-20 03:24:05.365 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:24:05.404 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:05.411 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:24:05.411 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 4 individual frames...
+2025-10-20 03:24:05.433 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:06.751 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:08.218 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:09.221 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:10.156 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 4 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:12.945 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma_var_evolution.gif
+2025-10-20 03:24:12.945 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:24:12.946 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:24:12.982 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:12.990 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:24:12.990 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 4 spatial error evolution frames...
+2025-10-20 03:24:13.013 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:13.895 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:14.591 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:15.286 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:15.967 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 4 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:18.160 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma_error_evolution.gif
+2025-10-20 03:24:18.161 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:24:18.161 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [5/24] (20.8%) | Branch: [5/8] (62.5%) | Run: res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:18.163 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 3 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:30.424 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 3 timesteps using method: absolute
+2025-10-20 03:24:30.425 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:24:30.463 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:30.470 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:24:30.471 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 3 individual frames...
+2025-10-20 03:24:30.493 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:31.959 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:33.311 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:34.293 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 3 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:36.636 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma_var_evolution.gif
+2025-10-20 03:24:36.637 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:24:36.637 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:24:36.673 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:36.680 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:24:36.681 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 3 spatial error evolution frames...
+2025-10-20 03:24:36.704 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:37.425 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:38.141 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:38.838 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 3 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:40.513 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma_error_evolution.gif
+2025-10-20 03:24:40.513 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:24:40.514 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [6/24] (25.0%) | Branch: [6/8] (75.0%) | Run: res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:40.516 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 2 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:49.148 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 2 timesteps using method: absolute
+2025-10-20 03:24:49.148 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:24:49.187 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:49.195 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:24:49.196 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 2 individual frames...
+2025-10-20 03:24:49.219 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:50.940 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:52.344 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 2 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:54.092 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma_var_evolution.gif
+2025-10-20 03:24:54.093 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:24:54.093 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:24:54.132 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:54.140 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:24:54.141 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 2 spatial error evolution frames...
+2025-10-20 03:24:54.165 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:55.295 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:24:56.052 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 2 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:57.172 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma_error_evolution.gif
+2025-10-20 03:24:57.173 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:24:57.173 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [7/24] (29.2%) | Branch: [7/8] (87.5%) | Run: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:24:57.175 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 1 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:25:02.384 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 1 timesteps using method: absolute
+2025-10-20 03:25:02.385 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:25:02.434 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:25:02.441 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:25:02.442 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 1 individual frames...
+2025-10-20 03:25:02.467 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:25:03.814 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 1 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:25:04.929 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma_var_evolution.gif
+2025-10-20 03:25:04.930 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:25:04.930 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:25:04.969 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:25:04.976 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:25:04.976 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 1 spatial error evolution frames...
+2025-10-20 03:25:04.999 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:25:05.891 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 1 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:25:06.599 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma_error_evolution.gif
+2025-10-20 03:25:06.599 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:25:06.599 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [8/24] (33.3%) | Branch: [8/8] (100.0%) | Run: res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:25:06.602 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 1 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:25:11.851 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 1 timesteps using method: absolute
+2025-10-20 03:25:11.851 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:25:11.893 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:25:11.900 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:25:11.901 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 1 individual frames...
+2025-10-20 03:25:11.924 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:25:13.283 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 1 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:25:14.414 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma_var_evolution.gif
+2025-10-20 03:25:14.415 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:25:14.415 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:25:14.457 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:25:14.465 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:25:14.465 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 1 spatial error evolution frames...
+2025-10-20 03:25:14.489 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:25:15.374 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 1 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:25:16.102 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma_error_evolution.gif
+2025-10-20 03:25:16.102 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:25:16.102 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: best_l1_rank2_nu0p5_gamma_is_1 (8 runs)
+2025-10-20 03:25:16.103 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [9/24] (37.5%) | Branch: [1/8] (12.5%) | Run: res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:25:16.105 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 4 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:25:32.015 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 4 timesteps using method: absolute
+2025-10-20 03:25:32.016 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:25:32.055 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:32.062 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:25:32.062 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 4 individual frames...
+2025-10-20 03:25:32.085 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:33.410 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:34.900 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:35.925 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:36.889 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 4 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:25:39.713 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1_var_evolution.gif
+2025-10-20 03:25:39.714 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:25:39.714 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:25:39.750 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:39.757 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:25:39.758 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 4 spatial error evolution frames...
+2025-10-20 03:25:39.783 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:40.474 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:41.163 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:41.860 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:25:42.537 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 4 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:25:44.686 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1_error_evolution.gif
+2025-10-20 03:25:44.686 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:25:44.687 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [10/24] (41.7%) | Branch: [2/8] (25.0%) | Run: res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:25:44.689 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 4 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:26:00.815 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 4 timesteps using method: absolute
+2025-10-20 03:26:00.815 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:26:00.855 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:00.863 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:26:00.863 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 4 individual frames...
+2025-10-20 03:26:00.886 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:02.282 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:03.981 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:05.088 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:06.120 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 4 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:26:09.012 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1_var_evolution.gif
+2025-10-20 03:26:09.013 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:26:09.013 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:26:09.053 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:09.060 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:26:09.061 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 4 spatial error evolution frames...
+2025-10-20 03:26:09.089 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:09.842 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:11.019 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:11.773 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:12.508 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 4 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:26:14.806 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1_error_evolution.gif
+2025-10-20 03:26:14.807 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:26:14.807 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [11/24] (45.8%) | Branch: [3/8] (37.5%) | Run: res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:26:14.809 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 4 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:26:30.781 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 4 timesteps using method: absolute
+2025-10-20 03:26:30.782 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:26:30.822 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:30.829 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:26:30.830 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 4 individual frames...
+2025-10-20 03:26:30.853 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:32.529 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:33.962 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:35.069 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:36.439 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 4 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:26:39.360 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1_var_evolution.gif
+2025-10-20 03:26:39.361 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:26:39.361 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:26:39.400 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:39.408 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:26:39.408 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 4 spatial error evolution frames...
+2025-10-20 03:26:39.431 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:40.191 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:40.948 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:41.713 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:26:42.445 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 4 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:26:44.728 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1_error_evolution.gif
+2025-10-20 03:26:44.729 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:26:44.729 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [12/24] (50.0%) | Branch: [4/8] (50.0%) | Run: res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:26:44.731 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 4 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:00.989 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 4 timesteps using method: absolute
+2025-10-20 03:27:00.989 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:27:01.030 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:01.037 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:27:01.037 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 4 individual frames...
+2025-10-20 03:27:01.061 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:02.458 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:04.154 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:05.258 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:06.298 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 4 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:09.483 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1_var_evolution.gif
+2025-10-20 03:27:09.484 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:27:09.484 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:27:09.523 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:09.530 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:27:09.531 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 4 spatial error evolution frames...
+2025-10-20 03:27:09.554 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:10.317 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:11.066 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:11.822 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:12.554 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 4 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:14.827 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1_error_evolution.gif
+2025-10-20 03:27:14.828 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:27:14.828 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [13/24] (54.2%) | Branch: [5/8] (62.5%) | Run: res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:14.831 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 3 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:27.063 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 3 timesteps using method: absolute
+2025-10-20 03:27:27.063 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:27:27.103 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:27.111 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:27:27.111 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 3 individual frames...
+2025-10-20 03:27:27.135 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:28.875 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:30.314 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:31.720 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 3 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:33.959 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1_var_evolution.gif
+2025-10-20 03:27:33.960 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:27:33.960 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:27:34.004 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:34.011 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:27:34.012 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 3 spatial error evolution frames...
+2025-10-20 03:27:34.036 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:34.816 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:35.593 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:36.359 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 3 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:38.105 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1_error_evolution.gif
+2025-10-20 03:27:38.106 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:27:38.106 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [14/24] (58.3%) | Branch: [6/8] (75.0%) | Run: res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:38.108 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 2 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:46.716 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 2 timesteps using method: absolute
+2025-10-20 03:27:46.716 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:27:46.754 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:46.761 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:27:46.762 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 2 individual frames...
+2025-10-20 03:27:46.984 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:48.307 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:49.636 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 2 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:51.121 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1_var_evolution.gif
+2025-10-20 03:27:51.121 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:27:51.121 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:27:51.158 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:51.165 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:27:51.165 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 2 spatial error evolution frames...
+2025-10-20 03:27:51.192 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:52.073 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:52.741 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 2 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:53.809 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1_error_evolution.gif
+2025-10-20 03:27:53.810 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:27:53.810 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [15/24] (62.5%) | Branch: [7/8] (87.5%) | Run: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:53.812 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 1 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:27:58.833 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 1 timesteps using method: absolute
+2025-10-20 03:27:58.833 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:27:58.871 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:27:58.879 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:27:58.880 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 1 individual frames...
+2025-10-20 03:27:58.903 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:28:00.203 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 1 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:28:01.436 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1_var_evolution.gif
+2025-10-20 03:28:01.437 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:28:01.437 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:28:01.474 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:28:01.481 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:28:01.482 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 1 spatial error evolution frames...
+2025-10-20 03:28:01.504 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:28:02.183 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 1 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:28:02.855 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1_error_evolution.gif
+2025-10-20 03:28:02.856 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:28:02.856 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [16/24] (66.7%) | Branch: [8/8] (100.0%) | Run: res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:28:02.858 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 1 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:28:07.880 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 1 timesteps using method: absolute
+2025-10-20 03:28:07.881 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:28:07.919 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:28:07.926 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:28:07.927 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 1 individual frames...
+2025-10-20 03:28:07.949 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:28:09.247 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 1 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:28:10.332 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1_var_evolution.gif
+2025-10-20 03:28:10.333 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:28:10.333 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:28:10.584 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:28:10.591 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:28:10.592 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 1 spatial error evolution frames...
+2025-10-20 03:28:10.614 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:28:11.289 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 1 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:28:11.969 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1_error_evolution.gif
+2025-10-20 03:28:11.970 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:28:11.970 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:300 - 
+📂 Processing branch: best_l1_rank3_nu1p0_default_gamma (8 runs)
+2025-10-20 03:28:11.971 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [17/24] (70.8%) | Branch: [1/8] (12.5%) | Run: res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:11.973 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 3 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:24.283 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 3 timesteps using method: absolute
+2025-10-20 03:28:24.283 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:28:24.323 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:24.331 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:28:24.331 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 3 individual frames...
+2025-10-20 03:28:24.355 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:25.753 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:27.454 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:28.505 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 3 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:30.811 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma_var_evolution.gif
+2025-10-20 03:28:30.812 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:28:30.812 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:28:30.852 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:30.859 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:28:30.860 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 3 spatial error evolution frames...
+2025-10-20 03:28:30.883 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:32.004 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:32.782 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:33.539 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 3 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:35.285 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma_error_evolution.gif
+2025-10-20 03:28:35.286 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:28:35.286 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [18/24] (75.0%) | Branch: [2/8] (25.0%) | Run: res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:35.288 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 3 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:47.588 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 3 timesteps using method: absolute
+2025-10-20 03:28:47.588 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:28:47.628 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:47.636 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:28:47.636 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 3 individual frames...
+2025-10-20 03:28:47.659 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:49.368 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:50.803 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:51.842 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 3 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:54.130 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma_var_evolution.gif
+2025-10-20 03:28:54.130 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:28:54.131 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:28:54.170 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:54.178 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:28:54.178 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 3 spatial error evolution frames...
+2025-10-20 03:28:54.202 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:55.392 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:56.171 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:28:56.936 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 3 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:58.700 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma_error_evolution.gif
+2025-10-20 03:28:58.701 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:28:58.701 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [19/24] (79.2%) | Branch: [3/8] (37.5%) | Run: res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:28:58.703 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 3 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:10.979 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 3 timesteps using method: absolute
+2025-10-20 03:29:10.979 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:29:11.017 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:11.025 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:29:11.025 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 3 individual frames...
+2025-10-20 03:29:11.047 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:12.516 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:13.871 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:14.850 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 3 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:17.199 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma_var_evolution.gif
+2025-10-20 03:29:17.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:29:17.200 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:29:17.236 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:17.243 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:29:17.243 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 3 spatial error evolution frames...
+2025-10-20 03:29:17.266 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:17.986 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:18.702 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:19.399 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 3 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:21.059 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma_error_evolution.gif
+2025-10-20 03:29:21.059 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:29:21.059 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [20/24] (83.3%) | Branch: [4/8] (50.0%) | Run: res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:21.061 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 3 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:33.513 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 3 timesteps using method: absolute
+2025-10-20 03:29:33.513 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:29:33.553 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:33.561 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:29:33.561 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 3 individual frames...
+2025-10-20 03:29:33.586 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:35.333 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:36.766 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:37.822 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 3 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:40.405 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma_var_evolution.gif
+2025-10-20 03:29:40.406 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:29:40.406 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:29:40.445 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:40.452 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:29:40.453 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 3 spatial error evolution frames...
+2025-10-20 03:29:40.481 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:41.260 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:42.037 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:42.795 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 3 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:44.526 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma_error_evolution.gif
+2025-10-20 03:29:44.527 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:29:44.527 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [21/24] (87.5%) | Branch: [5/8] (62.5%) | Run: res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:44.529 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 2 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:53.202 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 2 timesteps using method: absolute
+2025-10-20 03:29:53.202 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:29:53.241 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:53.248 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:29:53.249 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 2 individual frames...
+2025-10-20 03:29:53.272 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:55.031 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:56.461 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 2 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:29:58.097 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma_var_evolution.gif
+2025-10-20 03:29:58.098 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:29:58.098 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:29:58.137 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:58.145 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:29:58.145 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 2 spatial error evolution frames...
+2025-10-20 03:29:58.169 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:29:59.309 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:00.047 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 2 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:01.141 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma_error_evolution.gif
+2025-10-20 03:30:01.142 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:30:01.142 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [22/24] (91.7%) | Branch: [6/8] (75.0%) | Run: res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:01.144 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 1 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:06.229 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 1 timesteps using method: absolute
+2025-10-20 03:30:06.230 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:30:06.269 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:06.276 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:30:06.277 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 1 individual frames...
+2025-10-20 03:30:06.302 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:07.610 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 1 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:08.690 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma_var_evolution.gif
+2025-10-20 03:30:08.690 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:30:08.690 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:30:08.727 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:08.735 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:30:08.735 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 1 spatial error evolution frames...
+2025-10-20 03:30:08.758 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:09.650 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 1 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:10.343 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma_error_evolution.gif
+2025-10-20 03:30:10.344 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:30:10.344 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [23/24] (95.8%) | Branch: [7/8] (87.5%) | Run: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:10.346 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 1 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:15.386 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 1 timesteps using method: absolute
+2025-10-20 03:30:15.387 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:30:15.425 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:15.432 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:30:15.433 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 1 individual frames...
+2025-10-20 03:30:15.456 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:16.793 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 1 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:17.943 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma_var_evolution.gif
+2025-10-20 03:30:17.943 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:30:17.943 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:30:17.988 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:17.997 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:30:17.998 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 1 spatial error evolution frames...
+2025-10-20 03:30:18.024 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:19.159 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 1 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:19.904 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma_error_evolution.gif
+2025-10-20 03:30:19.904 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:30:19.904 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:307 -   ├─ [24/24] (100.0%) | Branch: [8/8] (100.0%) | Run: res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:19.907 | INFO     | src.workflows.analysis_pipeline:load_all_var_files:92 - Loading all 1 VAR files from /scratch/project_2008296/chau/runs/shocktube_phase2/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:24.980 | DEBUG    | src.analysis.errors:calculate_spatial_errors:116 - Calculating spatial errors for 1 timesteps using method: absolute
+2025-10-20 03:30:24.981 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:338 -      ├─ Creating var evolution video and frames...
+2025-10-20 03:30:25.023 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:25.030 | INFO     | src.visualization.videos:create_var_evolution_video:157 - Creating individual frames...
+2025-10-20 03:30:25.031 | INFO     | src.visualization.videos:create_var_evolution_frames:218 - Creating 1 individual frames...
+2025-10-20 03:30:25.054 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:26.441 | SUCCESS  | src.visualization.videos:create_var_evolution_frames:273 - Saved 1 frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/frames/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:27.580 | SUCCESS  | src.visualization.videos:create_var_evolution_video:167 - Saved VAR evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/var/evolution/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma_var_evolution.gif
+2025-10-20 03:30:27.581 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:344 -      ├─ Creating combined error evolution (L1, L2, LINF) video and frames...
+2025-10-20 03:30:27.581 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:365 -      ├─ Creating single error evolution video and frames...
+2025-10-20 03:30:27.619 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:27.626 | INFO     | src.visualization.videos:create_error_evolution_video:434 - Creating individual frames...
+2025-10-20 03:30:27.627 | INFO     | src.visualization.videos:create_error_evolution_frames:485 - Creating 1 spatial error evolution frames...
+2025-10-20 03:30:27.650 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:28.384 | SUCCESS  | src.visualization.videos:create_error_evolution_frames:579 - Saved 1 error evolution frames to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/error_frames/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:29.475 | SUCCESS  | src.visualization.videos:create_error_evolution_video:444 - Saved error evolution animation to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma_error_evolution.gif
+2025-10-20 03:30:29.476 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:370 -      └─ ✓ Created error evolution video
+2025-10-20 03:30:29.476 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:376 - 
+================================================================================
+2025-10-20 03:30:29.476 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:377 - PHASE 2: Creating overlay videos
+2025-10-20 03:30:29.476 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:378 - ================================================================================
+2025-10-20 03:30:29.477 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma: avg L2 error (rho only) = 1.799151e-01
+2025-10-20 03:30:29.477 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma: avg L2 error (rho only) = 1.800031e-01
+2025-10-20 03:30:29.478 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma: avg L2 error (rho only) = 1.798849e-01
+2025-10-20 03:30:29.478 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma: avg L2 error (rho only) = 1.802760e-01
+2025-10-20 03:30:29.478 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma: avg L2 error (rho only) = 1.256424e-01
+2025-10-20 03:30:29.479 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma: avg L2 error (rho only) = 5.140300e-02
+2025-10-20 03:30:29.479 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma: avg L2 error (rho only) = 4.774588e-02
+2025-10-20 03:30:29.480 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma: avg L2 error (rho only) = 4.774588e-02
+2025-10-20 03:30:29.480 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1: avg L2 error (rho only) = 1.856559e-01
+2025-10-20 03:30:29.480 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1: avg L2 error (rho only) = 1.857011e-01
+2025-10-20 03:30:29.481 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1: avg L2 error (rho only) = 1.857208e-01
+2025-10-20 03:30:29.481 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1: avg L2 error (rho only) = 1.855416e-01
+2025-10-20 03:30:29.481 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1: avg L2 error (rho only) = 1.290039e-01
+2025-10-20 03:30:29.482 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1: avg L2 error (rho only) = 5.058474e-02
+2025-10-20 03:30:29.482 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1: avg L2 error (rho only) = 4.774588e-02
+2025-10-20 03:30:29.482 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1: avg L2 error (rho only) = 4.774588e-02
+2025-10-20 03:30:29.483 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma: avg L2 error (rho only) = 1.254239e-01
+2025-10-20 03:30:29.483 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma: avg L2 error (rho only) = 1.254191e-01
+2025-10-20 03:30:29.483 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma: avg L2 error (rho only) = 1.254394e-01
+2025-10-20 03:30:29.484 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma: avg L2 error (rho only) = 1.256480e-01
+2025-10-20 03:30:29.484 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma: avg L2 error (rho only) = 5.367071e-02
+2025-10-20 03:30:29.484 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma: avg L2 error (rho only) = 4.774588e-02
+2025-10-20 03:30:29.485 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma: avg L2 error (rho only) = 4.774588e-02
+2025-10-20 03:30:29.485 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:395 -   res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma: avg L2 error (rho only) = 4.774588e-02
+2025-10-20 03:30:29.485 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:398 - 
+🏆 Finding best performers in each branch...
+2025-10-20 03:30:29.486 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:408 -   ├─ best_l1_rank1_nu0p5_default_gamma: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma (L2=4.774588e-02)
+2025-10-20 03:30:29.486 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:408 -   ├─ best_l1_rank2_nu0p5_gamma_is_1: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1 (L2=4.774588e-02)
+2025-10-20 03:30:29.486 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:408 -   ├─ best_l1_rank3_nu1p0_default_gamma: res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma (L2=4.774588e-02)
+2025-10-20 03:30:29.486 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:411 - 
+🎬 Creating branch overlay videos...
+2025-10-20 03:30:29.486 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:416 -   ├─ Branch: best_l1_rank1_nu0p5_default_gamma (8 runs)
+2025-10-20 03:30:35.047 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/shocktube_phase2_best_l1_rank1_nu0p5_default_gamma_overlay_error_evolution.gif
+2025-10-20 03:30:35.048 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:437 -      └─ ✓ Created overlay for best_l1_rank1_nu0p5_default_gamma
+2025-10-20 03:30:35.048 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:416 -   ├─ Branch: best_l1_rank2_nu0p5_gamma_is_1 (8 runs)
+2025-10-20 03:30:40.367 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/shocktube_phase2_best_l1_rank2_nu0p5_gamma_is_1_overlay_error_evolution.gif
+2025-10-20 03:30:40.368 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:437 -      └─ ✓ Created overlay for best_l1_rank2_nu0p5_gamma_is_1
+2025-10-20 03:30:40.368 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:416 -   ├─ Branch: best_l1_rank3_nu1p0_default_gamma (8 runs)
+2025-10-20 03:30:44.737 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/shocktube_phase2_best_l1_rank3_nu1p0_default_gamma_overlay_error_evolution.gif
+2025-10-20 03:30:44.737 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:437 -      └─ ✓ Created overlay for best_l1_rank3_nu1p0_default_gamma
+2025-10-20 03:30:44.737 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:440 - 
+🏆 Finding top 3 best performers overall...
+2025-10-20 03:30:44.738 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:445 -   ├─ #1: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma (L2=4.774588e-02)
+2025-10-20 03:30:44.738 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:445 -   ├─ #2: res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma (L2=4.774588e-02)
+2025-10-20 03:30:44.738 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:445 -   ├─ #3: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1 (L2=4.774588e-02)
+2025-10-20 03:30:44.739 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:448 - 
+🎬 Creating top 3 overlay video...
+2025-10-20 03:30:45.815 | SUCCESS  | src.visualization.videos:create_overlay_error_evolution_video:715 - Saved overlay error evolution to /scratch/project_2008296/chau/pencil_platform/analysis/shocktube_phase2/error/evolution/shocktube_phase2_top3_best_performers_overlay_error_evolution.gif
+2025-10-20 03:30:45.815 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:468 -      └─ ✓ Created top 3 overlay video
+2025-10-20 03:30:45.815 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:473 - 
+================================================================================
+2025-10-20 03:30:45.816 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:474 - PHASE 3: Calculating error norms
+2025-10-20 03:30:45.816 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:475 - ================================================================================
+2025-10-20 03:30:45.817 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:482 - Clearing old error norm directories...
+2025-10-20 03:30:45.818 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:488 - Calculating error norms for 24 runs...
+2025-10-20 03:30:45.818 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-15_chi9e-15_best_l1_rank1_nu0p5_default_gamma: calculating L1...
+2025-10-20 03:30:45.819 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 4 timesteps
+2025-10-20 03:30:45.819 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-14_chi9e-14_best_l1_rank1_nu0p5_default_gamma: calculating L1...
+2025-10-20 03:30:45.820 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 4 timesteps
+2025-10-20 03:30:45.820 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-13_chi9e-13_best_l1_rank1_nu0p5_default_gamma: calculating L1...
+2025-10-20 03:30:45.820 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 4 timesteps
+2025-10-20 03:30:45.821 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-12_chi9e-12_best_l1_rank1_nu0p5_default_gamma: calculating L1...
+2025-10-20 03:30:45.822 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 4 timesteps
+2025-10-20 03:30:45.822 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-11_chi9e-11_best_l1_rank1_nu0p5_default_gamma: calculating L1...
+2025-10-20 03:30:45.822 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 3 timesteps
+2025-10-20 03:30:45.823 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-10_chi9e-10_best_l1_rank1_nu0p5_default_gamma: calculating L1...
+2025-10-20 03:30:45.823 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 2 timesteps
+2025-10-20 03:30:45.823 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma: calculating L1...
+2025-10-20 03:30:45.824 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 1 timesteps
+2025-10-20 03:30:45.824 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma: calculating L1...
+2025-10-20 03:30:45.824 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 1 timesteps
+2025-10-20 03:30:45.825 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-15_chi9e-15_best_l1_rank2_nu0p5_gamma_is_1: calculating L1...
+2025-10-20 03:30:45.825 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 4 timesteps
+2025-10-20 03:30:45.825 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-14_chi9e-14_best_l1_rank2_nu0p5_gamma_is_1: calculating L1...
+2025-10-20 03:30:45.826 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 4 timesteps
+2025-10-20 03:30:45.826 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-13_chi9e-13_best_l1_rank2_nu0p5_gamma_is_1: calculating L1...
+2025-10-20 03:30:45.826 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 4 timesteps
+2025-10-20 03:30:45.827 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-12_chi9e-12_best_l1_rank2_nu0p5_gamma_is_1: calculating L1...
+2025-10-20 03:30:45.827 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 4 timesteps
+2025-10-20 03:30:45.828 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-11_chi9e-11_best_l1_rank2_nu0p5_gamma_is_1: calculating L1...
+2025-10-20 03:30:45.828 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 3 timesteps
+2025-10-20 03:30:45.828 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-10_chi9e-10_best_l1_rank2_nu0p5_gamma_is_1: calculating L1...
+2025-10-20 03:30:45.829 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 2 timesteps
+2025-10-20 03:30:45.829 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1: calculating L1...
+2025-10-20 03:30:45.829 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 1 timesteps
+2025-10-20 03:30:45.830 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-08_chi9e-08_best_l1_rank2_nu0p5_gamma_is_1: calculating L1...
+2025-10-20 03:30:45.830 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 1 timesteps
+2025-10-20 03:30:45.830 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-15_chi9e-15_best_l1_rank3_nu1p0_default_gamma: calculating L1...
+2025-10-20 03:30:45.830 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 3 timesteps
+2025-10-20 03:30:45.831 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-14_chi9e-14_best_l1_rank3_nu1p0_default_gamma: calculating L1...
+2025-10-20 03:30:45.831 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 3 timesteps
+2025-10-20 03:30:45.831 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-13_chi9e-13_best_l1_rank3_nu1p0_default_gamma: calculating L1...
+2025-10-20 03:30:45.832 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 3 timesteps
+2025-10-20 03:30:45.832 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-12_chi9e-12_best_l1_rank3_nu1p0_default_gamma: calculating L1...
+2025-10-20 03:30:45.832 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 3 timesteps
+2025-10-20 03:30:45.833 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-11_chi9e-11_best_l1_rank3_nu1p0_default_gamma: calculating L1...
+2025-10-20 03:30:45.833 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 2 timesteps
+2025-10-20 03:30:45.833 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma: calculating L1...
+2025-10-20 03:30:45.834 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 1 timesteps
+2025-10-20 03:30:45.834 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-09_chi9e-09_best_l1_rank3_nu1p0_default_gamma: calculating L1...
+2025-10-20 03:30:45.834 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 1 timesteps
+2025-10-20 03:30:45.835 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:494 -   ├─ res400_hyper3_nu9e-08_chi9e-08_best_l1_rank3_nu1p0_default_gamma: calculating L1...
+2025-10-20 03:30:45.835 | DEBUG    | src.analysis.errors:calculate_error_norms:57 - Calculating error norms (l1) for 1 timesteps
+2025-10-20 03:30:45.835 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:505 - 
+Calculating combined scores (using DENSITY only)...
+2025-10-20 03:30:45.836 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:544 - 
+================================================================================
+2025-10-20 03:30:45.836 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:545 - PHASE 4: Creating error norm visualizations
+2025-10-20 03:30:45.836 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:546 - ================================================================================
+2025-10-20 03:30:45.836 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:548 -   ├─ Combined scores comparison...
+2025-10-20 03:30:47.621 | INFO     | src.visualization.plots:create_combined_scores_plot:137 -        └─ Saved to shocktube_phase2_combined_scores.png
+2025-10-20 03:30:47.622 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:551 -   ├─ Per-metric comparisons...
+2025-10-20 03:30:51.522 | INFO     | src.visualization.plots:create_per_metric_plots:184 -        └─ Saved L1 comparison to shocktube_phase2_l1_comparison.png
+2025-10-20 03:30:51.523 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:554 -   ├─ Top 5 detailed view...
+2025-10-20 03:30:53.225 | INFO     | src.visualization.plots:create_best_performers_plot:231 -        └─ Saved top 5 detailed comparison to shocktube_phase2_top5_detailed.png
+2025-10-20 03:30:53.226 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:557 -   ├─ Branch comparison...
+2025-10-20 03:30:53.240 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma'
+2025-10-20 03:30:53.248 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1'
+2025-10-20 03:30:53.254 | DEBUG    | src.experiment.naming:decode_experiment_name:230 - Using legacy hardcoded decoder for 'res400_hyper3_nu9e-10_chi9e-10_best_l1_rank3_nu1p0_default_gamma'
+2025-10-20 03:30:53.836 | INFO     | src.visualization.plots:create_branch_comparison_plot:272 -        └─ Saved branch comparison to shocktube_phase2_branch_best.png
+2025-10-20 03:30:53.836 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:560 -   └─ Error evolution plots...
+2025-10-20 03:30:55.494 | INFO     | src.visualization.plots:create_error_evolution_plots:314 -        └─ Saved L1 evolution to shocktube_phase2_top3_l1_evolution.png
+2025-10-20 03:30:55.494 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:566 - 
+================================================================================
+2025-10-20 03:30:55.495 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:567 - PHASE 5: Generating reports
+2025-10-20 03:30:55.495 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:568 - ================================================================================
+2025-10-20 03:30:55.499 | INFO     | src.workflows.analysis_pipeline:save_error_norms_summary:919 -        ├─ Saved JSON summary to shocktube_phase2_error_norms_summary.json
+2025-10-20 03:30:55.499 | INFO     | src.workflows.analysis_pipeline:save_error_norms_summary:920 -        └─ Saved Markdown report to shocktube_phase2_error_norms_summary.md
+2025-10-20 03:30:55.499 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:576 - 
+================================================================================
+2025-10-20 03:30:55.500 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:577 - PHASE 6: Organizing folder structure
+2025-10-20 03:30:55.500 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:578 - ================================================================================
+2025-10-20 03:30:55.500 | INFO     | src.analysis.organizer:organize:319 - ================================================================================
+2025-10-20 03:30:55.500 | INFO     | src.analysis.organizer:organize:320 - ORGANIZING ANALYSIS FOLDER STRUCTURE
+2025-10-20 03:30:55.500 | INFO     | src.analysis.organizer:organize:321 - ================================================================================
+2025-10-20 03:30:55.501 | INFO     | src.analysis.organizer:create_structure:61 - Creating organized folder structure...
+2025-10-20 03:30:55.502 | SUCCESS  | src.analysis.organizer:create_structure:72 - ✓ Created organized folder structure
+2025-10-20 03:30:55.503 | INFO     | src.analysis.organizer:migrate_existing_files:90 - Migrating existing files to new structure...
+2025-10-20 03:30:55.503 | INFO     | src.analysis.organizer:migrate_existing_files:102 -   ├─ Migrating error_norms/ → error/norms/
+2025-10-20 03:30:55.510 | INFO     | src.analysis.organizer:migrate_existing_files:117 -      └─ Removed old directory: error_norms/
+2025-10-20 03:30:55.511 | SUCCESS  | src.analysis.organizer:migrate_existing_files:119 - ✓ Migration complete
+2025-10-20 03:30:55.511 | SUCCESS  | src.analysis.organizer:organize:326 - ================================================================================
+2025-10-20 03:30:55.511 | SUCCESS  | src.analysis.organizer:organize:327 - FOLDER ORGANIZATION COMPLETE
+2025-10-20 03:30:55.511 | SUCCESS  | src.analysis.organizer:organize:328 - ================================================================================
+2025-10-20 03:30:55.511 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:584 - 
+================================================================================
+2025-10-20 03:30:55.512 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:585 - PHASE 7: Populating best performers folders
+2025-10-20 03:30:55.512 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:586 - ================================================================================
+2025-10-20 03:30:55.512 | INFO     | src.analysis.organizer:populate_best_performers:168 - Populating best performers (top 3 for each metric)...
+2025-10-20 03:30:55.512 | INFO     | src.analysis.organizer:create_best_performers_structure:132 - Creating best performers structure...
+2025-10-20 03:30:55.512 | SUCCESS  | src.analysis.organizer:create_best_performers_structure:147 - ✓ Created best performers folder structure
+2025-10-20 03:30:55.512 | INFO     | src.analysis.organizer:populate_best_performers:177 -   ├─ Processing L1 metric...
+2025-10-20 03:30:55.513 | INFO     | src.analysis.organizer:populate_best_performers:197 -      ├─ #1: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma (score: 6.746573e-03)
+2025-10-20 03:30:55.518 | INFO     | src.analysis.organizer:populate_best_performers:197 -      ├─ #2: res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma (score: 6.746573e-03)
+2025-10-20 03:30:55.522 | INFO     | src.analysis.organizer:populate_best_performers:197 -      ├─ #3: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1 (score: 6.746573e-03)
+2025-10-20 03:30:55.527 | INFO     | src.analysis.organizer:populate_best_performers:213 -      └─ ✓ Copied top 3 performers for L1
+2025-10-20 03:30:55.527 | INFO     | src.analysis.organizer:populate_best_performers:216 -   ├─ Processing Combined scores...
+2025-10-20 03:30:55.527 | INFO     | src.analysis.organizer:populate_best_performers:222 -      ├─ #1: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank1_nu0p5_default_gamma (score: 6.746573e-03)
+2025-10-20 03:30:55.532 | INFO     | src.analysis.organizer:populate_best_performers:222 -      ├─ #2: res400_hyper3_nu9e-08_chi9e-08_best_l1_rank1_nu0p5_default_gamma (score: 6.746573e-03)
+2025-10-20 03:30:55.537 | INFO     | src.analysis.organizer:populate_best_performers:222 -      ├─ #3: res400_hyper3_nu9e-09_chi9e-09_best_l1_rank2_nu0p5_gamma_is_1 (score: 6.746573e-03)
+2025-10-20 03:30:55.541 | INFO     | src.analysis.organizer:populate_best_performers:238 -      └─ ✓ Copied top 3 performers for Combined
+2025-10-20 03:30:55.544 | SUCCESS  | src.analysis.organizer:populate_best_performers:244 - ✓ Best performers populated
+2025-10-20 03:30:55.544 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:595 - 
+================================================================================
+2025-10-20 03:30:55.544 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:596 - FINAL SUMMARY
+2025-10-20 03:30:55.544 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:597 - ================================================================================

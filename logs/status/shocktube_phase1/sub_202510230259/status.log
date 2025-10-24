@@ -1,0 +1,15 @@
+2025-10-23 02:59:42.179 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/status/shocktube_phase1/sub_202510230259/status.log
+2025-10-23 02:59:42.179 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/status/shocktube_phase1/sub_202510230259
+2025-10-23 02:59:42.180 | INFO     | src.experiment.job_manager:check_suite_status:65 - --- STATUS CHECK MODE for 'shocktube_phase1' ---
+2025-10-23 02:59:42.182 | INFO     | src.experiment.job_manager:check_suite_status:84 - Querying SLURM for batch job ID: 5308698
+2025-10-23 02:59:42.213 | INFO     | src.experiment.job_manager:check_suite_status:122 - Job 5308698 is queued or just starting (not yet in sacct)
+2025-10-23 02:59:42.214 | INFO     | src.experiment.job_manager:check_suite_status:153 - --- Job Status Summary ---
+2025-10-23 02:59:42.214 | INFO     | src.experiment.job_manager:check_suite_status:154 -   Total Simulations: 12
+2025-10-23 02:59:42.214 | INFO     | src.experiment.job_manager:check_suite_status:155 -   Completed: 0
+2025-10-23 02:59:42.215 | INFO     | src.experiment.job_manager:check_suite_status:156 -   Failed/Cancelled: 0
+2025-10-23 02:59:42.215 | INFO     | src.experiment.job_manager:check_suite_status:157 -   Running: 0
+2025-10-23 02:59:42.216 | INFO     | src.experiment.job_manager:check_suite_status:158 -   Pending: 12
+2025-10-23 02:59:42.216 | INFO     | __main__:main:185 - Waiting for job completion...
+2025-10-23 02:59:42.217 | INFO     | __main__:main:187 - (Use Ctrl+C to exit, then run with --monitor to check progress)
+2025-10-23 03:00:47.411 | SUCCESS  | src.experiment.job_manager:wait_for_completion:570 - Job array completed successfully!
+2025-10-23 03:00:47.412 | SUCCESS  | __main__:main:194 - Job completed!
