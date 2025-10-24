@@ -92,14 +92,17 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         
         logger.info(f"Loading all {len(var_files)} VAR files from {run_path}")
         
+        # Read params once - it's the same for all VAR files
+        params = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
+        
         all_data = []
         for var_file in var_files:
             try:
-                # Read VAR file with all associated data (grid, params, etc.)
+                # Read VAR file with all associated data (preserves ghost zones)
                 var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=False)
                 
                 density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
-                cp, gamma = var.param.cp, var.param.gamma
+                cp, gamma = params.cp, params.gamma
                 cv = cp / gamma
                 
                 if not hasattr(var, 'ss'):
@@ -123,7 +126,7 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
                     "pp": np.squeeze(pressure), 
                     "ee": np.squeeze(internal_energy), 
                     "t": var.t, 
-                    "params": var.param,
+                    "params": params,
                     "var_file": var_file.name
                 })
             except Exception as e:
