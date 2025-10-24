@@ -17,6 +17,7 @@ from src.analysis.errors import (
     calculate_absolute_deviation_per_var,
     calculate_spatial_errors,
     calculate_error_norms,
+    calculate_normalized_spatial_errors,
     ExperimentErrorAnalyzer
 )
 from src.analysis.metrics import calculate_errors_over_time
@@ -26,6 +27,7 @@ from src.visualization.plots import (
     create_best_performers_plot,
     create_branch_comparison_plot,
     create_error_evolution_plots,
+    create_spatial_temporal_error_heatmap,
 )
 from src.visualization.videos import (
     create_var_evolution_video,
@@ -242,9 +244,16 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     error_config = plan.get('error_analysis', {})
     metrics = error_config.get('metrics', ['l1', 'l2', 'linf'])
     combine_in_videos = error_config.get('combine_in_videos', True)
+    analyze_variables = error_config.get('analyze_variables', ['rho', 'ux', 'pp', 'ee'])
+    
+    # Load config loader to get variable configurations
+    config_loader = create_config_loader()
+    analysis_config = config_loader.load_analysis_config(experiment_name)
+    variables_config = analysis_config.get('variables', {})
     
     logger.info(f"Error analysis configuration:")
     logger.info(f"  ├─ Metrics to calculate: {', '.join([m.upper() for m in metrics])}")
+    logger.info(f"  ├─ Variables: {', '.join(analyze_variables)}")
     logger.info(f"  └─ Combine in videos: {combine_in_videos}")
     
     hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
@@ -284,6 +293,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 break
         else:
             runs_per_branch['default'].append(run_name)
+    
+    # ============================================================
+    # Initialize organizer early to use correct directory structure
+    # ============================================================
+    organizer = AnalysisOrganizer(experiment_name, analysis_dir)
+    organizer.create_structure()
     
     # ============================================================
     # PHASE 1: Load data and create individual videos
@@ -372,6 +387,52 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 )
                 logger.info(f"     └─ ✓ Created error evolution video")
             # --- END: Modified section ---
+            
+            # Calculate normalized spatial-temporal errors and generate heatmaps
+            logger.info(f"     ├─ Calculating normalized spatial-temporal errors...")
+            normalized_errors = calculate_normalized_spatial_errors(
+                all_sim_data,
+                all_analytical_data,
+                variables=analyze_variables,
+                normalize_by_space=False,
+                normalize_by_time=False
+            )
+            
+            # Cache normalized errors for later use
+            loaded_data_cache[run_name]['normalized_errors'] = normalized_errors
+            
+            # Generate spatial-temporal error heatmaps
+            if normalized_errors:
+                logger.info(f"     ├─ Generating spatial-temporal error heatmaps ({len(analyze_variables)} vars × 2 types)...")
+                heatmap_count = 0
+                for var in analyze_variables:
+                    if var in normalized_errors:
+                        var_config = variables_config.get(var, {'plot_label': var.upper()})
+                        
+                        # Absolute error heatmap
+                        create_spatial_temporal_error_heatmap(
+                            normalized_errors,
+                            organizer.spacetime_maps_dir,
+                            run_name,
+                            var,
+                            var_config,
+                            unit_length,
+                            use_relative=False
+                        )
+                        
+                        # Relative error heatmap
+                        create_spatial_temporal_error_heatmap(
+                            normalized_errors,
+                            organizer.spacetime_maps_dir,
+                            run_name,
+                            var,
+                            var_config,
+                            unit_length,
+                            use_relative=True
+                        )
+                        heatmap_count += 2
+                
+                logger.info(f"     └─ ✓ Created {heatmap_count} spatial-temporal heatmaps")
     
     # ============================================================
     # PHASE 2: Find best performers and create overlay videos
@@ -469,12 +530,6 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             top_3_spatial_errors, error_evolution_dir, output_name, fps=2, unit_length=unit_length
         )
         logger.info(f"     └─ ✓ Created top 3 overlay video")
-    
-    # ============================================================
-    # Initialize organizer early to use correct directory structure
-    # ============================================================
-    organizer = AnalysisOrganizer(experiment_name, analysis_dir)
-    organizer.create_structure()
     
     # ============================================================
     # PHASE 3: Calculate L1/L2 error norms (reusing loaded data)
