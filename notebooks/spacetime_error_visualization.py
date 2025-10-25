@@ -22,8 +22,18 @@ import argparse
 import json
 
 # Add project root to path
-PROJECT_ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
+# Handle both script execution and interactive environments (Jupyter, IPython)
+try:
+    PROJECT_ROOT = Path(__file__).parent.parent
+except NameError:
+    # If __file__ is not defined (e.g., in Jupyter), use current working directory
+    PROJECT_ROOT = Path.cwd()
+    # If we're in the notebooks directory, go up one level
+    if PROJECT_ROOT.name == 'notebooks':
+        PROJECT_ROOT = PROJECT_ROOT.parent
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.analysis.data_prep import (
     prepare_spacetime_error_data,
