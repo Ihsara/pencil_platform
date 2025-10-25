@@ -503,7 +503,7 @@ def list_available_runs(experiment_name: str) -> list:
         with open(plan_file, 'r') as f:
             plan = yaml.safe_load(f)
         
-        manifest_file = DIRS.runs / experiment_name / "manifest.txt"
+        manifest_file = DIRS.runs / experiment_name / "run_manifest.txt"
         if manifest_file.exists():
             with open(manifest_file, 'r') as f:
                 run_names = [line.strip() for line in f if line.strip()]
