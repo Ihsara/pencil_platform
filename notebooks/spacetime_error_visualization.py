@@ -121,7 +121,7 @@ def create_mind_the_gap_plot(
                 color=errors_valid[mask],
                 colorscale='Plasma',
                 cmin=stats['min'],
-                cmax=stats['p99'],  # Use p99 to avoid outliers
+                cmax=stats['percentiles']['p99'],  # Use p99 to avoid outliers
                 colorbar=dict(
                     title=f"{error_type.capitalize()}<br>Error",
                     tickformat='.2e'
@@ -153,7 +153,7 @@ def create_mind_the_gap_plot(
                 color=errors_valid,
                 colorscale='Plasma',
                 cmin=stats['min'],
-                cmax=stats['p99'],
+                cmax=stats['percentiles']['p99'],
                 colorbar=dict(
                     title=f"{error_type.capitalize()}<br>Error",
                     tickformat='.2e',
