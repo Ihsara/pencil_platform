@@ -413,7 +413,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 logger.info(f"     └─ ✓ Created error evolution video")
             # --- END: Modified section ---
             
-            # Calculate normalized spatial-temporal errors and generate heatmaps
+            # Calculate normalized spatial-temporal errors (for notebook usage)
             logger.info(f"     ├─ Calculating normalized spatial-temporal errors...")
             normalized_errors = calculate_normalized_spatial_errors(
                 all_sim_data,
@@ -423,41 +423,9 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 normalize_by_time=False
             )
             
-            # Cache normalized errors for later use
+            # Cache normalized errors for later use (e.g., in notebooks)
             loaded_data_cache[run_name]['normalized_errors'] = normalized_errors
-            
-            # Generate spatial-temporal error heatmaps
-            if normalized_errors:
-                logger.info(f"     ├─ Generating spatial-temporal error heatmaps ({len(analyze_variables)} vars × 2 types)...")
-                heatmap_count = 0
-                for var in analyze_variables:
-                    if var in normalized_errors:
-                        var_config = variables_config.get(var, {'plot_label': var.upper()})
-                        
-                        # Absolute error heatmap
-                        create_spatial_temporal_error_heatmap(
-                            normalized_errors,
-                            organizer.spacetime_maps_dir,
-                            run_name,
-                            var,
-                            var_config,
-                            unit_length,
-                            use_relative=False
-                        )
-                        
-                        # Relative error heatmap
-                        create_spatial_temporal_error_heatmap(
-                            normalized_errors,
-                            organizer.spacetime_maps_dir,
-                            run_name,
-                            var,
-                            var_config,
-                            unit_length,
-                            use_relative=True
-                        )
-                        heatmap_count += 2
-                
-                logger.info(f"     └─ ✓ Created {heatmap_count} spatial-temporal heatmaps")
+            logger.info(f"     └─ ✓ Calculated errors for {len(normalized_errors)} variables (available for notebook visualization)")
     
     # ============================================================
     # PHASE 2: Find best performers and create overlay videos

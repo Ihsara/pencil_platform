@@ -314,110 +314,6 @@ def create_error_evolution_plots(top_3, error_norms_cache, metrics, output_dir, 
         logger.info(f"       └─ Saved {metric.upper()} evolution to {output_file.name}")
 
 
-# ============================================================================
-# SECTION 5: SPATIAL-TEMPORAL ERROR VISUALIZATION
-# ============================================================================
-
-def create_spatial_temporal_error_heatmap(
-    spatial_errors: Dict,
-    output_path: Path,
-    run_name: str,
-    variable: str,
-    variable_config: Dict,
-    unit_length: float,
-    use_relative: bool = False
-):
-    """
-    Create spatial-temporal error heatmap showing error(x, t) evolution.
-    
-    This function generates 2D heatmaps visualizing how errors evolve across
-    space and time, enabling identification of error patterns and maximum
-    error locations.
-    
-    Args:
-        spatial_errors: Dictionary containing error fields from calculate_normalized_spatial_errors
-        output_path: Directory where the heatmap will be saved
-        run_name: Name of the simulation run
-        variable: Variable name (e.g., 'rho', 'ux', 'pp', 'ee')
-        variable_config: Configuration dict with plot_label and other settings
-        unit_length: Unit conversion factor for spatial coordinates
-        use_relative: If True, plot relative errors; if False, plot absolute errors
-    """
-    from matplotlib.colors import LogNorm
-    
-    output_path.mkdir(parents=True, exist_ok=True)
-    
-    if variable not in spatial_errors:
-        logger.warning(f"Variable '{variable}' not found in spatial errors")
-        return
-    
-    var_data = spatial_errors[variable]
-    
-    # Select error field based on type
-    if use_relative:
-        error_field = var_data['relative_error_field']
-        error_type = 'relative'
-        cbar_label = 'Relative Error'
-    else:
-        error_field = var_data['error_field']
-        error_type = 'absolute'
-        cbar_label = 'Absolute Error'
-    
-    x_coords = var_data['x_coords'] * unit_length  # Convert to physical units (kpc)
-    timesteps = var_data['timesteps']
-    
-    # Create figure
-    fig, ax = plt.subplots(figsize=(12, 8))
-    
-    # Create meshgrid for pcolormesh
-    # X: spatial coordinates, Y: timestep indices
-    X, Y = np.meshgrid(x_coords, range(len(timesteps)))
-    
-    # Plot with logarithmic color scale
-    try:
-        im = ax.pcolormesh(X, Y, error_field, 
-                          cmap='plasma', 
-                          norm=LogNorm(vmin=error_field[error_field > 0].min() if np.any(error_field > 0) else 1e-10,
-                                     vmax=error_field.max()),
-                          shading='auto')
-    except ValueError:
-        # Fallback to linear scale if log scale fails
-        logger.warning(f"Could not use log scale for {variable}, using linear scale")
-        im = ax.pcolormesh(X, Y, error_field, 
-                          cmap='plasma', 
-                          shading='auto')
-    
-    # Add colorbar
-    cbar = plt.colorbar(im, ax=ax, label=cbar_label)
-    
-    # Highlight maximum error location (for relative errors only)
-    if use_relative and 'max_error_location' in var_data:
-        max_loc = var_data['max_error_location']
-        max_x = x_coords[max_loc['space_index']]
-        max_t_idx = max_loc['time_index']
-        
-        ax.scatter([max_x], [max_t_idx], 
-                  s=200, c='red', marker='*', 
-                  edgecolors='white', linewidths=2,
-                  label=f'Max Error: {max_loc["value"]:.2e}\n(t={max_loc["time"]:.2e}, x={max_x:.2f} kpc)',
-                  zorder=10)
-        ax.legend(loc='upper right', fontsize=9, framealpha=0.9)
-    
-    # Labels and title
-    plot_label = variable_config.get('plot_label', variable.upper())
-    ax.set_xlabel('Position (x) [kpc]', fontsize=12)
-    ax.set_ylabel('Timestep (VAR File Index)', fontsize=12)
-    ax.set_title(f'{plot_label} {error_type.capitalize()} Error Evolution\n{run_name}', 
-                fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.2, linewidth=0.5)
-    
-    # Save figure
-    filename = output_path / f"{run_name}_{variable}_spacetime_{error_type}.png"
-    plt.tight_layout()
-    plt.savefig(filename, dpi=150, bbox_inches='tight')
-    plt.close(fig)
-    
-    logger.debug(f"Saved {error_type} error heatmap: {filename.name}")
 
 
 # ============================================================================
@@ -448,7 +344,4 @@ __all__ = [
     'create_best_performers_plot',
     'create_branch_comparison_plot',
     'create_error_evolution_plots',
-    
-    # Spatial-temporal error visualization
-    'create_spatial_temporal_error_heatmap',
 ]
