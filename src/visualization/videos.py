@@ -459,8 +459,8 @@ def create_error_evolution_frames(spatial_errors: Dict, output_path: Path, run_n
         run_name: Name of the run
         unit_length: Unit conversion factor for length (e.g., to kpc)
     """
-    # Save frames in error_frames/{run_name}/ directory
-    frames_dir = output_path.parent / "error_frames" / run_name
+    # Save frames in frames/{run_name}/ directory
+    frames_dir = output_path.parent / "frames" / run_name
     frames_dir.mkdir(parents=True, exist_ok=True)
     
     variables = ['rho', 'ux', 'pp', 'ee']
@@ -880,7 +880,7 @@ def create_combined_error_evolution_frames(
     """
     Creates individual PNG frames for combined spatial error evolution.
     """
-    frames_dir = output_path.parent / "combined_error_frames" / run_name
+    frames_dir = output_path.parent / "frames" / run_name
     frames_dir.mkdir(parents=True, exist_ok=True)
     
     variables = ['rho', 'ux', 'pp', 'ee']

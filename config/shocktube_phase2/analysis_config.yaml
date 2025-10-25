@@ -35,6 +35,7 @@ variables:
 # Error analysis (phase-specific: all metrics)
 error_analysis:
   metrics: ['l1', 'l2', 'linf']  # Phase 2: all metrics
+  ranking_metric: 'l1'  # Metric to use for ranking best performers
   use_code_units: true
   combine_in_videos: true
   analyze_variables: ['rho', 'ux', 'pp', 'ee']

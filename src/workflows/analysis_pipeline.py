@@ -243,8 +243,20 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     # Read error analysis configuration from plan file
     error_config = plan.get('error_analysis', {})
     metrics = error_config.get('metrics', ['l1', 'l2', 'linf'])
+    ranking_metric = error_config.get('ranking_metric', None)
     combine_in_videos = error_config.get('combine_in_videos', True)
     analyze_variables = error_config.get('analyze_variables', ['rho', 'ux', 'pp', 'ee'])
+    
+    # Validate and set ranking metric
+    if ranking_metric is None:
+        # Default to first metric if not specified
+        ranking_metric = metrics[0] if metrics else 'l1'
+        logger.warning(f"No ranking_metric specified in config, defaulting to first metric: {ranking_metric.upper()}")
+    elif ranking_metric not in metrics:
+        # Ranking metric must be in the metrics list
+        logger.error(f"Configured ranking_metric '{ranking_metric}' not in metrics list {metrics}")
+        logger.warning(f"Falling back to first metric: {metrics[0].upper()}")
+        ranking_metric = metrics[0] if metrics else 'l1'
     
     # Load config loader to get variable configurations
     config_loader = create_config_loader(experiment_name, DIRS.config)
@@ -253,6 +265,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     
     logger.info(f"Error analysis configuration:")
     logger.info(f"  ├─ Metrics to calculate: {', '.join([m.upper() for m in metrics])}")
+    logger.info(f"  ├─ Ranking metric: {ranking_metric.upper()}")
     logger.info(f"  ├─ Variables: {', '.join(analyze_variables)}")
     logger.info(f"  └─ Combine in videos: {combine_in_videos}")
     
@@ -352,10 +365,18 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 'spatial_errors': spatial_errors_abs,
             }
             
-            # Get unit length
+            # Get unit length - respect use_code_units flag
             unit_length = 1.0
             if all_sim_data and 'params' in all_sim_data[0]:
-                unit_length = all_sim_data[0]['params'].unit_length
+                # Check if we should use code units (normalized) or physical units
+                use_code_units = error_config.get('use_code_units', True)
+                
+                if use_code_units:
+                    unit_length = 1.0  # Force code units for normalized calculations
+                    logger.debug(f"     ├─ Using code units (unit_length=1.0) for normalized calculations")
+                else:
+                    unit_length = all_sim_data[0]['params'].unit_length
+                    logger.debug(f"     ├─ Using physical units (unit_length={unit_length:.3e})")
 
             logger.info(f"     ├─ Creating var evolution video and frames...")
             create_var_evolution_video(
@@ -445,22 +466,37 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     logger.info("PHASE 2: Creating overlay videos")
     logger.info("=" * 80)
     
+    # Use the explicitly configured ranking_metric (already validated above)
+    logger.info(f"Using configured ranking metric: {ranking_metric.upper()}")
+    
     # Calculate average error for each run using ONLY DENSITY (rho)
     run_scores = {}
     for run_name, cached in loaded_data_cache.items():
         spatial_errors = cached['spatial_errors']
         
-        # Calculate average L2 error for DENSITY ONLY across all timesteps
+        # Calculate average error for DENSITY ONLY across all timesteps using configured ranking metric
         total_error = 0
         count = 0
         if 'rho' in spatial_errors:
             for errors in spatial_errors['rho']['errors_per_timestep']:
-                total_error += np.sqrt(np.mean(errors**2))  # L2 norm
+                if ranking_metric == 'l1':
+                    # L1 norm: mean absolute error
+                    total_error += np.mean(np.abs(errors))
+                elif ranking_metric == 'l2':
+                    # L2 norm: root mean square error
+                    total_error += np.sqrt(np.mean(errors**2))
+                elif ranking_metric == 'linf':
+                    # L∞ norm: maximum absolute error
+                    total_error += np.max(np.abs(errors))
+                else:
+                    # Default to L1 if somehow an invalid metric got through
+                    logger.warning(f"Unknown ranking metric '{ranking_metric}', using L1")
+                    total_error += np.mean(np.abs(errors))
                 count += 1
         
         avg_error = total_error / count if count > 0 else float('inf')
         run_scores[run_name] = avg_error
-        logger.info(f"  {run_name}: avg L2 error (rho only) = {avg_error:.6e}")
+        logger.info(f"  {run_name}: avg {ranking_metric.upper()} error (rho only) = {avg_error:.6e}")
     
     # Find best performer in each branch
     logger.info(f"\n🏆 Finding best performers in each branch...")
@@ -473,7 +509,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
         if branch_scores:
             best_run = min(branch_scores, key=branch_scores.get)
             branch_best_performers[branch_name] = best_run
-            logger.info(f"  ├─ {branch_name}: {best_run} (L2={branch_scores[best_run]:.6e})")
+            logger.info(f"  ├─ {branch_name}: {best_run} ({ranking_metric.upper()}={branch_scores[best_run]:.6e})")
     
     # Create overlay videos for each branch (all runs in branch)
     logger.info(f"\n🎬 Creating branch overlay videos...")
@@ -490,13 +526,17 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 spatial_errors_list.append((run_name, cached['spatial_errors']))
         
         if spatial_errors_list:
-            # Get unit_length from first run
+            # Get unit_length from first run - respect use_code_units flag
             unit_length = 1.0
             first_run_data = loaded_data_cache[branch_runs[0]]
             if first_run_data['sim_data'] and 'params' in first_run_data['sim_data'][0]:
                 params = first_run_data['sim_data'][0]['params']
-                if hasattr(params, 'unit_length'):
-                    unit_length = params.unit_length  # Already in cm
+                use_code_units = error_config.get('use_code_units', True)
+                
+                if use_code_units:
+                    unit_length = 1.0  # Force code units
+                elif hasattr(params, 'unit_length'):
+                    unit_length = params.unit_length
             
             output_name = f"{experiment_name}_{branch_name}_overlay"
             create_overlay_error_evolution_video(
@@ -510,7 +550,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     top_3_runs = [run for run, score in sorted_runs[:3]]
     
     for idx, (run, score) in enumerate(sorted_runs[:3], 1):
-        logger.info(f"  ├─ #{idx}: {run} (L2={score:.6e})")
+        logger.info(f"  ├─ #{idx}: {run} ({ranking_metric.upper()}={score:.6e})")
     
     # Create overlay video for top 3
     logger.info(f"\n🎬 Creating top 3 overlay video...")
@@ -521,13 +561,17 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             top_3_spatial_errors.append((run_name, cached['spatial_errors']))
     
     if top_3_spatial_errors:
-        # Get unit_length from first run
+        # Get unit_length from first run - respect use_code_units flag
         unit_length = 1.0
         first_run_data = loaded_data_cache[top_3_runs[0]]
         if first_run_data['sim_data'] and 'params' in first_run_data['sim_data'][0]:
             params = first_run_data['sim_data'][0]['params']
-            if hasattr(params, 'unit_length'):
-                unit_length = params.unit_length  # Already in cm
+            use_code_units = error_config.get('use_code_units', True)
+            
+            if use_code_units:
+                unit_length = 1.0  # Force code units
+            elif hasattr(params, 'unit_length'):
+                unit_length = params.unit_length
         
         output_name = f"{experiment_name}_top3_best_performers_overlay"
         create_overlay_error_evolution_video(
