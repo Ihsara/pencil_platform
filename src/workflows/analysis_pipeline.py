@@ -27,7 +27,6 @@ from src.visualization.plots import (
     create_best_performers_plot,
     create_branch_comparison_plot,
     create_error_evolution_plots,
-    create_spatial_temporal_error_heatmap,
 )
 from src.visualization.videos import (
     create_var_evolution_video,
