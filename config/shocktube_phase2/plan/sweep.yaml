@@ -62,33 +62,7 @@ parameter_sweeps:
 # --- Branches ---
 # Three scenarios based on top 3 L1 performers from Phase 1
 branches:
-  # Scenario 1: Best L1 performer (rank 1)
-  # nu=0.5, chi=0.5, diffrho=0.5, default_gamma
-  - name: "r1_nu0.5_dg"
-    settings:
-      run_in.yaml:
-        density_run_pars: 
-          diffrho_shock: 0.5
-          lgamma_is_1: false
-        viscosity_run_pars: 
-          nu_shock: 0.5
-        entropy_run_pars: 
-          chi_shock: 0.5
-
-  # Scenario 2: Second best L1 performer (rank 2)
-  # nu=0.5, chi=0.5, diffrho=0.5, gamma_is_1
-  - name: "r2_nu0.5_g1"
-    settings:
-      run_in.yaml:
-        density_run_pars: 
-          diffrho_shock: 0.5
-          lgamma_is_1: true
-        viscosity_run_pars: 
-          nu_shock: 0.5
-        entropy_run_pars: 
-          chi_shock: 0.5
-
-  # Scenario 3: Third best L1 performer (rank 3)
+  # Scenario 1: Third best L1 performer (rank 3)
   # nu=1.0, chi=1.0, diffrho=1.0, default_gamma
   - name: "r3_nu1.0_dg"
     settings:

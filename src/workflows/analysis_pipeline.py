@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple
 from src.core.constants import DIRS, FILES
 from src.core.logging import setup_file_logging
 from src.core.config_loader import create_config_loader
+from src.experiment.job_manager import _ensure_manifest_exists
 from src.analysis.errors import (
     calculate_std_deviation_across_vars, 
     calculate_absolute_deviation_per_var,
@@ -274,8 +275,16 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     logger.info(f"  └─ Combine in videos: {combine_in_videos}")
     
     hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
-    manifest_file = DIRS.runs / experiment_name / FILES.manifest
+    local_exp_dir = DIRS.runs / experiment_name
+    manifest_file = local_exp_dir / FILES.manifest
     analysis_dir = DIRS.root / "analysis" / experiment_name
+    
+    # Ensure manifest exists - regenerate if missing
+    if not manifest_file.exists():
+        logger.warning(f"Manifest file not found. Attempting to regenerate...")
+        if not _ensure_manifest_exists(experiment_name, local_exp_dir):
+            logger.error("Cannot proceed with analysis: manifest file could not be created")
+            sys.exit(1)
     
     # Create directory structure following the standard: var/, error/, best/
     var_dir = analysis_dir / "var"
@@ -287,13 +296,18 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     error_evo_plotly_dir = error_dir / "evo_plotly"
     error_frames_dir = error_dir / "frames"
 
-    # Clear old visualizations before creating new ones
+    # Clear old visualizations AND cache before creating new ones
     logger.info("Clearing old visualization directories...")
     clear_directory(var_evolution_dir)
     clear_directory(var_evo_plotly_dir)
     clear_directory(error_evolution_dir)
     clear_directory(error_evo_plotly_dir)
     clear_directory(error_frames_dir)
+    
+    # Clear cache directory to force fresh computation
+    cache_dir = error_dir / "cache"
+    logger.info("Clearing cache directory for fresh computation...")
+    clear_directory(cache_dir)
 
     with open(manifest_file, 'r') as f: 
         run_names = [line.strip() for line in f if line.strip()]
@@ -451,7 +465,19 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             
             # Cache normalized errors for later use (e.g., in notebooks)
             loaded_data_cache[run_name]['normalized_errors'] = normalized_errors
-            logger.info(f"     └─ ✓ Calculated errors for {len(normalized_errors)} variables (available for notebook visualization)")
+            
+            # Save to pickle cache for fast notebook loading
+            cache_dir = analysis_dir / "error" / "cache"
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            cache_file = cache_dir / f"{run_name}_normalized_errors.pkl"
+            
+            try:
+                import pickle
+                with open(cache_file, 'wb') as f:
+                    pickle.dump(normalized_errors, f, protocol=pickle.HIGHEST_PROTOCOL)
+                logger.info(f"     └─ ✓ Calculated and cached errors for {len(normalized_errors)} variables")
+            except Exception as e:
+                logger.warning(f"     └─ ✓ Calculated errors for {len(normalized_errors)} variables (cache save failed: {e})")
             
             # Create and cache "mind the gap" spacetime data
             logger.info(f"     ├─ Creating 'mind the gap' spacetime data...")
@@ -957,8 +983,16 @@ def analyze_suite_with_error_norms(experiment_name: str, metrics: List[str] = No
         plan = yaml.safe_load(f)
     
     hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
-    manifest_file = DIRS.runs / experiment_name / FILES.manifest
+    local_exp_dir = DIRS.runs / experiment_name
+    manifest_file = local_exp_dir / FILES.manifest
     analysis_dir = DIRS.root / "analysis" / experiment_name
+    
+    # Ensure manifest exists - regenerate if missing
+    if not manifest_file.exists():
+        logger.warning(f"Manifest file not found. Attempting to regenerate...")
+        if not _ensure_manifest_exists(experiment_name, local_exp_dir):
+            logger.error("Cannot proceed with analysis: manifest file could not be created")
+            sys.exit(1)
     
     # Create NEW subfolder for error norm results
     error_norms_dir = analysis_dir / "error_norms"

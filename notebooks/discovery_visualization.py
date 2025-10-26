@@ -231,40 +231,67 @@ def create_3d_error_map_with_dropdowns(
 def _load_3d_error_surface(
     experiment_name: str,
     run_name: str,
-    element: str
+    element: str,
+    force_recompute: bool = False
 ) -> Optional[Dict[str, np.ndarray]]:
     """
     Load error data and prepare for 3D surface plot.
+    
+    Args:
+        experiment_name: Name of the experiment
+        run_name: Name of the run
+        element: Element to visualize
+        force_recompute: If True, recompute even if cached data exists
     
     Returns:
         Dictionary with 'x', 'y', 'z' arrays or None if failed
     """
     try:
-        # Load from HPC directory
-        plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / "sweep.yaml"
-        with open(plan_file, 'r') as f:
-            plan = yaml.safe_load(f)
+        # Try to load from cache first unless force_recompute is True
+        cache_dir = DIRS.root / "analysis" / experiment_name / "error" / "cache"
+        cache_file = cache_dir / f"{run_name}_normalized_errors.pkl"
         
-        hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
-        run_path = hpc_run_base_dir / run_name
+        normalized_errors = None
         
-        # Load VAR files
-        all_sim_data = load_all_var_files(run_path)
-        if not all_sim_data:
-            return None
+        if not force_recompute and cache_file.exists():
+            try:
+                import pickle
+                with open(cache_file, 'rb') as f:
+                    normalized_errors = pickle.load(f)
+                logger.info(f"✓ Loaded cached error data for {run_name}")
+            except Exception as e:
+                logger.warning(f"Failed to load cache for {run_name}, recomputing: {e}")
+                normalized_errors = None
         
-        # Generate analytical solutions
-        all_analytical_data = [
-            get_analytical_solution(s['params'], s['x'], s['t']) 
-            for s in all_sim_data
-        ]
-        
-        # Calculate normalized errors
-        normalized_errors = calculate_normalized_spatial_errors(
-            all_sim_data,
-            all_analytical_data,
-            variables=[element]
-        )
+        # If no cache or force_recompute, calculate from scratch
+        if normalized_errors is None:
+            logger.info(f"Computing error data for {run_name}...")
+            
+            # Load from HPC directory
+            plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / "sweep.yaml"
+            with open(plan_file, 'r') as f:
+                plan = yaml.safe_load(f)
+            
+            hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
+            run_path = hpc_run_base_dir / run_name
+            
+            # Load VAR files
+            all_sim_data = load_all_var_files(run_path)
+            if not all_sim_data:
+                return None
+            
+            # Generate analytical solutions
+            all_analytical_data = [
+                get_analytical_solution(s['params'], s['x'], s['t']) 
+                for s in all_sim_data
+            ]
+            
+            # Calculate normalized errors
+            normalized_errors = calculate_normalized_spatial_errors(
+                all_sim_data,
+                all_analytical_data,
+                variables=[element]
+            )
         
         if element not in normalized_errors:
             return None
@@ -296,7 +323,8 @@ def _load_3d_error_surface(
 def create_error_evolution_animation(
     experiment_name: str,
     run_name: str,
-    element: str = 'rho'
+    element: str = 'rho',
+    force_recompute: bool = False
 ) -> Optional[go.Figure]:
     """
     Create animated line graph showing error evolution over time.
@@ -305,6 +333,7 @@ def create_error_evolution_animation(
         experiment_name: Name of the experiment
         run_name: Name of the run
         element: Element to visualize ('rho', 'ux', 'pp', 'ee')
+        force_recompute: If True, recompute even if cached data exists
         
     Returns:
         Plotly Figure with animation controls or None if failed
@@ -317,32 +346,52 @@ def create_error_evolution_animation(
     }
     
     try:
-        # Load from HPC directory
-        plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / "sweep.yaml"
-        with open(plan_file, 'r') as f:
-            plan = yaml.safe_load(f)
+        # Try to load from cache first unless force_recompute is True
+        cache_dir = DIRS.root / "analysis" / experiment_name / "error" / "cache"
+        cache_file = cache_dir / f"{run_name}_normalized_errors.pkl"
         
-        hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
-        run_path = hpc_run_base_dir / run_name
+        normalized_errors = None
         
-        # Load VAR files
-        all_sim_data = load_all_var_files(run_path)
-        if not all_sim_data:
-            logger.error(f"No VAR files found for {run_name}")
-            return None
+        if not force_recompute and cache_file.exists():
+            try:
+                import pickle
+                with open(cache_file, 'rb') as f:
+                    normalized_errors = pickle.load(f)
+                logger.info(f"✓ Loaded cached error data for {run_name}")
+            except Exception as e:
+                logger.warning(f"Failed to load cache for {run_name}, recomputing: {e}")
+                normalized_errors = None
         
-        # Generate analytical solutions
-        all_analytical_data = [
-            get_analytical_solution(s['params'], s['x'], s['t']) 
-            for s in all_sim_data
-        ]
-        
-        # Calculate normalized errors
-        normalized_errors = calculate_normalized_spatial_errors(
-            all_sim_data,
-            all_analytical_data,
-            variables=[element]
-        )
+        # If no cache or force_recompute, calculate from scratch
+        if normalized_errors is None:
+            logger.info(f"Computing error data for {run_name}...")
+            
+            # Load from HPC directory
+            plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / "sweep.yaml"
+            with open(plan_file, 'r') as f:
+                plan = yaml.safe_load(f)
+            
+            hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
+            run_path = hpc_run_base_dir / run_name
+            
+            # Load VAR files
+            all_sim_data = load_all_var_files(run_path)
+            if not all_sim_data:
+                logger.error(f"No VAR files found for {run_name}")
+                return None
+            
+            # Generate analytical solutions
+            all_analytical_data = [
+                get_analytical_solution(s['params'], s['x'], s['t']) 
+                for s in all_sim_data
+            ]
+            
+            # Calculate normalized errors
+            normalized_errors = calculate_normalized_spatial_errors(
+                all_sim_data,
+                all_analytical_data,
+                variables=[element]
+            )
         
         if element not in normalized_errors:
             logger.error(f"Element {element} not found in normalized errors")
@@ -455,7 +504,8 @@ def create_error_evolution_animation(
 def show_error_evolution(
     experiment_name: str,
     run_name: str,
-    element: str = 'rho'
+    element: str = 'rho',
+    force_recompute: bool = False
 ) -> Optional[go.Figure]:
     """
     Show error evolution animation (Jupyter-friendly).
@@ -463,25 +513,35 @@ def show_error_evolution(
     Creates an animated line graph showing how error varies with distance
     at each timestep. Use the slider or play button to navigate through time.
     
+    By default, uses cached data from --analyze runs for fast loading.
+    Set force_recompute=True for exploratory work when you need fresh calculations.
+    
     Args:
         experiment_name: Name of the experiment (e.g., 'shocktube_phase1')
         run_name: Name of the run
         element: Element to visualize - 'rho', 'ux', 'pp', or 'ee'
+        force_recompute: If True, recalculate errors instead of using cache
         
     Returns:
         Plotly Figure object that can be displayed with fig.show()
         
     Example:
         >>> from notebooks.discovery_visualization import show_error_evolution
+        >>> # Use cached data (fast)
         >>> fig = show_error_evolution('shocktube_phase1', 'res400_nohyper_...', 'rho')
         >>> fig.show()
+        >>> 
+        >>> # Force recomputation (for exploratory work)
+        >>> fig = show_error_evolution('shocktube_phase1', 'res400_nohyper_...', 'rho', force_recompute=True)
+        >>> fig.show()
     """
-    return create_error_evolution_animation(experiment_name, run_name, element)
+    return create_error_evolution_animation(experiment_name, run_name, element, force_recompute)
 
 
 def show_3d_error_map(
     experiment_names: Optional[List[str]] = None,
-    default_experiment: Optional[str] = None
+    default_experiment: Optional[str] = None,
+    force_recompute: bool = False
 ) -> go.Figure:
     """
     Show 3D error map with dropdowns (Jupyter-friendly).
@@ -489,18 +549,30 @@ def show_3d_error_map(
     Creates an interactive 3D surface plot where you can select different
     experiments, branches, runs, and elements from dropdown menus.
     
+    By default, uses cached data from --analyze runs for fast loading.
+    Set force_recompute=True for exploratory work when you need fresh calculations.
+    
     Args:
         experiment_names: List of experiments to include (if None, auto-detect)
         default_experiment: Default experiment to show
+        force_recompute: If True, recalculate errors instead of using cache
         
     Returns:
         Plotly Figure object that can be displayed with fig.show()
         
     Example:
         >>> from notebooks.discovery_visualization import show_3d_error_map
+        >>> # Use cached data (fast)
         >>> fig = show_3d_error_map(['shocktube_phase1', 'shocktube_phase2'])
         >>> fig.show()
+        >>> 
+        >>> # Force recomputation (for exploratory work)
+        >>> fig = show_3d_error_map(['shocktube_phase1'], force_recompute=True)
+        >>> fig.show()
     """
+    # Note: Currently force_recompute is not passed down to create_3d_error_map_with_dropdowns
+    # since that function loads all data at once. For now, the _load_3d_error_surface
+    # internal function will use force_recompute=False by default
     return create_3d_error_map_with_dropdowns(experiment_names, default_experiment)
 
 
