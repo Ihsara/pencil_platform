@@ -378,12 +378,38 @@ def create_error_evolution_plotly(
             row=row, col=col
         )
     
-    # Update axes
+    # Calculate and set fixed axis limits (like matplotlib) to prevent jumping between frames
     x_label = 'x [kpc]' if unit_length != 1.0 else 'x [normalized]'
     for var_idx, (var, label) in enumerate(valid_vars):
         row, col = positions[var_idx]
-        fig.update_xaxes(title_text=x_label, row=row, col=col)
-        fig.update_yaxes(title_text=f"Error in {label}", row=row, col=col)
+        
+        # Set x-axis range
+        x_raw = spatial_errors[var]['x']
+        try:
+            x_coords = x_raw * unit_length
+            if not np.all(np.isfinite(x_coords)):
+                x_coords = x_raw
+        except (OverflowError, RuntimeWarning):
+            x_coords = x_raw
+        
+        fig.update_xaxes(
+            title_text=x_label, 
+            range=[x_coords.min(), x_coords.max()],
+            row=row, col=col
+        )
+        
+        # Calculate y-axis range across ALL timesteps (same as matplotlib)
+        all_errors = np.concatenate(spatial_errors[var]['errors_per_timestep'])
+        y_min = all_errors.min()
+        y_max = all_errors.max()
+        y_range = y_max - y_min if y_max > y_min else y_max * 0.1
+        y_margin = 0.1 * y_range
+        
+        fig.update_yaxes(
+            title_text=f"Error in {label}",
+            range=[y_min - y_margin, y_max + y_margin],
+            row=row, col=col
+        )
     
     # Update layout
     var_file_0 = spatial_errors[list(spatial_errors.keys())[0]]['var_files'][0]
@@ -591,12 +617,39 @@ def create_combined_error_evolution_plotly(
                     row=row, col=col
                 )
     
-    # Update axes
+    # Calculate and set fixed axis limits (like matplotlib) to prevent jumping between frames
     for var_idx, (var, label) in enumerate(zip(variables, var_labels)):
         row, col = positions[var_idx]
         x_label = 'x [kpc]' if unit_length != 1.0 else 'x [normalized]'
-        fig.update_xaxes(title_text=x_label, row=row, col=col)
-        fig.update_yaxes(title_text=f"Error in {label}", row=row, col=col)
+        
+        # Set x-axis range from first error type (all should have same x coords)
+        x_coords = spatial_errors_dict[first_error_type][var]['x'] * unit_length
+        fig.update_xaxes(
+            title_text=x_label,
+            range=[x_coords.min(), x_coords.max()],
+            row=row, col=col
+        )
+        
+        # Calculate y-axis range across ALL timesteps and ALL error types (same as matplotlib)
+        all_errors = []
+        for error_type, spatial_errors in spatial_errors_dict.items():
+            if var in spatial_errors:
+                all_errors.extend(np.concatenate(spatial_errors[var]['errors_per_timestep']))
+        
+        if all_errors:
+            all_errors_array = np.array(all_errors)
+            y_min = all_errors_array.min()
+            y_max = all_errors_array.max()
+            y_range = y_max - y_min if y_max > y_min else y_max * 0.1
+            y_margin = 0.1 * y_range
+            
+            fig.update_yaxes(
+                title_text=f"Error in {label}",
+                range=[y_min - y_margin, y_max + y_margin],
+                row=row, col=col
+            )
+        else:
+            fig.update_yaxes(title_text=f"Error in {label}", row=row, col=col)
     
     # Update layout
     var_file_0 = spatial_errors_dict[first_error_type]['rho']['var_files'][0]
