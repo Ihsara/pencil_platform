@@ -1,0 +1,19 @@
+# A simple list of variables to be printed.
+format: list
+data:
+  variables:
+    - it(i8)
+    - t(e12.4)
+    - dt(e12.4)
+    - umax(e12.4)
+    - ekin(e12.4)
+    - ethm(e12.4)
+    - TTmax(e12.4)
+    - epsK(e12.4)
+    - visc_heatm(e12.4)
+    - pdivum(e12.4)
+    - ruxm(e12.4)
+    - rhomin(e12.4)
+    - rhomax(e12.4)
+    - ssm(e12.4)
+    - meshRe3max(e12.4)

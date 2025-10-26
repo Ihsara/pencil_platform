@@ -1,0 +1,6 @@
+format: list
+data:
+  variables:
+    - ss
+    - uu
+    - lnrho
