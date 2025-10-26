@@ -473,35 +473,8 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             
             logger.info(f"     └─ ✓ Saved spacetime data for interactive visualization")
             
-            # Create 2D error line graphs with slider and play button
-            logger.info(f"     ├─ Creating 2D error line graphs (with slider/play)...")
-            from notebooks.spacetime_error_visualization import create_error_line_graph_with_animation
-            
-            # Create organized structure: error -> evo_time -> <element> -> graphs
-            evo_time_dir = analysis_dir / "error" / "evo_time"
-            
-            for var in analyze_variables:
-                element_dir = evo_time_dir / var
-                element_dir.mkdir(parents=True, exist_ok=True)
-                
-                prepared_data = prepare_spacetime_error_data(
-                    normalized_errors,
-                    var,
-                    unit_length,
-                    use_relative=True
-                )
-                
-                if prepared_data:
-                    fig = create_error_line_graph_with_animation(
-                        prepared_data,
-                        title=f"{var.upper()} Error Evolution: {run_name}"
-                    )
-                    
-                    if fig:
-                        output_file = element_dir / f"{run_name}.html"
-                        fig.write_html(str(output_file))
-            
-            logger.info(f"     └─ ✓ Created 2D error line graphs for {len(analyze_variables)} elements")
+            # Store normalized errors for later combined visualization
+            logger.info(f"     └─ ✓ Calculated errors for {len(analyze_variables)} variables")
     
     # ============================================================
     # PHASE 2: Find best performers and create overlay videos
@@ -622,6 +595,210 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             top_3_spatial_errors, error_evolution_dir, output_name, fps=2, unit_length=unit_length
         )
         logger.info(f"     └─ ✓ Created top 3 overlay video")
+    
+    # ============================================================
+    # PHASE 2.5: Create combined error line graphs with all experiments
+    # ============================================================
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 2.5: Creating combined error line graphs")
+    logger.info("=" * 80)
+    
+    from datetime import datetime
+    import plotly.express as px
+    import plotly.graph_objects as go
+    
+    # Get current timestamp in YYYYMMDD format
+    timestamp = datetime.now().strftime("%Y%m%d")
+    
+    # Create organized structure: error -> evo_time -> <element>
+    evo_time_dir = analysis_dir / "error" / "evo_time"
+    
+    # Find best performer (lowest score)
+    best_run_name = min(run_scores.items(), key=lambda x: x[1])[0] if run_scores else None
+    
+    for var in analyze_variables:
+        element_dir = evo_time_dir / var
+        element_dir.mkdir(parents=True, exist_ok=True)
+        
+        logger.info(f"  ├─ Creating combined {var.upper()} graph with all {len(loaded_data_cache)} experiments...")
+        
+        # Collect all data for this variable
+        all_traces = []
+        run_labels = []
+        timesteps_ref = None
+        
+        for run_idx, (run_name, cached) in enumerate(loaded_data_cache.items()):
+            normalized_errors = cached.get('normalized_errors')
+            if not normalized_errors or var not in normalized_errors:
+                continue
+            
+            # Prepare data for this run
+            prepared_data = prepare_spacetime_error_data(
+                normalized_errors,
+                var,
+                unit_length,
+                use_relative=True
+            )
+            
+            if not prepared_data:
+                continue
+            
+            x_coords = prepared_data['x_coords']
+            timesteps = prepared_data['timesteps']
+            error_matrix = prepared_data['error_matrix']
+            
+            if timesteps_ref is None:
+                timesteps_ref = timesteps
+            
+            # Determine if this is the best performer
+            is_best = (run_name == best_run_name)
+            
+            # Create color - use distinct colors from a palette
+            colors = px.colors.qualitative.Set3 + px.colors.qualitative.Pastel + px.colors.qualitative.Set2
+            line_color = colors[run_idx % len(colors)]
+            
+            # Set opacity - 0.5 for non-best, 1.0 for best
+            opacity = 1.0 if is_best else 0.5
+            line_width = 3 if is_best else 1.5
+            
+            # Create frames for this run
+            for t_idx in range(len(timesteps)):
+                trace = go.Scatter(
+                    x=x_coords,
+                    y=error_matrix[t_idx],
+                    mode='lines',
+                    name=run_name,
+                    line=dict(width=line_width, color=line_color),
+                    opacity=opacity,
+                    visible=(t_idx == 0),  # Only first frame visible initially
+                    legendgroup=run_name,
+                    showlegend=(t_idx == 0),  # Only show in legend once
+                    hovertemplate=f'{run_name}<br>x=%{{x:.3f}}<br>error=%{{y:.3e}}<extra></extra>'
+                )
+                all_traces.append((trace, t_idx, run_name, is_best))
+            
+            run_labels.append((run_name, is_best))
+        
+        if not all_traces or timesteps_ref is None:
+            logger.warning(f"     └─ No data available for {var}")
+            continue
+        
+        # Group traces by timestep
+        traces_by_timestep = {}
+        for trace, t_idx, run_name, is_best in all_traces:
+            if t_idx not in traces_by_timestep:
+                traces_by_timestep[t_idx] = []
+            traces_by_timestep[t_idx].append(trace)
+        
+        # Create figure with all traces
+        fig = go.Figure()
+        for trace, _, _, _ in all_traces:
+            fig.add_trace(trace)
+        
+        # Create animation frames
+        n_timesteps = max(traces_by_timestep.keys()) + 1
+        frames = []
+        for t_idx in range(n_timesteps):
+            frame_data = []
+            for trace_idx, (trace, trace_t_idx, _, _) in enumerate(all_traces):
+                # Make trace visible if it matches current timestep
+                visible = (trace_t_idx == t_idx)
+                frame_data.append(go.Scatter(visible=visible))
+            
+            t_val = timesteps_ref[t_idx] if t_idx < len(timesteps_ref) else 0
+            frames.append(go.Frame(
+                data=frame_data,
+                name=str(t_idx),
+                layout=go.Layout(
+                    title_text=f"{var.upper()} Error Evolution - All Experiments<br>VAR{t_idx} (t={t_val:.3e})"
+                )
+            ))
+        
+        fig.frames = frames
+        
+        # Update layout
+        fig.update_layout(
+            title=dict(
+                text=f"{var.upper()} Error Evolution - All Experiments<br><sub>Best performer: {best_run_name} (highlighted)</sub>",
+                x=0.5,
+                xanchor='center'
+            ),
+            xaxis=dict(
+                title='Position (x) [kpc]',
+                gridcolor='lightgray'
+            ),
+            yaxis=dict(
+                title='Relative Error',
+                gridcolor='lightgray',
+                type='log'
+            ),
+            height=600,
+            width=1400,
+            hovermode='closest',
+            plot_bgcolor='rgba(240, 240, 240, 0.5)',
+            updatemenus=[
+                dict(
+                    type='buttons',
+                    showactive=False,
+                    buttons=[
+                        dict(
+                            label='▶ Play',
+                            method='animate',
+                            args=[None, dict(
+                                frame=dict(duration=500, redraw=True),
+                                fromcurrent=True,
+                                mode='immediate',
+                                transition=dict(duration=300)
+                            )]
+                        ),
+                        dict(
+                            label='⏸ Pause',
+                            method='animate',
+                            args=[[None], dict(
+                                frame=dict(duration=0, redraw=False),
+                                mode='immediate',
+                                transition=dict(duration=0)
+                            )]
+                        )
+                    ],
+                    x=0.1,
+                    y=1.15,
+                    xanchor='left',
+                    yanchor='top'
+                )
+            ],
+            sliders=[dict(
+                active=0,
+                yanchor='top',
+                y=-0.15,
+                xanchor='left',
+                currentvalue=dict(
+                    prefix='VAR Snapshot: ',
+                    visible=True,
+                    xanchor='center'
+                ),
+                pad=dict(b=10, t=50),
+                len=0.9,
+                x=0.05,
+                steps=[
+                    dict(
+                        args=[[f.name], dict(
+                            frame=dict(duration=500, redraw=True),
+                            mode='immediate',
+                            transition=dict(duration=300)
+                        )],
+                        label=f"VAR{i}",
+                        method='animate'
+                    )
+                    for i in range(n_timesteps)
+                ]
+            )]
+        )
+        
+        # Save with timestamp naming
+        output_file = element_dir / f"{timestamp}.html"
+        fig.write_html(str(output_file))
+        logger.info(f"     └─ ✓ Saved combined graph: {output_file.name}")
     
     # ============================================================
     # PHASE 3: Calculate L1/L2 error norms (reusing loaded data)
