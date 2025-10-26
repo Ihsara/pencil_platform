@@ -205,6 +205,103 @@ These JSON files contain pre-computed spacetime error data that can be quickly l
 2. **Use in Jupyter**: Open `mind_the_gap_example.ipynb` and create visualizations
 3. **Data is Reused**: No need to re-run analysis for subsequent visualizations
 
+## Discovery Visualization (NEW)
+
+### discovery_visualization.py
+
+Advanced interactive error analysis with organized output structure and comprehensive visualization options.
+
+#### Features
+
+**1. Error Evolution Animation**
+- Line graphs showing error vs distance for each VAR snapshot
+- Slider to navigate through timesteps
+- Play/Pause buttons for automatic animation
+- One line per VAR snapshot showing error across all grid points
+
+**2. 3D Error Maps with Dropdowns**
+- Interactive 3D surface plots
+- Dropdown menus for:
+  - Experiment selection
+  - Branch selection (parameter groups)
+  - Run selection
+  - Element selection (rho, ux, pp, ee)
+- Axes: X=Distance, Y=Time, Z=Error Magnitude
+- Based on [Plotly dropdown example](https://plotly.com/python/dropdowns/)
+
+#### Organized Output Structure
+
+Visualizations are saved in an organized hierarchy:
+
+```
+analysis/
+├── <experiment>/
+│   ├── error/
+│   │   ├── evo_time/          # Renamed from "evolution"
+│   │   │   ├── rho/           # Density visualizations
+│   │   │   │   ├── line_<run1>.html
+│   │   │   │   ├── line_<run2>.html
+│   │   │   │   └── ...
+│   │   │   ├── ux/            # Velocity visualizations
+│   │   │   ├── pp/            # Pressure visualizations
+│   │   │   └── ee/            # Energy visualizations
+│   │   ├── error_frames/
+│   │   └── spacetime_maps/
+```
+
+#### Jupyter Usage
+
+```python
+from notebooks.discovery_visualization import show_error_evolution, show_3d_error_map
+
+# Show error evolution with animation
+fig = show_error_evolution('shocktube_phase1', 'run_name', 'rho')
+fig.show()
+
+# Show 3D error map with dropdowns
+fig = show_3d_error_map(['shocktube_phase1', 'shocktube_phase2'])
+fig.show()
+```
+
+#### Command-Line Usage
+
+```bash
+# Generate all visualizations for an experiment
+python notebooks/discovery_visualization.py \
+    --experiment shocktube_phase1 \
+    --generate-all
+
+# Show specific run visualization
+python notebooks/discovery_visualization.py \
+    --experiment shocktube_phase1 \
+    --run <run_name> \
+    --element rho
+```
+
+#### Example Notebook
+
+See `discovery_example.ipynb` for complete examples and usage patterns.
+
+#### Key Differences from Mind the Gap
+
+| Feature | Mind the Gap | Discovery Viz |
+|---------|-------------|---------------|
+| View | Scatter plot (space-time) | Line graphs + 3D surface |
+| Animation | All timesteps visible | One timestep at a time |
+| Organization | Flat structure | Element-based hierarchy |
+| Dropdowns | None | Experiment/Branch/Run/Element |
+| Output | Single variable | All elements organized |
+
+## Folder Structure Changes
+
+**Important**: The `evolution` folders have been renamed to `evo_time`:
+
+- `analysis/<experiment>/error/evolution/` → `analysis/<experiment>/error/evo_time/`
+- `analysis/<experiment>/var/evolution/` → `analysis/<experiment>/var/evo_time/`
+- `analysis/<experiment>/best/evolution/` → `analysis/<experiment>/best/evo_time/`
+
+This provides clearer naming and aligns with the temporal evolution focus of the visualizations.
+
 ## Future Enhancements
 
 Potential future additions:
@@ -213,3 +310,4 @@ Potential future additions:
 - Additional plot types (contour, surface, etc.)
 - Statistical comparison tools
 - Time-series analysis of error evolution
+- Integration with interactive dashboards (Dash/Streamlit)

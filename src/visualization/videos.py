@@ -760,7 +760,6 @@ def create_combined_error_evolution_video(
     max_timesteps = len(spatial_errors_dict[first_error_type]['rho']['errors_per_timestep'])
     
     lines = {var: {} for var in variables}
-    inf_markers = {var: None for var in variables}
 
     for idx, (var, label) in enumerate(zip(variables, var_labels)):
         ax = axes[idx]
@@ -770,9 +769,6 @@ def create_combined_error_evolution_video(
                 linestyle = linestyles.get(error_type, '-')
                 line, = ax.plot([], [], linestyle, linewidth=2.5, color=colors.get(error_type, 'k'), alpha=0.85)
                 lines[var][error_type] = line
-
-        inf_marker, = ax.plot([], [], 'o', color=colors['L_inf'], markersize=8, alpha=0.9)
-        inf_markers[var] = inf_marker
         
         x_raw = spatial_errors_dict[first_error_type][var]['x']
         x_coords = x_raw * unit_length
@@ -806,10 +802,6 @@ def create_combined_error_evolution_video(
             Line2D([0], [0], color=colors.get(error_type, 'k'), linestyle=linestyle,
                    linewidth=2.5, alpha=0.85, label=error_type)
         )
-    legend_elements.append(
-        Line2D([0], [0], marker='o', color='w', markerfacecolor=colors['L_inf'],
-               markersize=8, alpha=0.9, linestyle='None', label='L_inf Norm (Max Abs)')
-    )
     legend_ax.legend(handles=legend_elements, loc='center', ncol=3, 
                     fontsize=12, frameon=True)
 
@@ -820,9 +812,8 @@ def create_combined_error_evolution_video(
         for var in variables:
             for line in lines[var].values():
                 line.set_data([], [])
-            inf_markers[var].set_data([], [])
         title.set_text(f'{formatted_title} - VAR 0')
-        return [l for v in lines.values() for l in v.values()] + list(inf_markers.values()) + [title]
+        return [l for v in lines.values() for l in v.values()] + [title]
 
     def animate(frame):
         for var in variables:
@@ -831,27 +822,13 @@ def create_combined_error_evolution_video(
                     x_coords = spatial_errors[var]['x'] * unit_length
                     errors = spatial_errors[var]['errors_per_timestep'][frame]
                     lines[var][error_type].set_data(x_coords, errors)
-
-            # L-infinity norm is max of absolute error
-            # Find the absolute error key (could be 'Absolute', 'L1/LINF (Absolute)', etc.)
-            abs_error_key = None
-            for key in spatial_errors_dict.keys():
-                if 'Absolute' in key or 'absolute' in key.lower():
-                    abs_error_key = key
-                    break
-            
-            if abs_error_key and var in spatial_errors_dict[abs_error_key]:
-                abs_errors = spatial_errors_dict[abs_error_key][var]['errors_per_timestep'][frame]
-                x_coords_abs = spatial_errors_dict[abs_error_key][var]['x'] * unit_length
-                max_error_idx = np.argmax(abs_errors)
-                inf_markers[var].set_data([x_coords_abs[max_error_idx]], [abs_errors[max_error_idx]])
             
         var_file = spatial_errors_dict[first_error_type]['rho']['var_files'][frame]
         timestep = spatial_errors_dict[first_error_type]['rho']['timesteps'][frame]
         var_num = var_file.replace('VAR', '') if 'VAR' in var_file else str(frame)
         title.set_text(f'{formatted_title} - VAR {var_num} | t={timestep:.4e} s')
         
-        return [l for v in lines.values() for l in v.values()] + list(inf_markers.values()) + [title]
+        return [l for v in lines.values() for l in v.values()] + [title]
 
     anim = animation.FuncAnimation(fig, animate, init_func=init, frames=max_timesteps,
                                   interval=1000//fps, blit=False, repeat=True)
@@ -917,19 +894,6 @@ def create_combined_error_evolution_frames(
                     linestyle = linestyles.get(error_type, '-')
                     ax.plot(x_coords, errors, linestyle, linewidth=2.5, color=colors.get(error_type, 'k'), alpha=0.85)
             
-            # Find the absolute error data (could be named 'Absolute', 'L1/LINF (Absolute)', etc.)
-            abs_error_key = None
-            for key in spatial_errors_dict.keys():
-                if 'Absolute' in key or 'absolute' in key.lower():
-                    abs_error_key = key
-                    break
-            
-            if abs_error_key and var in spatial_errors_dict[abs_error_key]:
-                abs_errors = spatial_errors_dict[abs_error_key][var]['errors_per_timestep'][frame]
-                x_coords_abs = spatial_errors_dict[abs_error_key][var]['x'] * unit_length
-                max_error_idx = np.argmax(abs_errors)
-                ax.plot(x_coords_abs[max_error_idx], abs_errors[max_error_idx], 'o', color=colors['L_inf'], markersize=8, alpha=0.9)
-
             ax.set_xlabel('x [kpc]', fontsize=11)
             ax.set_ylabel(f'Error in {label}', fontsize=11)
             ax.set_title(label, fontsize=12, fontweight='bold')
@@ -948,10 +912,6 @@ def create_combined_error_evolution_frames(
                 Line2D([0], [0], color=colors.get(error_type, 'k'), linestyle=linestyle,
                        linewidth=2.5, alpha=0.85, label=error_type)
             )
-        legend_elements.append(
-            Line2D([0], [0], marker='o', color='w', markerfacecolor=colors['L_inf'],
-                   markersize=8, alpha=0.9, linestyle='None', label='L_inf Norm (Max Abs)')
-        )
         legend_ax.legend(handles=legend_elements, loc='center', ncol=3, 
                         fontsize=12, frameon=True)
       

@@ -34,6 +34,11 @@ from src.visualization.videos import (
     create_overlay_error_evolution_video,
     create_combined_error_evolution_video
 )
+from src.visualization.plots_plotly import (
+    create_var_evolution_plotly,
+    create_error_evolution_plotly,
+    create_combined_error_evolution_plotly
+)
 from src.experiment.naming import format_experiment_title, format_short_experiment_name
 from src.analysis.organizer import AnalysisOrganizer
 
@@ -277,13 +282,17 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     error_dir = analysis_dir / "error"
     
     var_evolution_dir = var_dir / "evolution"
+    var_evo_plotly_dir = var_dir / "evo_plotly"
     error_evolution_dir = error_dir / "evolution"
+    error_evo_plotly_dir = error_dir / "evo_plotly"
     error_frames_dir = error_dir / "frames"
 
     # Clear old visualizations before creating new ones
     logger.info("Clearing old visualization directories...")
     clear_directory(var_evolution_dir)
+    clear_directory(var_evo_plotly_dir)
     clear_directory(error_evolution_dir)
+    clear_directory(error_evo_plotly_dir)
     clear_directory(error_frames_dir)
 
     with open(manifest_file, 'r') as f: 
@@ -382,6 +391,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 all_sim_data, all_analytical_data, var_evolution_dir, run_name, fps=2, save_frames=True
             )
             
+            # Also create interactive plotly version
+            logger.info(f"     ├─ Creating interactive plotly var evolution...")
+            create_var_evolution_plotly(
+                all_sim_data, all_analytical_data, var_evo_plotly_dir, run_name
+            )
+            
             # Create COMBINED error evolution with all configured metrics by DEFAULT
             logger.info(f"     ├─ Creating combined error evolution (L1, L2, LINF) video and frames...")
             if combine_in_videos and len(metrics) > 1:
@@ -401,6 +416,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                     spatial_errors_dict, error_evolution_dir, run_name, fps=2, 
                     unit_length=unit_length, save_frames=True
                 )
+                
+                # Also create interactive plotly version
+                logger.info(f"     ├─ Creating interactive plotly combined error evolution...")
+                create_combined_error_evolution_plotly(
+                    spatial_errors_dict, error_evo_plotly_dir, run_name, unit_length=unit_length
+                )
                 logger.info(f"     └─ ✓ Created combined error evolution with {len(spatial_errors_dict)} error types")
             else:
                 # Fallback: create single error evolution video
@@ -408,6 +429,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 create_error_evolution_video(
                     spatial_errors_abs, error_evolution_dir, run_name, fps=2, 
                     unit_length=unit_length, save_frames=True
+                )
+                
+                # Also create interactive plotly version
+                logger.info(f"     ├─ Creating interactive plotly error evolution...")
+                create_error_evolution_plotly(
+                    spatial_errors_abs, error_evo_plotly_dir, run_name, unit_length=unit_length
                 )
                 logger.info(f"     └─ ✓ Created error evolution video")
             # --- END: Modified section ---
@@ -445,6 +472,36 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                     export_spacetime_data_to_json(prepared_data, mind_gap_dir, run_name, var)
             
             logger.info(f"     └─ ✓ Saved spacetime data for interactive visualization")
+            
+            # Create 2D error line graphs with slider and play button
+            logger.info(f"     ├─ Creating 2D error line graphs (with slider/play)...")
+            from notebooks.spacetime_error_visualization import create_error_line_graph_with_animation
+            
+            # Create organized structure: error -> evo_time -> <element> -> graphs
+            evo_time_dir = analysis_dir / "error" / "evo_time"
+            
+            for var in analyze_variables:
+                element_dir = evo_time_dir / var
+                element_dir.mkdir(parents=True, exist_ok=True)
+                
+                prepared_data = prepare_spacetime_error_data(
+                    normalized_errors,
+                    var,
+                    unit_length,
+                    use_relative=True
+                )
+                
+                if prepared_data:
+                    fig = create_error_line_graph_with_animation(
+                        prepared_data,
+                        title=f"{var.upper()} Error Evolution: {run_name}"
+                    )
+                    
+                    if fig:
+                        output_file = element_dir / f"{run_name}.html"
+                        fig.write_html(str(output_file))
+            
+            logger.info(f"     └─ ✓ Created 2D error line graphs for {len(analyze_variables)} elements")
     
     # ============================================================
     # PHASE 2: Find best performers and create overlay videos

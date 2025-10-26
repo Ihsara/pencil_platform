@@ -49,6 +49,149 @@ from src.core.constants import DIRS
 from loguru import logger
 
 
+def create_error_line_graph_with_animation(
+    prepared_data: dict,
+    title: str = "Error Evolution by Timestep",
+    height: int = 600,
+    width: int = 1200
+) -> go.Figure:
+    """
+    Create 2D error line graph with slider and play button.
+    
+    For every grid point x, calculates error between analytical and numerical.
+    Each timestep (VAR snapshot) has a line showing error vs distance.
+    Slider and play button control the time direction (VAR0 to VAR_max).
+    
+    Args:
+        prepared_data: Dictionary from prepare_spacetime_error_data
+        title: Plot title
+        height: Plot height in pixels
+        width: Plot width in pixels
+        
+    Returns:
+        Plotly Figure with animation controls
+    """
+    x_coords = prepared_data['x_coords']
+    timesteps = prepared_data['timesteps']
+    error_matrix = prepared_data['error_matrix']
+    variable = prepared_data['variable']
+    error_type = prepared_data['error_type']
+    
+    # Create frames for each timestep
+    frames = []
+    for t_idx in range(len(timesteps)):
+        frame_data = go.Scatter(
+            x=x_coords,
+            y=error_matrix[t_idx],
+            mode='lines+markers',
+            name=f'VAR{t_idx}',
+            line=dict(width=2, color='#1f77b4'),
+            marker=dict(size=4, color='#1f77b4')
+        )
+        
+        frames.append(go.Frame(
+            data=[frame_data],
+            name=str(t_idx),
+            layout=go.Layout(
+                title_text=f"{title}<br>VAR{t_idx} (t={timesteps[t_idx]:.3e})"
+            )
+        ))
+    
+    # Create initial figure (first timestep)
+    fig = go.Figure(
+        data=[go.Scatter(
+            x=x_coords,
+            y=error_matrix[0],
+            mode='lines+markers',
+            name=f'VAR0',
+            line=dict(width=2, color='#1f77b4'),
+            marker=dict(size=4, color='#1f77b4')
+        )],
+        frames=frames
+    )
+    
+    # Add play and pause buttons
+    fig.update_layout(
+        title=dict(
+            text=f"{title}<br><sub>Variable: {variable.upper()}, Error Type: {error_type.capitalize()}</sub>",
+            x=0.5,
+            xanchor='center'
+        ),
+        xaxis=dict(
+            title='Position (x) [kpc]',
+            gridcolor='lightgray'
+        ),
+        yaxis=dict(
+            title=f'{error_type.capitalize()} Error',
+            gridcolor='lightgray',
+            type='log' if error_type == 'relative' else 'linear'
+        ),
+        height=height,
+        width=width,
+        hovermode='x unified',
+        plot_bgcolor='rgba(240, 240, 240, 0.5)',
+        updatemenus=[
+            dict(
+                type='buttons',
+                showactive=False,
+                buttons=[
+                    dict(
+                        label='▶ Play',
+                        method='animate',
+                        args=[None, dict(
+                            frame=dict(duration=500, redraw=True),
+                            fromcurrent=True,
+                            mode='immediate',
+                            transition=dict(duration=300)
+                        )]
+                    ),
+                    dict(
+                        label='⏸ Pause',
+                        method='animate',
+                        args=[[None], dict(
+                            frame=dict(duration=0, redraw=False),
+                            mode='immediate',
+                            transition=dict(duration=0)
+                        )]
+                    )
+                ],
+                x=0.1,
+                y=1.15,
+                xanchor='left',
+                yanchor='top'
+            )
+        ],
+        sliders=[dict(
+            active=0,
+            yanchor='top',
+            y=-0.15,
+            xanchor='left',
+            currentvalue=dict(
+                prefix='VAR Snapshot: ',
+                visible=True,
+                xanchor='center'
+            ),
+            pad=dict(b=10, t=50),
+            len=0.9,
+            x=0.05,
+            steps=[
+                dict(
+                    args=[[f.name], dict(
+                        frame=dict(duration=500, redraw=True),
+                        mode='immediate',
+                        transition=dict(duration=300)
+                    )],
+                    label=f"VAR{i}",
+                    method='animate'
+                )
+                for i, f in enumerate(frames)
+            ]
+        )]
+    )
+    
+    return fig
+
+
 def create_mind_the_gap_plot(
     prepared_data: dict,
     title: str = "Spacetime Error Evolution",
@@ -168,25 +311,6 @@ def create_mind_the_gap_plot(
         )],
         frames=frames
     )
-    
-    # Add max error marker
-    if prepared_data['max_error']:
-        max_err = prepared_data['max_error']
-        fig.add_trace(go.Scatter(
-            x=[max_err['x']],
-            y=[max_err['time']],
-            mode='markers',
-            marker=dict(
-                size=40,
-                color='red',
-                symbol='star',
-                line=dict(width=2, color='white')
-            ),
-            text=[f"MAX ERROR<br>x={max_err['x']:.3f} kpc<br>t={max_err['time']:.3e}<br>error={max_err['value']:.3e}"],
-            hovertemplate='%{text}<extra></extra>',
-            name='Max Error',
-            showlegend=True
-        ))
     
     # Layout configuration
     fig.update_layout(
@@ -358,21 +482,6 @@ def create_multi_variable_dashboard(
             row=row, col=col
         )
         
-        # Add max error marker
-        if 'max_error_location' in var_data:
-            max_loc = var_data['max_error_location']
-            fig.add_trace(
-                go.Scatter(
-                    x=[max_loc['x']],
-                    y=[max_loc['time_index']],
-                    mode='markers',
-                    marker=dict(size=15, color='red', symbol='star', line=dict(width=2, color='white')),
-                    showlegend=False,
-                    hovertext=f"Max: {max_loc['value']:.3e}",
-                    hoverinfo='text'
-                ),
-                row=row, col=col
-            )
     
     # Update axes
     for idx in range(1, 5):
