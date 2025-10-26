@@ -293,7 +293,192 @@ def _load_3d_error_surface(
         return None
 
 
+def create_error_evolution_animation(
+    experiment_name: str,
+    run_name: str,
+    element: str = 'rho'
+) -> Optional[go.Figure]:
+    """
+    Create animated line graph showing error evolution over time.
+    
+    Args:
+        experiment_name: Name of the experiment
+        run_name: Name of the run
+        element: Element to visualize ('rho', 'ux', 'pp', 'ee')
+        
+    Returns:
+        Plotly Figure with animation controls or None if failed
+    """
+    element_labels = {
+        'rho': 'Density (ρ)',
+        'ux': 'Velocity (uₓ)',
+        'pp': 'Pressure (p)',
+        'ee': 'Energy (e)'
+    }
+    
+    try:
+        # Load from HPC directory
+        plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / "sweep.yaml"
+        with open(plan_file, 'r') as f:
+            plan = yaml.safe_load(f)
+        
+        hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
+        run_path = hpc_run_base_dir / run_name
+        
+        # Load VAR files
+        all_sim_data = load_all_var_files(run_path)
+        if not all_sim_data:
+            logger.error(f"No VAR files found for {run_name}")
+            return None
+        
+        # Generate analytical solutions
+        all_analytical_data = [
+            get_analytical_solution(s['params'], s['x'], s['t']) 
+            for s in all_sim_data
+        ]
+        
+        # Calculate normalized errors
+        normalized_errors = calculate_normalized_spatial_errors(
+            all_sim_data,
+            all_analytical_data,
+            variables=[element]
+        )
+        
+        if element not in normalized_errors:
+            logger.error(f"Element {element} not found in normalized errors")
+            return None
+        
+        # Extract data
+        var_data = normalized_errors[element]
+        x_coords = var_data['x_coords']
+        timesteps = var_data['timesteps']
+        error_matrix = var_data['relative_error_field']
+        
+        # Create frames for animation
+        frames = []
+        for i, t in enumerate(timesteps):
+            frame_data = go.Scatter(
+                x=x_coords,
+                y=error_matrix[i, :],
+                mode='lines+markers',
+                name=f't={t:.4f}',
+                line=dict(color='blue', width=2),
+                marker=dict(size=4)
+            )
+            frames.append(go.Frame(
+                data=[frame_data],
+                name=f'frame_{i}',
+                layout=dict(title=f'Error vs Distance - {element_labels[element]}<br>Time: {t:.4f} [code units]')
+            ))
+        
+        # Create initial figure with first timestep
+        fig = go.Figure(
+            data=[go.Scatter(
+                x=x_coords,
+                y=error_matrix[0, :],
+                mode='lines+markers',
+                name=f't={timesteps[0]:.4f}',
+                line=dict(color='blue', width=2),
+                marker=dict(size=4)
+            )],
+            frames=frames
+        )
+        
+        # Add animation controls
+        fig.update_layout(
+            title=f'Error Evolution - {element_labels[element]}<br><sub>{run_name}</sub>',
+            xaxis=dict(title='Position (x) [kpc]'),
+            yaxis=dict(title='Relative Error', type='log'),
+            height=600,
+            width=1000,
+            updatemenus=[
+                dict(
+                    type='buttons',
+                    showactive=False,
+                    buttons=[
+                        dict(label='Play',
+                             method='animate',
+                             args=[None, dict(frame=dict(duration=100, redraw=True),
+                                            fromcurrent=True,
+                                            mode='immediate')]),
+                        dict(label='Pause',
+                             method='animate',
+                             args=[[None], dict(frame=dict(duration=0, redraw=False),
+                                              mode='immediate',
+                                              transition=dict(duration=0))])
+                    ],
+                    x=0.1,
+                    y=1.15,
+                    xanchor='left',
+                    yanchor='top'
+                )
+            ],
+            sliders=[
+                dict(
+                    active=0,
+                    yanchor='top',
+                    y=0,
+                    xanchor='left',
+                    x=0.1,
+                    currentvalue=dict(
+                        prefix='Timestep: ',
+                        visible=True,
+                        xanchor='right'
+                    ),
+                    pad=dict(b=10, t=50),
+                    len=0.9,
+                    steps=[
+                        dict(
+                            args=[[f'frame_{i}'],
+                                  dict(frame=dict(duration=100, redraw=True),
+                                       mode='immediate',
+                                       transition=dict(duration=0))],
+                            method='animate',
+                            label=f'{t:.4f}'
+                        )
+                        for i, t in enumerate(timesteps)
+                    ]
+                )
+            ]
+        )
+        
+        return fig
+        
+    except Exception as e:
+        logger.error(f"Failed to create error evolution animation for {experiment_name}/{run_name}/{element}: {e}")
+        import traceback
+        traceback.print_exc()
+        return None
+
+
 # Jupyter-friendly API
+def show_error_evolution(
+    experiment_name: str,
+    run_name: str,
+    element: str = 'rho'
+) -> Optional[go.Figure]:
+    """
+    Show error evolution animation (Jupyter-friendly).
+    
+    Creates an animated line graph showing how error varies with distance
+    at each timestep. Use the slider or play button to navigate through time.
+    
+    Args:
+        experiment_name: Name of the experiment (e.g., 'shocktube_phase1')
+        run_name: Name of the run
+        element: Element to visualize - 'rho', 'ux', 'pp', or 'ee'
+        
+    Returns:
+        Plotly Figure object that can be displayed with fig.show()
+        
+    Example:
+        >>> from notebooks.discovery_visualization import show_error_evolution
+        >>> fig = show_error_evolution('shocktube_phase1', 'res400_nohyper_...', 'rho')
+        >>> fig.show()
+    """
+    return create_error_evolution_animation(experiment_name, run_name, element)
+
+
 def show_3d_error_map(
     experiment_names: Optional[List[str]] = None,
     default_experiment: Optional[str] = None
@@ -301,6 +486,16 @@ def show_3d_error_map(
     """
     Show 3D error map with dropdowns (Jupyter-friendly).
     
+    Creates an interactive 3D surface plot where you can select different
+    experiments, branches, runs, and elements from dropdown menus.
+    
+    Args:
+        experiment_names: List of experiments to include (if None, auto-detect)
+        default_experiment: Default experiment to show
+        
+    Returns:
+        Plotly Figure object that can be displayed with fig.show()
+        
     Example:
         >>> from notebooks.discovery_visualization import show_3d_error_map
         >>> fig = show_3d_error_map(['shocktube_phase1', 'shocktube_phase2'])
