@@ -447,8 +447,28 @@ def create_visualization_for_run(
         variables=['rho', 'ux', 'pp', 'ee']
     )
     
-    # Get unit length
-    unit_length = all_sim_data[0]['params'].unit_length if all_sim_data else 1.0
+    # Get unit length - respect use_code_units flag from analysis config
+    unit_length = 1.0  # Default to code units
+    if all_sim_data and 'params' in all_sim_data[0]:
+        params = all_sim_data[0]['params']
+        
+        # Load analysis config to check use_code_units flag
+        try:
+            from src.core.config_loader import create_config_loader
+            config_loader = create_config_loader(experiment_name, DIRS.config)
+            analysis_config = config_loader.load_analysis_config()
+            error_config = analysis_config.get('error_analysis', {})
+            use_code_units = error_config.get('use_code_units', True)
+            
+            if use_code_units:
+                unit_length = 1.0  # Force code units for normalized calculations
+                logger.debug(f"Using code units (unit_length=1.0) for normalized calculations")
+            elif hasattr(params, 'unit_length'):
+                unit_length = params.unit_length  # Use physical units
+                logger.debug(f"Using physical units (unit_length={unit_length:.3e})")
+        except Exception as e:
+            logger.warning(f"Could not load analysis config, defaulting to code units: {e}")
+            unit_length = 1.0
     
     if dashboard:
         # Create dashboard

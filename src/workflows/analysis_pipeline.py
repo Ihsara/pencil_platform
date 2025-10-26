@@ -425,6 +425,26 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             # Cache normalized errors for later use (e.g., in notebooks)
             loaded_data_cache[run_name]['normalized_errors'] = normalized_errors
             logger.info(f"     └─ ✓ Calculated errors for {len(normalized_errors)} variables (available for notebook visualization)")
+            
+            # Create and cache "mind the gap" spacetime data
+            logger.info(f"     ├─ Creating 'mind the gap' spacetime data...")
+            from src.analysis.data_prep import prepare_spacetime_error_data, export_spacetime_data_to_json
+            
+            mind_gap_dir = analysis_dir / "error" / "mind_the_gap" / run_name
+            mind_gap_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Prepare and save data for each variable
+            for var in analyze_variables:
+                prepared_data = prepare_spacetime_error_data(
+                    normalized_errors,
+                    var,
+                    unit_length,
+                    use_relative=True
+                )
+                if prepared_data:
+                    export_spacetime_data_to_json(prepared_data, mind_gap_dir, run_name, var)
+            
+            logger.info(f"     └─ ✓ Saved spacetime data for interactive visualization")
     
     # ============================================================
     # PHASE 2: Find best performers and create overlay videos

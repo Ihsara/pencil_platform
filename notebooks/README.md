@@ -126,10 +126,90 @@ uv pip install plotly
 
 4. **Export Options**: The generated HTML files are standalone and can be shared/opened in any browser without requiring Python or Plotly installation.
 
+## Jupyter-Friendly Interface
+
+### mind_the_gap_jupyter.py
+
+A Jupyter-friendly Python module that provides easy-to-use functions for creating "Mind the Gap" visualizations directly from Jupyter notebooks, with automatic data caching and reuse.
+
+#### Quick Start
+
+```python
+from notebooks.mind_the_gap_jupyter import MindTheGapVisualizer
+
+# Initialize visualizer
+viz = MindTheGapVisualizer('shocktube_phase1')
+
+# Check available runs and data status
+viz.show_available_runs()
+
+# Create plot
+fig = viz.plot('run_001', variable='rho')
+fig.show()
+
+# Create dashboard with all variables
+fig = viz.dashboard('run_001')
+fig.show()
+```
+
+#### Key Features
+
+- **Automatic Data Caching**: Analysis results are saved as JSON and reused
+- **Data Availability Checking**: Know which runs have cached data
+- **Auto-analyze Option**: Automatically run analysis if data is missing
+- **Interactive Widgets**: Optional ipywidgets dropdown interface
+- **Quick Access Functions**: One-liner convenience functions
+
+#### Example Notebook
+
+See `mind_the_gap_example.ipynb` for a complete interactive tutorial.
+
+#### API Reference
+
+**MindTheGapVisualizer Class:**
+
+- `show_available_runs()` - Display all runs with data availability status
+- `check_data(run_name)` - Check if data is available for a specific run
+- `plot(run_name, variable, auto_analyze=False)` - Create single-variable plot
+- `dashboard(run_name, auto_analyze=False)` - Create multi-variable dashboard
+- `analyze_and_cache(run_names=None)` - Run analysis to generate cached data
+- `create_interactive_viewer()` - Create interactive widget interface (requires ipywidgets)
+
+**Quick Access Functions:**
+
+```python
+from notebooks.mind_the_gap_jupyter import quick_plot, quick_dashboard
+
+# One-liner to plot (auto-analyze enabled by default)
+fig = quick_plot('shocktube_phase1', 'run_001', 'rho')
+fig.show()
+
+# One-liner for dashboard
+fig = quick_dashboard('shocktube_phase1', 'run_001')
+fig.show()
+```
+
+#### Data Caching
+
+When you run analysis with `--analyze` flag, spacetime data is automatically cached as JSON files:
+
+```
+analysis/<experiment>/error/mind_the_gap/<run_name>/<run_name>_<variable>_spacetime_data.json
+```
+
+These JSON files contain pre-computed spacetime error data that can be quickly loaded for visualization without re-running the full analysis.
+
+#### Workflow
+
+1. **Run Analysis Once**: `python main.py --experiment shocktube_phase1 --analyze`
+2. **Use in Jupyter**: Open `mind_the_gap_example.ipynb` and create visualizations
+3. **Data is Reused**: No need to re-run analysis for subsequent visualizations
+
 ## Future Enhancements
 
 Potential future additions:
-- Jupyter notebook (.ipynb) version for interactive exploration
-- Comparison plots for multiple runs
+- Comparison plots for multiple runs side-by-side
 - Export to video format (MP4)
 - Additional plot types (contour, surface, etc.)
+- Statistical comparison tools
+- Time-series analysis of error evolution
