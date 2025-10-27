@@ -83,6 +83,7 @@ def create_var_evolution_plotly(
             
             if var in sim_data and var in analytical_data:
                 # Analytical line (shown in all frames)
+                # Note: Do NOT include xaxis/yaxis in frame traces - Plotly maps them automatically
                 frame_data.append(
                     go.Scatter(
                         x=analytical_data['x'],
@@ -91,9 +92,7 @@ def create_var_evolution_plotly(
                         name='Analytical',
                         line=dict(color='red', width=2.5, dash='dash'),
                         legendgroup='analytical',
-                        showlegend=(var_idx == 0),  # Only show in legend once
-                        xaxis=f'x{var_idx+1}' if var_idx > 0 else 'x',
-                        yaxis=f'y{var_idx+1}' if var_idx > 0 else 'y'
+                        showlegend=(var_idx == 0)  # Only show in legend once
                     )
                 )
                 
@@ -107,9 +106,7 @@ def create_var_evolution_plotly(
                         line=dict(color='blue', width=2),
                         marker=dict(size=4),
                         legendgroup='numerical',
-                        showlegend=(var_idx == 0),  # Only show in legend once
-                        xaxis=f'x{var_idx+1}' if var_idx > 0 else 'x',
-                        yaxis=f'y{var_idx+1}' if var_idx > 0 else 'y'
+                        showlegend=(var_idx == 0)  # Only show in legend once
                     )
                 )
         
@@ -322,6 +319,7 @@ def create_error_evolution_plotly(
             
             errors = spatial_errors[var]['errors_per_timestep'][frame_idx]
             
+            # Note: Do NOT include xaxis/yaxis in frame traces - Plotly maps them automatically
             frame_data.append(
                 go.Scatter(
                     x=x_coords,
@@ -330,9 +328,7 @@ def create_error_evolution_plotly(
                     name='Spatial Error',
                     line=dict(color='#1f77b4', width=2),
                     legendgroup='error',
-                    showlegend=(var_idx == 0),
-                    xaxis=f'x{var_idx+1}' if var_idx > 0 else 'x',
-                    yaxis=f'y{var_idx+1}' if var_idx > 0 else 'y'
+                    showlegend=(var_idx == 0)
                 )
             )
         
@@ -563,6 +559,7 @@ def create_combined_error_evolution_plotly(
                     dash_style = linestyles.get(error_type, 'solid')
                     color = colors.get(error_type, '#000000')
                     
+                    # Note: Do NOT include xaxis/yaxis in frame traces - Plotly maps them automatically
                     frame_data.append(
                         go.Scatter(
                             x=x_coords,
@@ -571,9 +568,7 @@ def create_combined_error_evolution_plotly(
                             name=error_type,
                             line=dict(color=color, width=2.5, dash=dash_style),
                             legendgroup=error_type,
-                            showlegend=(var_idx == 0),
-                            xaxis=f'x{var_idx+1}' if var_idx > 0 else 'x',
-                            yaxis=f'y{var_idx+1}' if var_idx > 0 else 'y'
+                            showlegend=(var_idx == 0)
                         )
                     )
         
