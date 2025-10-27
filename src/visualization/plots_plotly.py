@@ -918,27 +918,28 @@ def show_3d_error_map(
             ]
         ))
     
-    # Dropdown 2: Select Parameter Combination (shortname)
-    # Group by unique shortnames across all branches
+    # Dropdown 2: Select Parameter Combination - FILTERED by first branch only
+    # Only show runs from the first branch (dropdown 1 filters the data)
     run_buttons = []
-    seen_combinations = set()
+    seen_shortnames = set()
     
     for combo in all_combinations:
-        # Create unique key for this parameter combination
-        combo_key = (combo['branch'], combo['shortname'])
-        
-        # Only add if we haven't seen this combination and only for first variable
-        if combo_key not in seen_combinations and combo['var'] == analyze_variables[0]:
-            seen_combinations.add(combo_key)
+        # Only include runs from the first branch
+        if combo['branch'] != first_branch:
+            continue
+            
+        # Only add unique shortnames for first variable
+        if combo['shortname'] not in seen_shortnames and combo['var'] == analyze_variables[0]:
+            seen_shortnames.add(combo['shortname'])
             run_buttons.append(dict(
-                label=f"{combo['shortname']} ({combo['branch']})",
+                label=combo['shortname'],  # No branch name - that's what dropdown 1 is for!
                 method='update',
                 args=[
                     {
                         'x': [combo['surface']['x']],
                         'y': [combo['surface']['y']],
                         'z': [combo['surface']['z']],
-                        'colorscale': ['Jet'],
+                        'colorscale': ['Turbo'],  # More dynamic colorscale
                         'cmin': [np.nanmin(combo['surface']['z'])],
                         'cmax': [np.nanmax(combo['surface']['z'])]
                     },
@@ -948,13 +949,14 @@ def show_3d_error_map(
                 ]
             ))
     
-    # Dropdown 3: Select Variable/Property ONLY (rho, ux, pp, ee)
-    # This should show only the 4 variables, using the first available combination for each
+    # Dropdown 3: Select Variable/Property with dynamic colors
     var_buttons = []
-    for var in analyze_variables:
-        # Find first available combination with this variable
+    var_colorscales = ['Viridis', 'Plasma', 'Inferno', 'Turbo']  # Different colors for each variable
+    
+    for var_idx, var in enumerate(analyze_variables):
+        # Find first available combination with this variable from first branch
         for combo in all_combinations:
-            if combo['var'] == var:
+            if combo['var'] == var and combo['branch'] == first_branch:
                 var_buttons.append(dict(
                     label=f"{var.upper()} - {var_labels[var]}",
                     method='update',
@@ -963,7 +965,7 @@ def show_3d_error_map(
                             'x': [combo['surface']['x']],
                             'y': [combo['surface']['y']],
                             'z': [combo['surface']['z']],
-                            'colorscale': ['Jet'],
+                            'colorscale': [var_colorscales[var_idx % len(var_colorscales)]],
                             'cmin': [np.nanmin(combo['surface']['z'])],
                             'cmax': [np.nanmax(combo['surface']['z'])]
                         },
@@ -972,7 +974,7 @@ def show_3d_error_map(
                         }
                     ]
                 ))
-                break  # Only add once per variable
+                break
     
     # Update layout with 3 separate dropdowns
     fig.update_layout(
@@ -1032,8 +1034,9 @@ def show_3d_error_map(
                 font=dict(size=12)
             )
         ],
-        height=800,
-        autosize=True,  # Make responsive to screen width
+        height=1000,  # Increased from 800 for bigger figure
+        width=1400,   # Added explicit width for bigger figure
+        autosize=True,
         margin=dict(t=150, l=0, r=0, b=0)
     )
     
