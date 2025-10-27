@@ -840,55 +840,124 @@ def show_3d_error_map(
     # Create figure
     fig = go.Figure()
     
-    # Add initial surface
+    # Add initial surface with better colorscale
     fig.add_trace(go.Surface(
         x=initial_data['x'],
         y=initial_data['y'],
         z=initial_data['z'],
-        colorscale='Plasma',
+        colorscale='Jet',  # Better for log scale visualization
         name=var_labels[first_var],
-        colorbar=dict(title="Error<br>Magnitude")
+        colorbar=dict(
+            title="Error<br>Magnitude",
+            tickformat=".2e",
+            len=0.75
+        ),
+        cmin=np.nanmin(initial_data['z']),
+        cmax=np.nanmax(initial_data['z'])
     ))
     
-    # Build dropdown buttons for 3-tier selection
-    dropdown_buttons = []
+    # Build separate dropdown data structures for 3-tier selection
+    # Structure: {branch: {run: [variables]}}
+    dropdown_data = {}
     
     for branch_name in sorted(runs_by_branch.keys()):
+        dropdown_data[branch_name] = {}
         for run_name in sorted(runs_by_branch[branch_name]):
             if run_name not in cached_data:
                 continue
             
             shortname = cached_data[run_name]['shortname']
+            dropdown_data[branch_name][run_name] = {
+                'shortname': shortname,
+                'variables': {}
+            }
             
             for var in analyze_variables:
-                # Create surface data
                 surface_data = _create_3d_surface_from_cache(
                     cached_data[run_name]['errors'], var
                 )
-                
-                if surface_data is None:
-                    continue
-                
-                # Create hierarchical button label
-                button_label = f"{branch_name} > {shortname} > {var.upper()}"
-                
-                button = dict(
-                    label=button_label,
-                    method='update',
-                    args=[
-                        {
-                            'x': [surface_data['x']],
-                            'y': [surface_data['y']],
-                            'z': [surface_data['z']]
-                        },
-                        {
-                            'title': f"3D Error Map: {var_labels[var]}<br><sub>Branch: {branch_name} | {shortname}</sub>"
-                        }
-                    ]
-                )
-                dropdown_buttons.append(button)
+                if surface_data is not None:
+                    dropdown_data[branch_name][run_name]['variables'][var] = surface_data
     
-    # Update layout with dropdown
+    # Create dropdown 1: Branch selection
+    branch_buttons = []
+    for branch_name in sorted(dropdown_data.keys()):
+        # Get first run and variable for this branch
+        first_run_in_branch = list(dropdown_data[branch_name].keys())[0]
+        first_var_in_branch = list(dropdown_data[branch_name][first_run_in_branch]['variables'].keys())[0]
+        surface_data = dropdown_data[branch_name][first_run_in_branch]['variables'][first_var_in_branch]
+        shortname = dropdown_data[branch_name][first_run_in_branch]['shortname']
+        
+        branch_buttons.append(dict(
+            label=branch_name,
+            method='update',
+            args=[
+                {
+                    'x': [surface_data['x']],
+                    'y': [surface_data['y']],
+                    'z': [surface_data['z']],
+                    'colorscale': ['Jet'],
+                    'cmin': [np.nanmin(surface_data['z'])],
+                    'cmax': [np.nanmax(surface_data['z'])]
+                },
+                {
+                    'title': f"3D Error Map: {var_labels[first_var_in_branch]}<br><sub>Branch: {branch_name} | {shortname}</sub>"
+                }
+            ]
+        ))
+    
+    # Create dropdown 2: Run/Combination selection (initially for first branch)
+    run_buttons = []
+    first_branch_data = dropdown_data[first_branch]
+    for run_name in sorted(first_branch_data.keys()):
+        shortname = first_branch_data[run_name]['shortname']
+        first_var_in_run = list(first_branch_data[run_name]['variables'].keys())[0]
+        surface_data = first_branch_data[run_name]['variables'][first_var_in_run]
+        
+        run_buttons.append(dict(
+            label=shortname,
+            method='update',
+            args=[
+                {
+                    'x': [surface_data['x']],
+                    'y': [surface_data['y']],
+                    'z': [surface_data['z']],
+                    'colorscale': ['Jet'],
+                    'cmin': [np.nanmin(surface_data['z'])],
+                    'cmax': [np.nanmax(surface_data['z'])]
+                },
+                {
+                    'title': f"3D Error Map: {var_labels[first_var_in_run]}<br><sub>Branch: {first_branch} | {shortname}</sub>"
+                }
+            ]
+        ))
+    
+    # Create dropdown 3: Variable/Property selection (initially for first run)
+    var_buttons = []
+    first_run_data = first_branch_data[first_run]['variables']
+    for var in sorted(first_run_data.keys()):
+        surface_data = first_run_data[var]
+        shortname = first_branch_data[first_run]['shortname']
+        
+        var_buttons.append(dict(
+            label=var.upper(),
+            method='update',
+            args=[
+                {
+                    'x': [surface_data['x']],
+                    'y': [surface_data['y']],
+                    'z': [surface_data['z']],
+                    'colorscale': ['Jet'],
+                    'cmin': [np.nanmin(surface_data['z'])],
+                    'cmax': [np.nanmax(surface_data['z'])]
+                },
+                {
+                    'title': f"3D Error Map: {var_labels[var]}<br><sub>Branch: {first_branch} | {shortname}</sub>"
+                }
+            ]
+        ))
+    
+    # Update layout with 3 separate dropdowns
     fig.update_layout(
         title=f"3D Error Map: {var_labels[first_var]}<br><sub>Branch: {first_branch} | {cached_data[first_run]['shortname']}</sub>",
         scene=dict(
@@ -900,8 +969,9 @@ def show_3d_error_map(
             )
         ),
         updatemenus=[
+            # Dropdown 1: Branch
             dict(
-                buttons=dropdown_buttons,
+                buttons=branch_buttons,
                 direction='down',
                 pad={'r': 10, 't': 10},
                 showactive=True,
@@ -909,14 +979,45 @@ def show_3d_error_map(
                 xanchor='left',
                 y=1.15,
                 yanchor='top',
-                bgcolor='rgba(255, 255, 255, 0.9)',
-                bordercolor='#888',
-                borderwidth=1
+                bgcolor='rgba(255, 255, 255, 0.95)',
+                bordercolor='#333',
+                borderwidth=2,
+                font=dict(size=12)
+            ),
+            # Dropdown 2: Run/Combination
+            dict(
+                buttons=run_buttons,
+                direction='down',
+                pad={'r': 10, 't': 10},
+                showactive=True,
+                x=0.25,
+                xanchor='left',
+                y=1.15,
+                yanchor='top',
+                bgcolor='rgba(255, 255, 255, 0.95)',
+                bordercolor='#333',
+                borderwidth=2,
+                font=dict(size=12)
+            ),
+            # Dropdown 3: Variable/Property
+            dict(
+                buttons=var_buttons,
+                direction='down',
+                pad={'r': 10, 't': 10},
+                showactive=True,
+                x=0.70,
+                xanchor='left',
+                y=1.15,
+                yanchor='top',
+                bgcolor='rgba(255, 255, 255, 0.95)',
+                bordercolor='#333',
+                borderwidth=2,
+                font=dict(size=12)
             )
         ],
         height=800,
-        width=1400,
-        margin=dict(t=150)
+        autosize=True,  # Make responsive to screen width
+        margin=dict(t=150, l=0, r=0, b=0)
     )
     
     # Save as HTML
