@@ -977,7 +977,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     
     generate_final_rich_report(
         experiment_name, organizer.error_evolution_dir, organizer.error_norms_dir, 
-        len(loaded_data_cache), sorted_runs[:5], branch_best, 
+        len(loaded_data_cache), sorted_runs[:10], branch_best, 
         combined_scores, metrics
     )
 
@@ -1355,22 +1355,14 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
     )
     
     ranking_table.add_column("Rank", style="bold yellow", justify="center", width=6)
-    ranking_table.add_column("Run Name", style="cyan", width=45)
-    ranking_table.add_column("Branch", style="magenta", width=20)
+    ranking_table.add_column("Run Name", style="cyan", width=30)
     ranking_table.add_column("Combined Error", justify="right", style="green", width=14)
     ranking_table.add_column("% Diff from Best", justify="right", style="yellow", width=16)
     
     # Add rows for all runs
     for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
-        # Get shortened name with format integrity check
-        short_name = format_short_experiment_name(run_name, experiment_name)
-        
-        # Check if name was truncated (format integrity issue)
-        if len(run_name) > 30 and short_name.endswith("..."):
-            # Name format issue detected - use different styling
-            name_display = f"[yellow]{short_name}[/yellow] ⚠️"
-        else:
-            name_display = short_name
+        # Use branch name as the shortened run identifier (it's already the meaningful short version)
+        short_name = scores['branch']
         
         # Calculate percentage difference from best
         if rank == 1:
@@ -1400,8 +1392,7 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         
         ranking_table.add_row(
             rank_display,
-            name_display,
-            scores['branch'],
+            short_name,
             f"{scores['combined']:.6e}",
             f"[{pct_style}]{pct_diff}[/{pct_style}]"
         )
@@ -1417,7 +1408,7 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
     )
     
     metrics_detail_table.add_column("Rank", style="bold yellow", justify="center", width=6)
-    metrics_detail_table.add_column("Run Name", style="cyan", width=35)
+    metrics_detail_table.add_column("Run Name", style="cyan", width=25)
     
     for metric in metrics:
         metrics_detail_table.add_column(
@@ -1428,7 +1419,8 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         )
     
     for rank, (run_name, scores) in enumerate(sorted_all_runs[:10], 1):
-        short_name = format_short_experiment_name(run_name, experiment_name)
+        # Use branch name as the short identifier
+        short_name = scores['branch']
         row_data = [str(rank), short_name]
         
         for metric in metrics:
@@ -1447,11 +1439,15 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
     total_range = worst_score - best_score
     range_pct = (total_range / best_score) * 100
     
+    # Get short names for statistics
+    best_short = best_scores['branch']
+    worst_short = worst_scores['branch']
+    
     stats_text = (
         f"[bold]📊 Ranking Statistics:[/bold]\n"
         f"   • Total runs ranked: [cyan]{len(sorted_all_runs)}[/cyan]\n"
-        f"   • Best score: [green]{best_score:.6e}[/green] ({best_run_name})\n"
-        f"   • Worst score: [red]{worst_score:.6e}[/red] ({worst_run_name})\n"
+        f"   • Best score: [green]{best_score:.6e}[/green] ({best_short})\n"
+        f"   • Worst score: [red]{worst_score:.6e}[/red] ({worst_short})\n"
         f"   • Score range: [yellow]{total_range:.6e}[/yellow] ({range_pct:.1f}% variation)\n"
         f"   • Metrics used: {', '.join([m.upper() for m in metrics])}"
     )
@@ -1461,28 +1457,6 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         title="📈 Summary Statistics",
         border_style="blue"
     ))
-    
-    # Check for name format issues
-    long_names = [name for name, _ in sorted_all_runs if len(name) > 30]
-    if long_names:
-        console.print("\n")
-        warning_text = (
-            f"[bold yellow]⚠️  Name Format Warning:[/bold yellow]\n"
-            f"   {len(long_names)} run(s) detected with long format names.\n"
-            f"   These names have been truncated in the display above.\n"
-            f"   Consider using the shorter naming convention for better readability.\n\n"
-            f"   Example long names:\n"
-        )
-        for name in long_names[:3]:
-            warning_text += f"   • {name}\n"
-        if len(long_names) > 3:
-            warning_text += f"   ... and {len(long_names) - 3} more"
-        
-        console.print(Panel(
-            warning_text,
-            title="⚠️  Format Integrity Check",
-            border_style="yellow"
-        ))
     
     # Save to file
     output_file = output_dir / f"{experiment_name}_error_ranking.txt"
@@ -1503,13 +1477,13 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         )
         
         file_table.add_column("Rank", justify="center", width=6)
-        file_table.add_column("Run Name", width=50)
-        file_table.add_column("Branch", width=20)
+        file_table.add_column("Run Name", width=30)
         file_table.add_column("Combined Error", justify="right", width=14)
         file_table.add_column("% Diff from Best", justify="right", width=16)
         
         for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
-            short_name = format_short_experiment_name(run_name, experiment_name)
+            # Use branch name as the short identifier
+            short_name = scores['branch']
             
             if rank == 1:
                 pct_diff = "0.00%"
@@ -1520,7 +1494,6 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
             file_table.add_row(
                 str(rank),
                 short_name,
-                scores['branch'],
                 f"{scores['combined']:.6e}",
                 pct_diff
             )
@@ -1529,8 +1502,8 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         
         file_console.print(f"\n\nStatistics:")
         file_console.print(f"  - Total runs ranked: {len(sorted_all_runs)}")
-        file_console.print(f"  - Best score: {best_score:.6e} ({best_run_name})")
-        file_console.print(f"  - Worst score: {worst_score:.6e} ({worst_run_name})")
+        file_console.print(f"  - Best score: {best_score:.6e} ({best_short})")
+        file_console.print(f"  - Worst score: {worst_score:.6e} ({worst_short})")
         file_console.print(f"  - Score range: {total_range:.6e} ({range_pct:.1f}% variation)")
         file_console.print(f"  - Metrics used: {', '.join([m.upper() for m in metrics])}")
     
@@ -1539,7 +1512,7 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
 
 
 def generate_final_rich_report(experiment_name, video_dir, error_norms_dir, 
-                               n_runs_analyzed, top_5, branch_best, 
+                               n_runs_analyzed, top_10, branch_best, 
                                combined_scores, metrics):
     """Generate comprehensive final Rich report with all analysis results."""
     from rich.console import Console
@@ -1565,33 +1538,38 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
         border_style="cyan"
     ))
     
-    # ============ TOP 5 OVERALL PERFORMERS ============
+    # ============ TOP 10 OVERALL PERFORMERS ============
     console.print("\n")
-    top_5_table = Table(
-        title="🥇 Top 5 Overall Best Performers",
+    top_10_table = Table(
+        title="🥇 Top 10 Overall Best Performers",
         title_style="bold yellow",
         border_style="yellow",
         show_header=True,
         header_style="bold"
     )
     
-    top_5_table.add_column("Rank", style="bold", justify="center", width=6)
-    top_5_table.add_column("Run Name", style="cyan")
-    top_5_table.add_column("Branch", style="magenta")
-    top_5_table.add_column("Combined Score", justify="right", style="green")
+    top_10_table.add_column("Rank", style="bold", justify="center", width=6)
+    top_10_table.add_column("Run Name", style="cyan")
+    top_10_table.add_column("Branch", style="magenta")
+    top_10_table.add_column("Combined Score", justify="right", style="green")
     
-    rank_emojis = {1: "🥇", 2: "🥈", 3: "🥉", 4: "4️⃣", 5: "5️⃣"}
+    # Use simple numbers for ranks 4+
+    rank_emojis = {1: "🥇", 2: "🥈", 3: "🥉"}
     
-    for idx, (run_name, scores) in enumerate(top_5, 1):
-        emoji = rank_emojis.get(idx, f"{idx}")
-        top_5_table.add_row(
-            emoji,
+    for idx, (run_name, scores) in enumerate(top_10, 1):
+        if idx <= 3:
+            rank_display = rank_emojis[idx]
+        else:
+            rank_display = f"#{idx}"
+        
+        top_10_table.add_row(
+            rank_display,
             run_name,
             scores['branch'],
             f"{scores['combined']:.6e}"
         )
     
-    console.print(top_5_table)
+    console.print(top_10_table)
     
     # ============ PER-METRIC SCORES FOR TOP 3 ============
     console.print("\n")
@@ -1605,7 +1583,7 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
     for metric in metrics:
         metrics_table.add_column(metric.upper(), justify="right", style="cyan")
     
-    for idx, (run_name, scores) in enumerate(top_5[:3], 1):
+    for idx, (run_name, scores) in enumerate(top_10[:3], 1):
         row_data = [rank_emojis[idx]]
         for metric in metrics:
             score = scores['per_metric'].get(metric, float('nan'))
@@ -1659,7 +1637,7 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
     # ============ KEY FINDINGS ============
     console.print("\n")
     
-    best_run_name, best_scores = top_5[0]
+    best_run_name, best_scores = top_10[0]
     best_l1 = best_scores['per_metric'].get('l1', float('nan'))
     best_l2 = best_scores['per_metric'].get('l2', float('nan'))
     best_linf = best_scores['per_metric'].get('linf', float('nan'))
@@ -1688,11 +1666,20 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
     # ============ RECOMMENDATIONS ============
     console.print("\n")
     
-    improvement_pct = ((top_5[-1][1]['combined'] - best_scores['combined']) / best_scores['combined']) * 100
+    # Calculate improvement based on available data
+    if len(top_10) >= 10:
+        improvement_pct = ((top_10[9][1]['combined'] - best_scores['combined']) / best_scores['combined']) * 100
+        comparison_text = "worst of top 10"
+    elif len(top_10) >= 5:
+        improvement_pct = ((top_10[-1][1]['combined'] - best_scores['combined']) / best_scores['combined']) * 100
+        comparison_text = f"worst of top {len(top_10)}"
+    else:
+        improvement_pct = 0.0
+        comparison_text = "other runs"
     
     recommendations_text = (
         f"[bold green]✓[/bold green] The best parameter set ([cyan]{best_run_name}[/cyan]) shows:\n"
-        f"   • {improvement_pct:.1f}% better performance than the worst of top 5\n"
+        f"   • {improvement_pct:.1f}% better performance than the {comparison_text}\n"
         f"   • Consistent low error across all metrics (L1, L2, L∞)\n"
         f"   • Recommended for production use\n\n"
         f"[bold yellow]📌 Next Steps:[/bold yellow]\n"
