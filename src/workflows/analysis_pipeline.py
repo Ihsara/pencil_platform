@@ -1361,8 +1361,8 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
     
     # Add rows for all runs
     for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
-        # Use branch name as the shortened run identifier (it's already the meaningful short version)
-        short_name = scores['branch']
+        # Use format_short_experiment_name for consistent shortened naming
+        short_name = format_short_experiment_name(run_name, experiment_name)
         
         # Calculate percentage difference from best
         if rank == 1:
@@ -1419,8 +1419,8 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         )
     
     for rank, (run_name, scores) in enumerate(sorted_all_runs[:10], 1):
-        # Use branch name as the short identifier
-        short_name = scores['branch']
+        # Use format_short_experiment_name for consistent shortened naming
+        short_name = format_short_experiment_name(run_name, experiment_name)
         row_data = [str(rank), short_name]
         
         for metric in metrics:
@@ -1482,8 +1482,8 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         file_table.add_column("% Diff from Best", justify="right", width=16)
         
         for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
-            # Use branch name as the short identifier
-            short_name = scores['branch']
+            # Use format_short_experiment_name for consistent shortened naming
+            short_name = format_short_experiment_name(run_name, experiment_name)
             
             if rank == 1:
                 pct_diff = "0.00%"
@@ -1562,9 +1562,12 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
         else:
             rank_display = f"#{idx}"
         
+        # Use format_short_experiment_name for consistent shortened naming
+        short_name = format_short_experiment_name(run_name, experiment_name)
+        
         top_10_table.add_row(
             rank_display,
-            run_name,
+            short_name,
             scores['branch'],
             f"{scores['combined']:.6e}"
         )
