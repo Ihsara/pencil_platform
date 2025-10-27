@@ -879,10 +879,12 @@ def show_3d_error_map(
                 if surface_data is not None:
                     dropdown_data[branch_name][run_name]['variables'][var] = surface_data
     
-    # Create dropdown 1: Branch selection
+    # Create ALL combinations for proper navigation
+    # We'll create flat lists that contain all branch-run-variable combinations
+    
+    # Dropdown 1: All branches - each shows first run + first var of that branch
     branch_buttons = []
     for branch_name in sorted(dropdown_data.keys()):
-        # Get first run and variable for this branch
         first_run_in_branch = list(dropdown_data[branch_name].keys())[0]
         first_var_in_branch = list(dropdown_data[branch_name][first_run_in_branch]['variables'].keys())[0]
         surface_data = dropdown_data[branch_name][first_run_in_branch]['variables'][first_var_in_branch]
@@ -906,56 +908,63 @@ def show_3d_error_map(
             ]
         ))
     
-    # Create dropdown 2: Run/Combination selection (initially for first branch)
+    # Dropdown 2: All runs across ALL branches - organized by branch prefix
     run_buttons = []
-    first_branch_data = dropdown_data[first_branch]
-    for run_name in sorted(first_branch_data.keys()):
-        shortname = first_branch_data[run_name]['shortname']
-        first_var_in_run = list(first_branch_data[run_name]['variables'].keys())[0]
-        surface_data = first_branch_data[run_name]['variables'][first_var_in_run]
-        
-        run_buttons.append(dict(
-            label=shortname,
-            method='update',
-            args=[
-                {
-                    'x': [surface_data['x']],
-                    'y': [surface_data['y']],
-                    'z': [surface_data['z']],
-                    'colorscale': ['Jet'],
-                    'cmin': [np.nanmin(surface_data['z'])],
-                    'cmax': [np.nanmax(surface_data['z'])]
-                },
-                {
-                    'title': f"3D Error Map: {var_labels[first_var_in_run]}<br><sub>Branch: {first_branch} | {shortname}</sub>"
-                }
-            ]
-        ))
+    for branch_name in sorted(dropdown_data.keys()):
+        for run_name in sorted(dropdown_data[branch_name].keys()):
+            shortname = dropdown_data[branch_name][run_name]['shortname']
+            first_var_in_run = list(dropdown_data[branch_name][run_name]['variables'].keys())[0]
+            surface_data = dropdown_data[branch_name][run_name]['variables'][first_var_in_run]
+            
+            # Create label with branch context for clarity
+            button_label = f"[{branch_name}] {shortname}"
+            
+            run_buttons.append(dict(
+                label=button_label,
+                method='update',
+                args=[
+                    {
+                        'x': [surface_data['x']],
+                        'y': [surface_data['y']],
+                        'z': [surface_data['z']],
+                        'colorscale': ['Jet'],
+                        'cmin': [np.nanmin(surface_data['z'])],
+                        'cmax': [np.nanmax(surface_data['z'])]
+                    },
+                    {
+                        'title': f"3D Error Map: {var_labels[first_var_in_run]}<br><sub>Branch: {branch_name} | {shortname}</sub>"
+                    }
+                ]
+            ))
     
-    # Create dropdown 3: Variable/Property selection (initially for first run)
+    # Dropdown 3: All variables across ALL runs - organized by branch and run
     var_buttons = []
-    first_run_data = first_branch_data[first_run]['variables']
-    for var in sorted(first_run_data.keys()):
-        surface_data = first_run_data[var]
-        shortname = first_branch_data[first_run]['shortname']
-        
-        var_buttons.append(dict(
-            label=var.upper(),
-            method='update',
-            args=[
-                {
-                    'x': [surface_data['x']],
-                    'y': [surface_data['y']],
-                    'z': [surface_data['z']],
-                    'colorscale': ['Jet'],
-                    'cmin': [np.nanmin(surface_data['z'])],
-                    'cmax': [np.nanmax(surface_data['z'])]
-                },
-                {
-                    'title': f"3D Error Map: {var_labels[var]}<br><sub>Branch: {first_branch} | {shortname}</sub>"
-                }
-            ]
-        ))
+    for branch_name in sorted(dropdown_data.keys()):
+        for run_name in sorted(dropdown_data[branch_name].keys()):
+            shortname = dropdown_data[branch_name][run_name]['shortname']
+            for var in sorted(dropdown_data[branch_name][run_name]['variables'].keys()):
+                surface_data = dropdown_data[branch_name][run_name]['variables'][var]
+                
+                # Create label with full context
+                button_label = f"[{branch_name}] {shortname} - {var.upper()}"
+                
+                var_buttons.append(dict(
+                    label=button_label,
+                    method='update',
+                    args=[
+                        {
+                            'x': [surface_data['x']],
+                            'y': [surface_data['y']],
+                            'z': [surface_data['z']],
+                            'colorscale': ['Jet'],
+                            'cmin': [np.nanmin(surface_data['z'])],
+                            'cmax': [np.nanmax(surface_data['z'])]
+                        },
+                        {
+                            'title': f"3D Error Map: {var_labels[var]}<br><sub>Branch: {branch_name} | {shortname}</sub>"
+                        }
+                    ]
+                ))
     
     # Update layout with 3 separate dropdowns
     fig.update_layout(
