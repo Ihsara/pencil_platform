@@ -953,6 +953,10 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     save_error_norms_summary(sorted_runs, branch_best, error_norms_cache, 
                             combined_scores, metrics, error_norms_dir, experiment_name)
     
+    # Generate complete error ranking report with all runs
+    logger.info("\n  ├─ Generating complete error ranking report...")
+    generate_error_ranking_report(experiment_name, combined_scores, metrics, error_norms_dir)
+    
     # ============================================================
     # PHASE 6: Populate best performers folders
     # ============================================================
@@ -1301,6 +1305,237 @@ def save_error_norms_summary(sorted_runs, branch_best, error_norms_cache,
     
     logger.info(f"       ├─ Saved JSON summary to {json_file.name}")
     logger.info(f"       └─ Saved Markdown report to {md_file.name}")
+
+
+def generate_error_ranking_report(experiment_name, combined_scores, metrics, output_dir):
+    """
+    Generate a comprehensive error ranking report with all runs sorted by error.
+    
+    Shows:
+    1. All runs ranked from lowest to highest error
+    2. Percentage difference compared to the best (first) run
+    3. Shortened run names with format integrity checking
+    
+    Args:
+        experiment_name: Name of the experiment
+        combined_scores: Dictionary of run scores
+        metrics: List of metrics used
+        output_dir: Directory to save the report
+    """
+    from rich.console import Console
+    from rich.table import Table
+    from rich.panel import Panel
+    
+    console = Console()
+    
+    # Sort all runs by combined score (lowest is best)
+    sorted_all_runs = sorted(combined_scores.items(), key=lambda x: x[1]['combined'])
+    
+    if not sorted_all_runs:
+        logger.warning("No runs to rank - skipping error ranking report")
+        return
+    
+    # Get best run score for percentage calculations
+    best_run_name, best_scores = sorted_all_runs[0]
+    best_score = best_scores['combined']
+    
+    console.print("\n")
+    console.print("╔" + "═" * 78 + "╗")
+    console.print("║" + " " * 25 + "ERROR RANKING REPORT" + " " * 33 + "║")
+    console.print("╚" + "═" * 78 + "╝")
+    console.print("\n")
+    
+    # Create main ranking table
+    ranking_table = Table(
+        title=f"📊 Complete Error Ranking - {experiment_name}",
+        title_style="bold cyan",
+        border_style="cyan",
+        show_header=True,
+        header_style="bold"
+    )
+    
+    ranking_table.add_column("Rank", style="bold yellow", justify="center", width=6)
+    ranking_table.add_column("Run Name", style="cyan", width=45)
+    ranking_table.add_column("Branch", style="magenta", width=20)
+    ranking_table.add_column("Combined Error", justify="right", style="green", width=14)
+    ranking_table.add_column("% Diff from Best", justify="right", style="yellow", width=16)
+    
+    # Add rows for all runs
+    for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
+        # Get shortened name with format integrity check
+        short_name = format_short_experiment_name(run_name, experiment_name)
+        
+        # Check if name was truncated (format integrity issue)
+        if len(run_name) > 30 and short_name.endswith("..."):
+            # Name format issue detected - use different styling
+            name_display = f"[yellow]{short_name}[/yellow] ⚠️"
+        else:
+            name_display = short_name
+        
+        # Calculate percentage difference from best
+        if rank == 1:
+            pct_diff = "0.00%"
+            pct_style = "bold green"
+        else:
+            pct_diff_val = ((scores['combined'] - best_score) / best_score) * 100
+            pct_diff = f"+{pct_diff_val:.2f}%"
+            
+            # Color code based on difference magnitude
+            if pct_diff_val < 10:
+                pct_style = "green"
+            elif pct_diff_val < 50:
+                pct_style = "yellow"
+            else:
+                pct_style = "red"
+        
+        # Rank emoji for top 3
+        if rank == 1:
+            rank_display = "🥇 1"
+        elif rank == 2:
+            rank_display = "🥈 2"
+        elif rank == 3:
+            rank_display = "🥉 3"
+        else:
+            rank_display = str(rank)
+        
+        ranking_table.add_row(
+            rank_display,
+            name_display,
+            scores['branch'],
+            f"{scores['combined']:.6e}",
+            f"[{pct_style}]{pct_diff}[/{pct_style}]"
+        )
+    
+    console.print(ranking_table)
+    
+    # Create per-metric breakdown table for top 10
+    console.print("\n")
+    metrics_detail_table = Table(
+        title="📈 Per-Metric Breakdown (Top 10)",
+        title_style="bold blue",
+        border_style="blue"
+    )
+    
+    metrics_detail_table.add_column("Rank", style="bold yellow", justify="center", width=6)
+    metrics_detail_table.add_column("Run Name", style="cyan", width=35)
+    
+    for metric in metrics:
+        metrics_detail_table.add_column(
+            metric.upper(), 
+            justify="right", 
+            style="magenta",
+            width=13
+        )
+    
+    for rank, (run_name, scores) in enumerate(sorted_all_runs[:10], 1):
+        short_name = format_short_experiment_name(run_name, experiment_name)
+        row_data = [str(rank), short_name]
+        
+        for metric in metrics:
+            score = scores['per_metric'].get(metric, float('nan'))
+            row_data.append(f"{score:.4e}")
+        
+        metrics_detail_table.add_row(*row_data)
+    
+    console.print(metrics_detail_table)
+    
+    # Statistics summary
+    console.print("\n")
+    
+    worst_run_name, worst_scores = sorted_all_runs[-1]
+    worst_score = worst_scores['combined']
+    total_range = worst_score - best_score
+    range_pct = (total_range / best_score) * 100
+    
+    stats_text = (
+        f"[bold]📊 Ranking Statistics:[/bold]\n"
+        f"   • Total runs ranked: [cyan]{len(sorted_all_runs)}[/cyan]\n"
+        f"   • Best score: [green]{best_score:.6e}[/green] ({best_run_name})\n"
+        f"   • Worst score: [red]{worst_score:.6e}[/red] ({worst_run_name})\n"
+        f"   • Score range: [yellow]{total_range:.6e}[/yellow] ({range_pct:.1f}% variation)\n"
+        f"   • Metrics used: {', '.join([m.upper() for m in metrics])}"
+    )
+    
+    console.print(Panel(
+        stats_text,
+        title="📈 Summary Statistics",
+        border_style="blue"
+    ))
+    
+    # Check for name format issues
+    long_names = [name for name, _ in sorted_all_runs if len(name) > 30]
+    if long_names:
+        console.print("\n")
+        warning_text = (
+            f"[bold yellow]⚠️  Name Format Warning:[/bold yellow]\n"
+            f"   {len(long_names)} run(s) detected with long format names.\n"
+            f"   These names have been truncated in the display above.\n"
+            f"   Consider using the shorter naming convention for better readability.\n\n"
+            f"   Example long names:\n"
+        )
+        for name in long_names[:3]:
+            warning_text += f"   • {name}\n"
+        if len(long_names) > 3:
+            warning_text += f"   ... and {len(long_names) - 3} more"
+        
+        console.print(Panel(
+            warning_text,
+            title="⚠️  Format Integrity Check",
+            border_style="yellow"
+        ))
+    
+    # Save to file
+    output_file = output_dir / f"{experiment_name}_error_ranking.txt"
+    
+    with open(output_file, 'w', encoding='utf-8') as f:
+        # Create a console that writes to file
+        file_console = Console(file=f, width=120)
+        
+        file_console.print(f"\n{'='*120}\n")
+        file_console.print(f"ERROR RANKING REPORT - {experiment_name}\n")
+        file_console.print(f"{'='*120}\n")
+        
+        # Recreate the table for file output
+        file_table = Table(
+            title=f"Complete Error Ranking (Sorted by Combined Error)",
+            show_header=True,
+            header_style="bold"
+        )
+        
+        file_table.add_column("Rank", justify="center", width=6)
+        file_table.add_column("Run Name", width=50)
+        file_table.add_column("Branch", width=20)
+        file_table.add_column("Combined Error", justify="right", width=14)
+        file_table.add_column("% Diff from Best", justify="right", width=16)
+        
+        for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
+            short_name = format_short_experiment_name(run_name, experiment_name)
+            
+            if rank == 1:
+                pct_diff = "0.00%"
+            else:
+                pct_diff_val = ((scores['combined'] - best_score) / best_score) * 100
+                pct_diff = f"+{pct_diff_val:.2f}%"
+            
+            file_table.add_row(
+                str(rank),
+                short_name,
+                scores['branch'],
+                f"{scores['combined']:.6e}",
+                pct_diff
+            )
+        
+        file_console.print(file_table)
+        
+        file_console.print(f"\n\nStatistics:")
+        file_console.print(f"  - Total runs ranked: {len(sorted_all_runs)}")
+        file_console.print(f"  - Best score: {best_score:.6e} ({best_run_name})")
+        file_console.print(f"  - Worst score: {worst_score:.6e} ({worst_run_name})")
+        file_console.print(f"  - Score range: {total_range:.6e} ({range_pct:.1f}% variation)")
+        file_console.print(f"  - Metrics used: {', '.join([m.upper() for m in metrics])}")
+    
+    logger.success(f"Saved error ranking report to {output_file}")
+    console.print(f"\n[green]✓ Report saved to:[/green] [cyan]{output_file}[/cyan]\n")
 
 
 def generate_final_rich_report(experiment_name, video_dir, error_norms_dir, 
