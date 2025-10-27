@@ -26,6 +26,10 @@ variables:
     unit_type: 'specific_energy'
     plot_label: r'$e$'
   
+  mesh3ReMax:
+    unit_type: 'dimensionless'
+    plot_label: r'mesh3ReMax'
+  
   x:
     unit_type: 'length'
   

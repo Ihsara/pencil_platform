@@ -32,14 +32,16 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
         'rho': r'Density $\rho$ [g cm$^{-3}$]',
         'ux': r'Velocity $u_x$ [km s$^{-1}$]',
         'pp': r'Pressure $p$ [dyn cm$^{-2}$]',
-        'ee': r'Energy $e$ [km$^2$ s$^{-2}$]'
+        'ee': r'Energy $e$ [km$^2$ s$^{-2}$]',
+        'mesh3ReMax': r'mesh3ReMax'
     }
     
     var_scales = {
         'rho': 'log',
         'ux': 'linear',
         'pp': 'log',
-        'ee': 'log'
+        'ee': 'log',
+        'mesh3ReMax': 'linear'
     }
     
     n_vars = len(sim_data_list)
@@ -55,23 +57,50 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     else:
         unit_dict = {var: 1.0 for var in variables}
     
-    # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
-    fig = plt.figure(figsize=(14, 16))
-    gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08, 
-                          hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
-    # Create subplots in first 2 rows only
-    axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+    # Determine layout based on number of variables
+    num_vars = len(variables)
+    if num_vars <= 4:
+        # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
+        fig = plt.figure(figsize=(14, 16))
+        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08, 
+                              hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
+        # Create subplots in first 2 rows only
+        axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+        legend_subplot = gs[2, :]
+    else:
+        # Create figure with 3x3 layout for 5+ variables (3 columns, 4 rows) - last row for legends
+        fig = plt.figure(figsize=(18, 18))
+        gs = fig.add_gridspec(4, 3, left=0.08, right=0.95, top=0.88, bottom=0.08,
+                              hspace=0.35, wspace=0.30, height_ratios=[1, 1, 1, 0.15])
+        # Create subplots for first 3 rows, accommodating 5 variables (2+2+1)
+        axes = []
+        for i in range(2):
+            for j in range(3):
+                if len(axes) < num_vars:
+                    axes.append(fig.add_subplot(gs[i, j]))
+        # If there's a 5th variable, place it centered in third row
+        if num_vars >= 5:
+            axes.append(fig.add_subplot(gs[2, 1]))
+        legend_subplot = gs[3, :]
     
     # Initialize lines for each variable
     lines = {}
     analytical_lines = {}
+    reference_lines = {}
     
     for idx, var in enumerate(variables):
         ax = axes[idx]
         
         # Create line objects
         lines[var], = ax.plot([], [], 'b-', linewidth=2, alpha=0.8)
-        analytical_lines[var], = ax.plot([], [], 'r--', linewidth=2.5, alpha=0.9)
+        
+        # For mesh3ReMax, create a static reference line at 1 instead of analytical
+        if var == 'mesh3ReMax':
+            # Static reference line at 1
+            reference_lines[var] = ax.axhline(y=1.0, color='r', linestyle='--', linewidth=2.5, alpha=0.9)
+        else:
+            # Regular analytical line for other variables
+            analytical_lines[var], = ax.plot([], [], 'r--', linewidth=2.5, alpha=0.9)
         
         ax.set_xlabel('x [kpc]', fontsize=11)
         ax.set_ylabel(var_labels.get(var, var), fontsize=11)
@@ -80,7 +109,23 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
         ax.grid(True, alpha=0.3)
         
         # Set axis limits based on data range
-        if analytical_data_list:
+        if var == 'mesh3ReMax':
+            # For mesh3ReMax, set limits based on simulation data only
+            if sim_data_list and var in sim_data_list[0]:
+                x_data = sim_data_list[0]['x']
+                ax.set_xlim(x_data.min(), x_data.max())
+                
+                all_sim_vals = [sd[var] for sd in sim_data_list if var in sd]
+                if all_sim_vals:
+                    all_vals = np.concatenate(all_sim_vals)
+                    y_range = all_vals.max() - all_vals.min()
+                    y_min = max(0, all_vals.min() - 0.1 * y_range)
+                    y_max = all_vals.max() + 0.1 * y_range
+                    # Ensure reference line at 1 is visible
+                    y_min = min(y_min, 0.8)
+                    y_max = max(y_max, 1.2)
+                    ax.set_ylim(y_min, y_max)
+        elif analytical_data_list:
             x_data = analytical_data_list[0]['x']
             ax.set_xlim(x_data.min(), x_data.max())
             
@@ -99,12 +144,19 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
                     y_max = all_vals.max() + 0.1 * y_range
                 ax.set_ylim(y_min, y_max)
     
-    # Joint legend in the last row (row 3, spans both columns)
-    legend_ax = fig.add_subplot(gs[2, :])
+    # Joint legend in the last row
+    legend_ax = fig.add_subplot(legend_subplot)
     legend_ax.axis('off')
-    legend_ax.legend([lines[variables[0]], analytical_lines[variables[0]]], 
-                     ['Numerical', 'Analytical'], 
-                     loc='center', ncol=2, fontsize=12, frameon=True)
+    
+    # Create legend elements based on what's being plotted
+    if 'mesh3ReMax' in variables:
+        legend_ax.legend([lines[variables[0]], analytical_lines.get(variables[0], lines[variables[0]])], 
+                         ['Numerical', 'Analytical / Reference'], 
+                         loc='center', ncol=2, fontsize=12, frameon=True)
+    else:
+        legend_ax.legend([lines[variables[0]], analytical_lines[variables[0]]], 
+                         ['Numerical', 'Analytical'], 
+                         loc='center', ncol=2, fontsize=12, frameon=True)
     
     # Info text in legend row
     info_text = fig.text(0.5, 0.03, '', fontsize=15, horizontalalignment='center',
@@ -118,7 +170,8 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
         """Initialize animation"""
         for var in variables:
             lines[var].set_data([], [])
-            analytical_lines[var].set_data([], [])
+            if var in analytical_lines:
+                analytical_lines[var].set_data([], [])
         info_text.set_text('')
         title.set_text(f'{formatted_title} - VAR 0')
         return list(lines.values()) + list(analytical_lines.values()) + [info_text, title]
@@ -126,12 +179,17 @@ def create_var_evolution_video(sim_data_list: List[dict], analytical_data_list: 
     def animate(frame):
         """Animation function"""
         sim_data = sim_data_list[frame]
-        analytical_data = analytical_data_list[frame]
+        analytical_data = analytical_data_list[frame] if frame < len(analytical_data_list) else None
         
         for var in variables:
-            if var in sim_data and var in analytical_data:
-                lines[var].set_data(sim_data['x'], sim_data[var] * unit_dict[var])
-                analytical_lines[var].set_data(analytical_data['x'], analytical_data[var] * unit_dict[var])
+            if var in sim_data:
+                if var == 'mesh3ReMax':
+                    # For mesh3ReMax, just plot the simulation data (no unit conversion)
+                    lines[var].set_data(sim_data['x'], sim_data[var])
+                    # Reference line at 1 is already static, no need to update
+                elif analytical_data and var in analytical_data:
+                    lines[var].set_data(sim_data['x'], sim_data[var] * unit_dict[var])
+                    analytical_lines[var].set_data(analytical_data['x'], analytical_data[var] * unit_dict[var])
         
         # Get VAR number correctly from var_file name or use frame index
         var_file_name = sim_data.get('var_file', f'VAR{frame}')
@@ -192,14 +250,16 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
         'rho': r'Density $\rho$ [g cm$^{-3}$]',
         'ux': r'Velocity $u_x$ [km s$^{-1}$]',
         'pp': r'Pressure $p$ [dyn cm$^{-2}$]',
-        'ee': r'Energy $e$ [km$^2$ s$^{-2}$]'
+        'ee': r'Energy $e$ [km$^2$ s$^{-2}$]',
+        'mesh3ReMax': r'mesh3ReMax'
     }
     
     var_scales = {
         'rho': 'log',
         'ux': 'linear',
         'pp': 'log',
-        'ee': 'log'
+        'ee': 'log',
+        'mesh3ReMax': 'linear'
     }
     
     n_vars = len(sim_data_list)
@@ -217,13 +277,32 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
     
     logger.info(f"Creating {n_vars} individual frames...")
     
+    # Determine layout based on number of variables
+    num_vars = len(variables)
+    
     for frame_idx, (sim_data, analytical_data) in enumerate(zip(sim_data_list, analytical_data_list)):
-        # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
-        fig = plt.figure(figsize=(14, 16))
-        gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08,
-                              hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
-        # Create subplots in first 2 rows only
-        axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+        # Determine layout based on number of variables
+        if num_vars <= 4:
+            # Create figure with 2x3 layout (2 columns, 3 rows) - last row for legends
+            fig = plt.figure(figsize=(14, 16))
+            gs = fig.add_gridspec(3, 2, left=0.08, right=0.95, top=0.88, bottom=0.08,
+                                  hspace=0.35, wspace=0.30, height_ratios=[1, 1, 0.15])
+            axes = [fig.add_subplot(gs[i, j]) for i in range(2) for j in range(2)]
+            legend_subplot = gs[2, :]
+        else:
+            # Create figure with 3x3 layout for 5+ variables (3 columns, 4 rows) - last row for legends
+            fig = plt.figure(figsize=(18, 18))
+            gs = fig.add_gridspec(4, 3, left=0.08, right=0.95, top=0.88, bottom=0.08,
+                                  hspace=0.35, wspace=0.30, height_ratios=[1, 1, 1, 0.15])
+            axes = []
+            for i in range(2):
+                for j in range(3):
+                    if len(axes) < num_vars:
+                        axes.append(fig.add_subplot(gs[i, j]))
+            # If there's a 5th variable, place it centered in third row
+            if num_vars >= 5:
+                axes.append(fig.add_subplot(gs[2, 1]))
+            legend_subplot = gs[3, :]
         
         # Get VAR number correctly from var_file name
         var_file_name = sim_data.get('var_file', f'VAR{frame_idx}')
@@ -242,11 +321,18 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
         for idx, var in enumerate(variables):
             ax = axes[idx]
             
-            if var in sim_data and var in analytical_data:
-                ax.plot(sim_data['x'], sim_data[var] * unit_dict[var], 
-                       'b-', linewidth=2, alpha=0.8)
-                ax.plot(analytical_data['x'], analytical_data[var] * unit_dict[var], 
-                       'r--', linewidth=2.5, alpha=0.9)
+            if var in sim_data:
+                if var == 'mesh3ReMax':
+                    # For mesh3ReMax, plot simulation data without unit conversion
+                    ax.plot(sim_data['x'], sim_data[var], 
+                           'b-', linewidth=2, alpha=0.8)
+                    # Add static reference line at 1
+                    ax.axhline(y=1.0, color='r', linestyle='--', linewidth=2.5, alpha=0.9)
+                elif var in analytical_data:
+                    ax.plot(sim_data['x'], sim_data[var] * unit_dict[var], 
+                           'b-', linewidth=2, alpha=0.8)
+                    ax.plot(analytical_data['x'], analytical_data[var] * unit_dict[var], 
+                           'r--', linewidth=2.5, alpha=0.9)
                 
                 ax.set_xlabel('x [kpc]', fontsize=11)
                 ax.set_ylabel(var_labels.get(var, var), fontsize=11)
@@ -254,15 +340,21 @@ def create_var_evolution_frames(sim_data_list: List[dict], analytical_data_list:
                 ax.set_title(f'{var.upper()}', fontsize=12, fontweight='bold')
                 ax.grid(True, alpha=0.3)
         
-        # Joint legend in the last row (row 3, spans both columns)
-        legend_ax = fig.add_subplot(gs[2, :])
+        # Joint legend in the last row
+        legend_ax = fig.add_subplot(legend_subplot)
         legend_ax.axis('off')
         # Create dummy lines for legend
         from matplotlib.lines import Line2D
-        legend_elements = [
-            Line2D([0], [0], color='b', linewidth=2, alpha=0.8, label='Numerical'),
-            Line2D([0], [0], color='r', linestyle='--', linewidth=2.5, alpha=0.9, label='Analytical')
-        ]
+        if 'mesh3ReMax' in variables:
+            legend_elements = [
+                Line2D([0], [0], color='b', linewidth=2, alpha=0.8, label='Numerical'),
+                Line2D([0], [0], color='r', linestyle='--', linewidth=2.5, alpha=0.9, label='Analytical / Reference')
+            ]
+        else:
+            legend_elements = [
+                Line2D([0], [0], color='b', linewidth=2, alpha=0.8, label='Numerical'),
+                Line2D([0], [0], color='r', linestyle='--', linewidth=2.5, alpha=0.9, label='Analytical')
+            ]
         legend_ax.legend(handles=legend_elements, loc='center', ncol=2, 
                         fontsize=12, frameon=True)
         
