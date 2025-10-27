@@ -374,21 +374,191 @@ def format_short_experiment_name(experiment_name: str,
     """
     Create a short, compact experiment name for legends and labels.
     
-    For now, uses simple fallback truncation until template decoding is fixed.
+    Intelligently preserves essential distinguishing parameters by:
+    1. Loading sweep config to identify varied parameters
+    2. Extracting those parameter values from the run name
+    3. Including branch name for context
+    4. Dropping static prefixes (resolution, etc.)
+    
+    This is completely experiment-agnostic and works for any sweep configuration.
     
     Args:
         experiment_name: Raw experiment name
         experiment_type: Optional experiment type for proper decoding
     
     Returns:
-        Shortened name (full name if under 45 chars, truncated with ... if longer)
+        Shortened name preserving essential parameters
     
     Example:
-        >>> format_short_experiment_name('res400_nohyper_massfix_gamma_is_1_nu5p0')
-        'res400_nohyper_massfix_gamma_is_1_nu5p0'  # Under 45 chars, kept as is
+        >>> format_short_experiment_name('res400_hyper3_nu9e-15_chi9e-15_r3_nu1.0_dg', 'shocktube_phase2')
+        'nu9e-15_chi9e-15_r3_nu1.0_dg'  # Preserves varied parameters
     """
-    # Use simple fallback for now - template decoding needs fixing
-    return _fallback_short_name(experiment_name)
+    # Try to use sweep config to intelligently shorten
+    if experiment_type:
+        sweep_config = _load_sweep_config(experiment_type)
+        if sweep_config:
+            shortened = _shorten_using_sweep_config(experiment_name, sweep_config)
+            if shortened:
+                return shortened
+    
+    # Fallback: use heuristic-based shortening
+    return _heuristic_short_name(experiment_name)
+
+
+def _shorten_using_sweep_config(experiment_name: str, sweep_config: Dict) -> Optional[str]:
+    """
+    Create shortened name using sweep configuration to identify varied parameters.
+    
+    This is experiment-agnostic - it works by identifying which parameters
+    are being varied in the sweep and preserving those in the shortened name.
+    
+    Args:
+        experiment_name: Full run name
+        sweep_config: Sweep configuration dictionary
+    
+    Returns:
+        Shortened name or None if shortening fails
+    """
+    try:
+        # Identify varied parameters from sweep config
+        varied_params = set()
+        
+        # Check parameter_sweeps section
+        if 'parameter_sweeps' in sweep_config:
+            for sweep in sweep_config['parameter_sweeps']:
+                if 'variables' in sweep:
+                    # Handle both single variables and lists
+                    variables = sweep['variables']
+                    if isinstance(variables, str):
+                        varied_params.add(variables)
+                    else:
+                        varied_params.update(variables)
+        
+        # Check if there are branches (multi-branch experiments)
+        has_branches = 'branches' in sweep_config and len(sweep_config['branches']) > 1
+        
+        # Get output_prefix pattern to identify what to drop
+        output_prefix = sweep_config.get('output_prefix', '')
+        
+        # Parse the run name to extract components
+        parts = experiment_name.split('_')
+        
+        # Identify which parts correspond to varied parameters
+        # Look for parts that match param names or have numeric values
+        essential_parts = []
+        capture = False
+        
+        for i, part in enumerate(parts):
+            # Check if this part represents a varied parameter
+            is_varied_param = False
+            
+            for param in varied_params:
+                # Match patterns like: nu9e-15, chi0p1, diffrho5p0, etc.
+                # The parameter name might have underscores or be simplified
+                param_base = param.replace('_', '').lower()
+                part_lower = part.lower()
+                
+                # Check if part starts with parameter name and has numeric value
+                if part_lower.startswith(param_base) or part_lower.startswith(param.lower()):
+                    if any(c.isdigit() for c in part):
+                        is_varied_param = True
+                        capture = True
+                        break
+                
+                # Also check if previous part was the param name (e.g., "nu" "9e-15")
+                if i > 0 and parts[i-1].lower() == param.lower():
+                    is_varied_param = True
+                    capture = True
+            
+            # Include branch names if multiple branches exist
+            if has_branches and not capture:
+                # Check if this might be part of a branch name
+                # Branch names typically come after the varied parameters
+                for branch in sweep_config['branches']:
+                    branch_name = branch.get('name', '')
+                    if branch_name and branch_name in experiment_name:
+                        # Once we hit potential branch territory, capture everything
+                        branch_parts = branch_name.split('_')
+                        if part in branch_parts:
+                            capture = True
+                            break
+            
+            if capture:
+                essential_parts.append(part)
+        
+        if essential_parts and len(essential_parts) >= 2:
+            shortened = '_'.join(essential_parts)
+            
+            # Only return if it's actually shorter and meaningful
+            if len(shortened) < len(experiment_name) and len(shortened) <= 45:
+                return shortened
+    
+    except Exception as e:
+        logger.debug(f"Failed to shorten using sweep config: {e}")
+    
+    return None
+
+
+def _heuristic_short_name(experiment_name: str) -> str:
+    """
+    Heuristic-based shortening when sweep config is not available.
+    
+    Uses common patterns to identify and preserve distinguishing parameters.
+    
+    Args:
+        experiment_name: Full run name
+    
+    Returns:
+        Shortened name
+    """
+    # If already short enough, return as-is
+    if len(experiment_name) <= 40:
+        return experiment_name
+    
+    parts = experiment_name.split('_')
+    
+    # Identify potential varied parameters (parts with numbers)
+    # and branch identifiers (typically at the end)
+    essential_parts = []
+    
+    # Skip common static prefixes
+    start_idx = 0
+    if parts[0].startswith('res') and len(parts) > 3:
+        start_idx = 1  # Skip resolution
+    
+    # Look for parts that likely represent varied parameters or branch info
+    for i in range(start_idx, len(parts)):
+        part = parts[i]
+        
+        # Keep parts that:
+        # 1. Start with common param prefixes and have numbers
+        # 2. Are in the latter half of the name (likely branch info)
+        # 3. Have scientific notation (e.g., 9e-15)
+        
+        has_number = any(c.isdigit() for c in part)
+        has_scientific = 'e-' in part or 'e+' in part
+        is_latter_half = i >= len(parts) // 2
+        
+        # Common parameter prefixes
+        param_prefixes = ['nu', 'chi', 'diff', 'gamma', 'r', 'b', 'hyp']
+        starts_with_param = any(part.lower().startswith(p) for p in param_prefixes)
+        
+        if (has_number and starts_with_param) or has_scientific or (is_latter_half and has_number):
+            essential_parts.append(part)
+        elif is_latter_half and not has_number:
+            # Include non-numeric parts from latter half (branch names)
+            essential_parts.append(part)
+    
+    if essential_parts:
+        shortened = '_'.join(essential_parts)
+        if len(shortened) <= 45:
+            return shortened
+    
+    # Last resort: truncate intelligently
+    if len(experiment_name) > 45:
+        return "..." + experiment_name[-42:]
+    
+    return experiment_name
 
 
 def _fallback_short_name(experiment_name: str) -> str:
