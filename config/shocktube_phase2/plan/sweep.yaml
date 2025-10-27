@@ -23,7 +23,7 @@ hpc:
 
   sbatch:
     job_name: "shock_sweep_ph2"
-    account: "project_2008296"
+    account: "project_2001062"
     partition: "small"
     time: "01:00:00"
     nodes: 1
