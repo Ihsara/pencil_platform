@@ -11,14 +11,6 @@
     },
     {
       "rank": 2,
-      "run_name": "res400_nohyper_massfix_gamma_is_1_nu0p5_chi0p5_diffrho0p5",
-      "combined_score": 0.05020618139214625,
-      "per_metric_scores": {
-        "l1": 0.05020618139214625
-      }
-    },
-    {
-      "rank": 3,
       "run_name": "res400_nohyper_massfix_default_gamma_nu0p1_chi0p1_diffrho0p1",
       "combined_score": 0.05226144094336929,
       "per_metric_scores": {

@@ -4,7 +4,7 @@
 
 **Metrics Used**: L1
 
-**Total Runs Analyzed**: 24
+**Total Runs Analyzed**: 8
 
 ## 🥇 Top 5 Overall Performers
 
@@ -39,18 +39,6 @@
   - L1: 1.960137e-01
 
 ## 🏆 Best Performer per Branch
-
-### r1_nu0.5_dg
-- **Run**: res400_hyper3_nu9e-15_chi9e-15_r1_nu0.5_dg
-- **Combined Score**: 3.416476e-01
-- **Per-Metric Scores**:
-  - L1: 3.416476e-01
-
-### r2_nu0.5_g1
-- **Run**: res400_hyper3_nu9e-15_chi9e-15_r2_nu0.5_g1
-- **Combined Score**: 3.477155e-01
-- **Per-Metric Scores**:
-  - L1: 3.477155e-01
 
 ### r3_nu1.0_dg
 - **Run**: res400_hyper3_nu9e-15_chi9e-15_r3_nu1.0_dg
