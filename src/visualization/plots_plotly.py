@@ -12,7 +12,7 @@ from plotly.subplots import make_subplots
 import numpy as np
 from pathlib import Path
 from loguru import logger
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from src.experiment.naming import format_experiment_title
 
