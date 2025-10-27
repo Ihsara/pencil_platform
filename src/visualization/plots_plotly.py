@@ -888,7 +888,10 @@ def show_3d_error_map(
                         'surface': surface_data
                     })
     
-    # Dropdown 1: Select Branch (shows all branches)
+    # Build dropdown menus with proper hierarchy and filtering
+    # The strategy: Create a mapping structure that allows each dropdown to filter properly
+    
+    # Dropdown 1: Select Branch
     branch_buttons = []
     for branch_name in sorted(dropdown_data.keys()):
         # Get first run and var from this branch
@@ -915,13 +918,20 @@ def show_3d_error_map(
             ]
         ))
     
-    # Dropdown 2: Select Run (shows ALL runs from ALL branches with clear labels)
+    # Dropdown 2: Select Parameter Combination (shortname)
+    # Group by unique shortnames across all branches
     run_buttons = []
+    seen_combinations = set()
+    
     for combo in all_combinations:
-        # Only include first variable for each run to avoid duplicates
-        if combo['var'] == analyze_variables[0]:
+        # Create unique key for this parameter combination
+        combo_key = (combo['branch'], combo['shortname'])
+        
+        # Only add if we haven't seen this combination and only for first variable
+        if combo_key not in seen_combinations and combo['var'] == analyze_variables[0]:
+            seen_combinations.add(combo_key)
             run_buttons.append(dict(
-                label=f"{combo['branch']} → {combo['shortname']}",
+                label=f"{combo['shortname']} ({combo['branch']})",
                 method='update',
                 args=[
                     {
@@ -938,26 +948,31 @@ def show_3d_error_map(
                 ]
             ))
     
-    # Dropdown 3: Select Variable (shows ALL combinations)
+    # Dropdown 3: Select Variable/Property ONLY (rho, ux, pp, ee)
+    # This should show only the 4 variables, using the first available combination for each
     var_buttons = []
-    for combo in all_combinations:
-        var_buttons.append(dict(
-            label=f"{combo['branch']} → {combo['shortname']} → {combo['var'].upper()}",
-            method='update',
-            args=[
-                {
-                    'x': [combo['surface']['x']],
-                    'y': [combo['surface']['y']],
-                    'z': [combo['surface']['z']],
-                    'colorscale': ['Jet'],
-                    'cmin': [np.nanmin(combo['surface']['z'])],
-                    'cmax': [np.nanmax(combo['surface']['z'])]
-                },
-                {
-                    'title': f"3D Error Map: {var_labels[combo['var']]}<br><sub>Branch: {combo['branch']} | {combo['shortname']}</sub>"
-                }
-            ]
-        ))
+    for var in analyze_variables:
+        # Find first available combination with this variable
+        for combo in all_combinations:
+            if combo['var'] == var:
+                var_buttons.append(dict(
+                    label=f"{var.upper()} - {var_labels[var]}",
+                    method='update',
+                    args=[
+                        {
+                            'x': [combo['surface']['x']],
+                            'y': [combo['surface']['y']],
+                            'z': [combo['surface']['z']],
+                            'colorscale': ['Jet'],
+                            'cmin': [np.nanmin(combo['surface']['z'])],
+                            'cmax': [np.nanmax(combo['surface']['z'])]
+                        },
+                        {
+                            'title': f"3D Error Map: {var_labels[var]}<br><sub>Branch: {combo['branch']} | {combo['shortname']}</sub>"
+                        }
+                    ]
+                ))
+                break  # Only add once per variable
     
     # Update layout with 3 separate dropdowns
     fig.update_layout(

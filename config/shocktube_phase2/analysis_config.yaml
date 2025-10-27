@@ -42,4 +42,4 @@ error_analysis:
   ranking_metric: 'l1'  # Metric to use for ranking best performers
   use_code_units: true
   combine_in_videos: true
-  analyze_variables: ['rho', 'ux', 'pp', 'ee']
+  analyze_variables: ['rho', 'ux', 'pp', 'ee', 'mesh3ReMax']  # Include mesh3ReMax for stability analysis
