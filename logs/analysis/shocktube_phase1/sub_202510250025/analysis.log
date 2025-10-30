@@ -1,0 +1,23 @@
+2025-10-25 00:25:10.566 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/analysis/shocktube_phase1/sub_202510250025/analysis.log
+2025-10-25 00:25:10.566 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/analysis/shocktube_phase1/sub_202510250025
+2025-10-25 00:25:10.566 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:233 - ================================================================================
+2025-10-25 00:25:10.567 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:234 - STARTING VIDEO-ONLY ANALYSIS: 'shocktube_phase1'
+2025-10-25 00:25:10.567 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:236 - Combined error video generation ENABLED.
+2025-10-25 00:25:10.567 | INFO     | src.workflows.analysis_pipeline:analyze_suite_videos_only:237 - ================================================================================
+2025-10-25 00:25:10.631 | ERROR    | __main__:main:225 - An unexpected error occurred: create_config_loader() missing 2 required positional arguments: 'experiment_name' and 'config_root'
+Traceback (most recent call last):
+
+  File "/scratch/project_2008296/chau/pencil_platform/main.py", line 229, in <module>
+    main()
+    └ <function main at 0x7fddd6c1d620>
+
+> File "/scratch/project_2008296/chau/pencil_platform/main.py", line 129, in main
+    analyze_suite_videos_only(experiment_name, combined_video=True)
+    │                         └ 'shocktube_phase1'
+    └ <function analyze_suite_videos_only at 0x7fddd6c1ce00>
+
+  File "/scratch/project_2008296/chau/pencil_platform/src/workflows/analysis_pipeline.py", line 250, in analyze_suite_videos_only
+    config_loader = create_config_loader()
+                    └ <function create_config_loader at 0x7fde173fc9a0>
+
+TypeError: create_config_loader() missing 2 required positional arguments: 'experiment_name' and 'config_root'

@@ -28,7 +28,7 @@ hpc:
   # SLURM SBATCH parameters for the array job submission script.
   sbatch:
     job_name: "shock_sweep_ph1"
-    account: "project_2008296"
+    account: "project_2001062"
     partition: "small"         # Use 'small' for single-core, short jobs.
     time: "04:00:00"         # Format: HH:MM:SS. 4 hours for high resolution runs.
     nodes: 1

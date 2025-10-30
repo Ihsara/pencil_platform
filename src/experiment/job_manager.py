@@ -11,6 +11,50 @@ from src.core.constants import DIRS, FILES
 from src.core.logging import setup_file_logging
 from src.experiment.naming import format_short_experiment_name
 
+def _ensure_manifest_exists(experiment_name: str, local_exp_dir: Path) -> bool:
+    """
+    Ensures the run manifest file exists by regenerating it from generated_configs directory.
+    
+    Args:
+        experiment_name: Name of the experiment
+        local_exp_dir: Path to the local experiment directory
+        
+    Returns:
+        True if manifest exists or was successfully created, False otherwise
+    """
+    manifest_file = local_exp_dir / FILES.manifest
+    
+    # If manifest already exists, we're good
+    if manifest_file.exists():
+        return True
+    
+    # Try to regenerate from generated_configs directory
+    generated_configs_dir = local_exp_dir / "generated_configs"
+    if not generated_configs_dir.exists():
+        logger.error(f"Cannot regenerate manifest: generated_configs directory not found at {generated_configs_dir}")
+        return False
+    
+    # Get all run directories from generated_configs
+    run_dirs = [d for d in generated_configs_dir.iterdir() if d.is_dir()]
+    
+    if not run_dirs:
+        logger.error(f"Cannot regenerate manifest: no run directories found in {generated_configs_dir}")
+        return False
+    
+    # Sort run directories by name for consistent ordering
+    run_names = sorted([d.name for d in run_dirs])
+    
+    # Write manifest file
+    try:
+        with open(manifest_file, 'w') as f:
+            for run_name in run_names:
+                f.write(f"{run_name}\n")
+        logger.info(f"Successfully regenerated manifest with {len(run_names)} runs at {manifest_file}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to write manifest file: {e}")
+        return False
+
 def submit_suite(experiment_name: str, submit_script_path: Path, plan: dict):
     """
     Submits the generated job array script to SLURM and records the job ID.
@@ -72,9 +116,14 @@ def check_suite_status(experiment_name: str, return_status: bool = False, silent
     if not batch_id_file.exists():
         logger.error(f"Batch ID file not found at '{batch_id_file}'. Cannot check status.")
         sys.exit(1)
+    
+    # Ensure manifest exists - regenerate if missing
     if not manifest_file.exists():
-        logger.error(f"Manifest file not found at '{manifest_file}'. Cannot map tasks to run names.")
-        sys.exit(1)
+        if not silent:
+            logger.warning(f"Manifest file not found. Attempting to regenerate...")
+        if not _ensure_manifest_exists(experiment_name, local_exp_dir):
+            logger.error(f"Cannot proceed without manifest file.")
+            sys.exit(1)
 
     batch_id = batch_id_file.read_text().strip()
     if not batch_id:
@@ -331,9 +380,16 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     batch_id_file = local_exp_dir / ".batch_id"
     manifest_file = local_exp_dir / FILES.manifest
     
-    if not batch_id_file.exists() or not manifest_file.exists():
-        logger.error("Cannot monitor progress: batch ID or manifest file not found")
+    if not batch_id_file.exists():
+        logger.error("Cannot monitor progress: batch ID file not found")
         return
+    
+    # Ensure manifest exists - regenerate if missing
+    if not manifest_file.exists():
+        logger.warning(f"Manifest file not found. Attempting to regenerate...")
+        if not _ensure_manifest_exists(experiment_name, local_exp_dir):
+            logger.error("Cannot monitor progress: manifest file could not be created")
+            return
     
     batch_id = batch_id_file.read_text().strip()
     with open(manifest_file, 'r') as f:

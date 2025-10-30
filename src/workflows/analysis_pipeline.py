@@ -12,11 +12,13 @@ from typing import Dict, List, Tuple
 from src.core.constants import DIRS, FILES
 from src.core.logging import setup_file_logging
 from src.core.config_loader import create_config_loader
+from src.experiment.job_manager import _ensure_manifest_exists
 from src.analysis.errors import (
     calculate_std_deviation_across_vars, 
     calculate_absolute_deviation_per_var,
     calculate_spatial_errors,
     calculate_error_norms,
+    calculate_normalized_spatial_errors,
     ExperimentErrorAnalyzer
 )
 from src.analysis.metrics import calculate_errors_over_time
@@ -32,6 +34,11 @@ from src.visualization.videos import (
     create_error_evolution_video,
     create_overlay_error_evolution_video,
     create_combined_error_evolution_video
+)
+from src.visualization.plots_plotly import (
+    create_var_evolution_plotly,
+    create_error_evolution_plotly,
+    create_combined_error_evolution_plotly
 )
 from src.experiment.naming import format_experiment_title, format_short_experiment_name
 from src.analysis.organizer import AnalysisOrganizer
@@ -241,29 +248,66 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     # Read error analysis configuration from plan file
     error_config = plan.get('error_analysis', {})
     metrics = error_config.get('metrics', ['l1', 'l2', 'linf'])
+    ranking_metric = error_config.get('ranking_metric', None)
     combine_in_videos = error_config.get('combine_in_videos', True)
+    analyze_variables = error_config.get('analyze_variables', ['rho', 'ux', 'pp', 'ee'])
+    
+    # Validate and set ranking metric
+    if ranking_metric is None:
+        # Default to first metric if not specified
+        ranking_metric = metrics[0] if metrics else 'l1'
+        logger.warning(f"No ranking_metric specified in config, defaulting to first metric: {ranking_metric.upper()}")
+    elif ranking_metric not in metrics:
+        # Ranking metric must be in the metrics list
+        logger.error(f"Configured ranking_metric '{ranking_metric}' not in metrics list {metrics}")
+        logger.warning(f"Falling back to first metric: {metrics[0].upper()}")
+        ranking_metric = metrics[0] if metrics else 'l1'
+    
+    # Load config loader to get variable configurations
+    config_loader = create_config_loader(experiment_name, DIRS.config)
+    analysis_config = config_loader.load_analysis_config()
+    variables_config = analysis_config.get('variables', {})
     
     logger.info(f"Error analysis configuration:")
     logger.info(f"  ├─ Metrics to calculate: {', '.join([m.upper() for m in metrics])}")
+    logger.info(f"  ├─ Ranking metric: {ranking_metric.upper()}")
+    logger.info(f"  ├─ Variables: {', '.join(analyze_variables)}")
     logger.info(f"  └─ Combine in videos: {combine_in_videos}")
     
     hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
-    manifest_file = DIRS.runs / experiment_name / FILES.manifest
+    local_exp_dir = DIRS.runs / experiment_name
+    manifest_file = local_exp_dir / FILES.manifest
     analysis_dir = DIRS.root / "analysis" / experiment_name
+    
+    # Ensure manifest exists - regenerate if missing
+    if not manifest_file.exists():
+        logger.warning(f"Manifest file not found. Attempting to regenerate...")
+        if not _ensure_manifest_exists(experiment_name, local_exp_dir):
+            logger.error("Cannot proceed with analysis: manifest file could not be created")
+            sys.exit(1)
     
     # Create directory structure following the standard: var/, error/, best/
     var_dir = analysis_dir / "var"
     error_dir = analysis_dir / "error"
     
     var_evolution_dir = var_dir / "evolution"
+    var_evo_plotly_dir = var_dir / "evo_plotly"
     error_evolution_dir = error_dir / "evolution"
+    error_evo_plotly_dir = error_dir / "evo_plotly"
     error_frames_dir = error_dir / "frames"
 
-    # Clear old visualizations before creating new ones
+    # Clear old visualizations AND cache before creating new ones
     logger.info("Clearing old visualization directories...")
     clear_directory(var_evolution_dir)
+    clear_directory(var_evo_plotly_dir)
     clear_directory(error_evolution_dir)
+    clear_directory(error_evo_plotly_dir)
     clear_directory(error_frames_dir)
+    
+    # Clear cache directory to force fresh computation
+    cache_dir = error_dir / "cache"
+    logger.info("Clearing cache directory for fresh computation...")
+    clear_directory(cache_dir)
 
     with open(manifest_file, 'r') as f: 
         run_names = [line.strip() for line in f if line.strip()]
@@ -277,13 +321,23 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     
     # Organize runs by branch
     runs_per_branch = {branch: [] for branch in branch_names}
+    runs_per_branch['default'] = []  # Always include default for unmatched runs
+    
     for run_name in run_names:
+        matched = False
         for branch_name in branch_names:
             if branch_name in run_name:
                 runs_per_branch[branch_name].append(run_name)
+                matched = True
                 break
-        else:
+        if not matched:
             runs_per_branch['default'].append(run_name)
+    
+    # ============================================================
+    # Initialize organizer early to use correct directory structure
+    # ============================================================
+    organizer = AnalysisOrganizer(experiment_name, analysis_dir)
+    organizer.create_structure()
     
     # ============================================================
     # PHASE 1: Load data and create individual videos
@@ -333,14 +387,28 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 'spatial_errors': spatial_errors_abs,
             }
             
-            # Get unit length
+            # Get unit length - respect use_code_units flag
             unit_length = 1.0
             if all_sim_data and 'params' in all_sim_data[0]:
-                unit_length = all_sim_data[0]['params'].unit_length
+                # Check if we should use code units (normalized) or physical units
+                use_code_units = error_config.get('use_code_units', True)
+                
+                if use_code_units:
+                    unit_length = 1.0  # Force code units for normalized calculations
+                    logger.debug(f"     ├─ Using code units (unit_length=1.0) for normalized calculations")
+                else:
+                    unit_length = all_sim_data[0]['params'].unit_length
+                    logger.debug(f"     ├─ Using physical units (unit_length={unit_length:.3e})")
 
             logger.info(f"     ├─ Creating var evolution video and frames...")
             create_var_evolution_video(
                 all_sim_data, all_analytical_data, var_evolution_dir, run_name, fps=2, save_frames=True
+            )
+            
+            # Also create interactive plotly version
+            logger.info(f"     ├─ Creating interactive plotly var evolution...")
+            create_var_evolution_plotly(
+                all_sim_data, all_analytical_data, var_evo_plotly_dir, run_name
             )
             
             # Create COMBINED error evolution with all configured metrics by DEFAULT
@@ -362,6 +430,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                     spatial_errors_dict, error_evolution_dir, run_name, fps=2, 
                     unit_length=unit_length, save_frames=True
                 )
+                
+                # Also create interactive plotly version
+                logger.info(f"     ├─ Creating interactive plotly combined error evolution...")
+                create_combined_error_evolution_plotly(
+                    spatial_errors_dict, error_evo_plotly_dir, run_name, unit_length=unit_length
+                )
                 logger.info(f"     └─ ✓ Created combined error evolution with {len(spatial_errors_dict)} error types")
             else:
                 # Fallback: create single error evolution video
@@ -370,8 +444,63 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                     spatial_errors_abs, error_evolution_dir, run_name, fps=2, 
                     unit_length=unit_length, save_frames=True
                 )
+                
+                # Also create interactive plotly version
+                logger.info(f"     ├─ Creating interactive plotly error evolution...")
+                create_error_evolution_plotly(
+                    spatial_errors_abs, error_evo_plotly_dir, run_name, unit_length=unit_length
+                )
                 logger.info(f"     └─ ✓ Created error evolution video")
             # --- END: Modified section ---
+            
+            # Calculate normalized spatial-temporal errors (for notebook usage)
+            logger.info(f"     ├─ Calculating normalized spatial-temporal errors...")
+            normalized_errors = calculate_normalized_spatial_errors(
+                all_sim_data,
+                all_analytical_data,
+                variables=analyze_variables,
+                normalize_by_space=False,
+                normalize_by_time=False
+            )
+            
+            # Cache normalized errors for later use (e.g., in notebooks)
+            loaded_data_cache[run_name]['normalized_errors'] = normalized_errors
+            
+            # Save to pickle cache for fast notebook loading
+            cache_dir = analysis_dir / "error" / "cache"
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            cache_file = cache_dir / f"{run_name}_normalized_errors.pkl"
+            
+            try:
+                import pickle
+                with open(cache_file, 'wb') as f:
+                    pickle.dump(normalized_errors, f, protocol=pickle.HIGHEST_PROTOCOL)
+                logger.info(f"     └─ ✓ Calculated and cached errors for {len(normalized_errors)} variables")
+            except Exception as e:
+                logger.warning(f"     └─ ✓ Calculated errors for {len(normalized_errors)} variables (cache save failed: {e})")
+            
+            # Create and cache "mind the gap" spacetime data
+            logger.info(f"     ├─ Creating 'mind the gap' spacetime data...")
+            from src.analysis.data_prep import prepare_spacetime_error_data, export_spacetime_data_to_json
+            
+            mind_gap_dir = analysis_dir / "error" / "mind_the_gap" / run_name
+            mind_gap_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Prepare and save data for each variable
+            for var in analyze_variables:
+                prepared_data = prepare_spacetime_error_data(
+                    normalized_errors,
+                    var,
+                    unit_length,
+                    use_relative=True
+                )
+                if prepared_data:
+                    export_spacetime_data_to_json(prepared_data, mind_gap_dir, run_name, var)
+            
+            logger.info(f"     └─ ✓ Saved spacetime data for interactive visualization")
+            
+            # Store normalized errors for later combined visualization
+            logger.info(f"     └─ ✓ Calculated errors for {len(analyze_variables)} variables")
     
     # ============================================================
     # PHASE 2: Find best performers and create overlay videos
@@ -380,22 +509,37 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     logger.info("PHASE 2: Creating overlay videos")
     logger.info("=" * 80)
     
+    # Use the explicitly configured ranking_metric (already validated above)
+    logger.info(f"Using configured ranking metric: {ranking_metric.upper()}")
+    
     # Calculate average error for each run using ONLY DENSITY (rho)
     run_scores = {}
     for run_name, cached in loaded_data_cache.items():
         spatial_errors = cached['spatial_errors']
         
-        # Calculate average L2 error for DENSITY ONLY across all timesteps
+        # Calculate average error for DENSITY ONLY across all timesteps using configured ranking metric
         total_error = 0
         count = 0
         if 'rho' in spatial_errors:
             for errors in spatial_errors['rho']['errors_per_timestep']:
-                total_error += np.sqrt(np.mean(errors**2))  # L2 norm
+                if ranking_metric == 'l1':
+                    # L1 norm: mean absolute error
+                    total_error += np.mean(np.abs(errors))
+                elif ranking_metric == 'l2':
+                    # L2 norm: root mean square error
+                    total_error += np.sqrt(np.mean(errors**2))
+                elif ranking_metric == 'linf':
+                    # L∞ norm: maximum absolute error
+                    total_error += np.max(np.abs(errors))
+                else:
+                    # Default to L1 if somehow an invalid metric got through
+                    logger.warning(f"Unknown ranking metric '{ranking_metric}', using L1")
+                    total_error += np.mean(np.abs(errors))
                 count += 1
         
         avg_error = total_error / count if count > 0 else float('inf')
         run_scores[run_name] = avg_error
-        logger.info(f"  {run_name}: avg L2 error (rho only) = {avg_error:.6e}")
+        logger.info(f"  {run_name}: avg {ranking_metric.upper()} error (rho only) = {avg_error:.6e}")
     
     # Find best performer in each branch
     logger.info(f"\n🏆 Finding best performers in each branch...")
@@ -408,7 +552,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
         if branch_scores:
             best_run = min(branch_scores, key=branch_scores.get)
             branch_best_performers[branch_name] = best_run
-            logger.info(f"  ├─ {branch_name}: {best_run} (L2={branch_scores[best_run]:.6e})")
+            logger.info(f"  ├─ {branch_name}: {best_run} ({ranking_metric.upper()}={branch_scores[best_run]:.6e})")
     
     # Create overlay videos for each branch (all runs in branch)
     logger.info(f"\n🎬 Creating branch overlay videos...")
@@ -425,13 +569,17 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                 spatial_errors_list.append((run_name, cached['spatial_errors']))
         
         if spatial_errors_list:
-            # Get unit_length from first run
+            # Get unit_length from first run - respect use_code_units flag
             unit_length = 1.0
             first_run_data = loaded_data_cache[branch_runs[0]]
             if first_run_data['sim_data'] and 'params' in first_run_data['sim_data'][0]:
                 params = first_run_data['sim_data'][0]['params']
-                if hasattr(params, 'unit_length'):
-                    unit_length = params.unit_length  # Already in cm
+                use_code_units = error_config.get('use_code_units', True)
+                
+                if use_code_units:
+                    unit_length = 1.0  # Force code units
+                elif hasattr(params, 'unit_length'):
+                    unit_length = params.unit_length
             
             output_name = f"{experiment_name}_{branch_name}_overlay"
             create_overlay_error_evolution_video(
@@ -445,7 +593,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     top_3_runs = [run for run, score in sorted_runs[:3]]
     
     for idx, (run, score) in enumerate(sorted_runs[:3], 1):
-        logger.info(f"  ├─ #{idx}: {run} (L2={score:.6e})")
+        logger.info(f"  ├─ #{idx}: {run} ({ranking_metric.upper()}={score:.6e})")
     
     # Create overlay video for top 3
     logger.info(f"\n🎬 Creating top 3 overlay video...")
@@ -456,13 +604,17 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             top_3_spatial_errors.append((run_name, cached['spatial_errors']))
     
     if top_3_spatial_errors:
-        # Get unit_length from first run
+        # Get unit_length from first run - respect use_code_units flag
         unit_length = 1.0
         first_run_data = loaded_data_cache[top_3_runs[0]]
         if first_run_data['sim_data'] and 'params' in first_run_data['sim_data'][0]:
             params = first_run_data['sim_data'][0]['params']
-            if hasattr(params, 'unit_length'):
-                unit_length = params.unit_length  # Already in cm
+            use_code_units = error_config.get('use_code_units', True)
+            
+            if use_code_units:
+                unit_length = 1.0  # Force code units
+            elif hasattr(params, 'unit_length'):
+                unit_length = params.unit_length
         
         output_name = f"{experiment_name}_top3_best_performers_overlay"
         create_overlay_error_evolution_video(
@@ -471,10 +623,232 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
         logger.info(f"     └─ ✓ Created top 3 overlay video")
     
     # ============================================================
-    # Initialize organizer early to use correct directory structure
+    # PHASE 2.5: Create combined error line graphs with all experiments
     # ============================================================
-    organizer = AnalysisOrganizer(experiment_name, analysis_dir)
-    organizer.create_structure()
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 2.5: Creating combined error line graphs")
+    logger.info("=" * 80)
+    
+    from datetime import datetime
+    import plotly.express as px
+    import plotly.graph_objects as go
+    
+    # Get current timestamp in YYYYMMDD format
+    timestamp = datetime.now().strftime("%Y%m%d")
+    
+    # Create organized structure: error -> evo_time -> <element>
+    evo_time_dir = analysis_dir / "error" / "evo_time"
+    
+    # Find best performer (lowest score)
+    best_run_name = min(run_scores.items(), key=lambda x: x[1])[0] if run_scores else None
+    
+    for var in analyze_variables:
+        element_dir = evo_time_dir / var
+        element_dir.mkdir(parents=True, exist_ok=True)
+        
+        logger.info(f"  ├─ Creating combined {var.upper()} graph with all {len(loaded_data_cache)} experiments...")
+        
+        # Collect all data for this variable
+        all_traces = []
+        run_labels = []
+        timesteps_ref = None
+        
+        for run_idx, (run_name, cached) in enumerate(loaded_data_cache.items()):
+            normalized_errors = cached.get('normalized_errors')
+            if not normalized_errors or var not in normalized_errors:
+                continue
+            
+            # Prepare data for this run
+            prepared_data = prepare_spacetime_error_data(
+                normalized_errors,
+                var,
+                unit_length,
+                use_relative=True
+            )
+            
+            if not prepared_data:
+                continue
+            
+            x_coords = prepared_data['x_coords']
+            timesteps = prepared_data['timesteps']
+            error_matrix = prepared_data['error_matrix']
+            
+            if timesteps_ref is None:
+                timesteps_ref = timesteps
+            
+            # Determine if this is the best performer
+            is_best = (run_name == best_run_name)
+            
+            # Create color - use distinct colors from a palette
+            colors = px.colors.qualitative.Set3 + px.colors.qualitative.Pastel + px.colors.qualitative.Set2
+            line_color = colors[run_idx % len(colors)]
+            
+            # Set opacity - 0.5 for non-best, 1.0 for best
+            opacity = 1.0 if is_best else 0.5
+            line_width = 3 if is_best else 1.5
+            
+            # Create frames for this run
+            for t_idx in range(len(timesteps)):
+                trace = go.Scatter(
+                    x=x_coords,
+                    y=error_matrix[t_idx],
+                    mode='lines',
+                    name=run_name,
+                    line=dict(width=line_width, color=line_color),
+                    opacity=opacity,
+                    visible=(t_idx == 0),  # Only first frame visible initially
+                    legendgroup=run_name,
+                    showlegend=(t_idx == 0),  # Only show in legend once
+                    hovertemplate=f'{run_name}<br>x=%{{x:.3f}}<br>error=%{{y:.3e}}<extra></extra>'
+                )
+                all_traces.append((trace, t_idx, run_name, is_best))
+            
+            run_labels.append((run_name, is_best))
+        
+        if not all_traces or timesteps_ref is None:
+            logger.warning(f"     └─ No data available for {var}")
+            continue
+        
+        # Group traces by timestep
+        traces_by_timestep = {}
+        for trace, t_idx, run_name, is_best in all_traces:
+            if t_idx not in traces_by_timestep:
+                traces_by_timestep[t_idx] = []
+            traces_by_timestep[t_idx].append(trace)
+        
+        # Create figure with all traces
+        fig = go.Figure()
+        for trace, _, _, _ in all_traces:
+            fig.add_trace(trace)
+        
+        # Create animation frames
+        n_timesteps = max(traces_by_timestep.keys()) + 1
+        frames = []
+        for t_idx in range(n_timesteps):
+            frame_data = []
+            for trace_idx, (trace, trace_t_idx, _, _) in enumerate(all_traces):
+                # Make trace visible if it matches current timestep
+                visible = (trace_t_idx == t_idx)
+                frame_data.append(go.Scatter(visible=visible))
+            
+            t_val = timesteps_ref[t_idx] if t_idx < len(timesteps_ref) else 0
+            frames.append(go.Frame(
+                data=frame_data,
+                name=str(t_idx),
+                layout=go.Layout(
+                    title_text=f"{var.upper()} Error Evolution - All Experiments<br>VAR{t_idx} (t={t_val:.3e})"
+                )
+            ))
+        
+        fig.frames = frames
+        
+        # Update layout
+        fig.update_layout(
+            title=dict(
+                text=f"{var.upper()} Error Evolution - All Experiments<br><sub>Best performer: {best_run_name} (highlighted)</sub>",
+                x=0.5,
+                xanchor='center'
+            ),
+            xaxis=dict(
+                title='Position (x) [kpc]',
+                gridcolor='lightgray'
+            ),
+            yaxis=dict(
+                title='Relative Error',
+                gridcolor='lightgray',
+                type='log'
+            ),
+            height=600,
+            width=1400,
+            hovermode='closest',
+            plot_bgcolor='rgba(240, 240, 240, 0.5)',
+            updatemenus=[
+                dict(
+                    type='buttons',
+                    showactive=False,
+                    buttons=[
+                        dict(
+                            label='▶ Play',
+                            method='animate',
+                            args=[None, dict(
+                                frame=dict(duration=500, redraw=True),
+                                fromcurrent=True,
+                                mode='immediate',
+                                transition=dict(duration=300)
+                            )]
+                        ),
+                        dict(
+                            label='⏸ Pause',
+                            method='animate',
+                            args=[[None], dict(
+                                frame=dict(duration=0, redraw=False),
+                                mode='immediate',
+                                transition=dict(duration=0)
+                            )]
+                        )
+                    ],
+                    x=0.1,
+                    y=1.15,
+                    xanchor='left',
+                    yanchor='top'
+                )
+            ],
+            sliders=[dict(
+                active=0,
+                yanchor='top',
+                y=-0.15,
+                xanchor='left',
+                currentvalue=dict(
+                    prefix='VAR Snapshot: ',
+                    visible=True,
+                    xanchor='center'
+                ),
+                pad=dict(b=10, t=50),
+                len=0.9,
+                x=0.05,
+                steps=[
+                    dict(
+                        args=[[f.name], dict(
+                            frame=dict(duration=500, redraw=True),
+                            mode='immediate',
+                            transition=dict(duration=300)
+                        )],
+                        label=f"VAR{i}",
+                        method='animate'
+                    )
+                    for i in range(n_timesteps)
+                ]
+            )]
+        )
+        
+        # Save with timestamp naming
+        output_file = element_dir / f"{timestamp}.html"
+        fig.write_html(str(output_file))
+        logger.info(f"     └─ ✓ Saved combined graph: {output_file.name}")
+    
+    # ============================================================
+    # PHASE 2.6: Create 3D error map with 3-tier dropdowns
+    # ============================================================
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 2.6: Creating 3D error map with 3-tier dropdowns")
+    logger.info("=" * 80)
+    
+    from src.visualization.plots_plotly import show_3d_error_map
+    
+    # Create output directory for 3D maps
+    map_3d_dir = analysis_dir / "error" / "3d_maps"
+    
+    try:
+        show_3d_error_map(
+            experiment_name=experiment_name,
+            analysis_dir=analysis_dir,
+            output_dir=map_3d_dir,
+            analyze_variables=analyze_variables
+        )
+    except Exception as e:
+        logger.error(f"Failed to create 3D error map: {e}")
+        import traceback
+        traceback.print_exc()
     
     # ============================================================
     # PHASE 3: Calculate L1/L2 error norms (reusing loaded data)
@@ -579,6 +953,10 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     save_error_norms_summary(sorted_runs, branch_best, error_norms_cache, 
                             combined_scores, metrics, error_norms_dir, experiment_name)
     
+    # Generate complete error ranking report with all runs
+    logger.info("\n  ├─ Generating complete error ranking report...")
+    generate_error_ranking_report(experiment_name, combined_scores, metrics, error_norms_dir)
+    
     # ============================================================
     # PHASE 6: Populate best performers folders
     # ============================================================
@@ -599,7 +977,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     
     generate_final_rich_report(
         experiment_name, organizer.error_evolution_dir, organizer.error_norms_dir, 
-        len(loaded_data_cache), sorted_runs[:5], branch_best, 
+        len(loaded_data_cache), sorted_runs[:10], branch_best, 
         combined_scores, metrics
     )
 
@@ -633,8 +1011,16 @@ def analyze_suite_with_error_norms(experiment_name: str, metrics: List[str] = No
         plan = yaml.safe_load(f)
     
     hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
-    manifest_file = DIRS.runs / experiment_name / FILES.manifest
+    local_exp_dir = DIRS.runs / experiment_name
+    manifest_file = local_exp_dir / FILES.manifest
     analysis_dir = DIRS.root / "analysis" / experiment_name
+    
+    # Ensure manifest exists - regenerate if missing
+    if not manifest_file.exists():
+        logger.warning(f"Manifest file not found. Attempting to regenerate...")
+        if not _ensure_manifest_exists(experiment_name, local_exp_dir):
+            logger.error("Cannot proceed with analysis: manifest file could not be created")
+            sys.exit(1)
     
     # Create NEW subfolder for error norm results
     error_norms_dir = analysis_dir / "error_norms"
@@ -921,8 +1307,212 @@ def save_error_norms_summary(sorted_runs, branch_best, error_norms_cache,
     logger.info(f"       └─ Saved Markdown report to {md_file.name}")
 
 
+def generate_error_ranking_report(experiment_name, combined_scores, metrics, output_dir):
+    """
+    Generate a comprehensive error ranking report with all runs sorted by error.
+    
+    Shows:
+    1. All runs ranked from lowest to highest error
+    2. Percentage difference compared to the best (first) run
+    3. Shortened run names with format integrity checking
+    
+    Args:
+        experiment_name: Name of the experiment
+        combined_scores: Dictionary of run scores
+        metrics: List of metrics used
+        output_dir: Directory to save the report
+    """
+    from rich.console import Console
+    from rich.table import Table
+    from rich.panel import Panel
+    
+    console = Console()
+    
+    # Sort all runs by combined score (lowest is best)
+    sorted_all_runs = sorted(combined_scores.items(), key=lambda x: x[1]['combined'])
+    
+    if not sorted_all_runs:
+        logger.warning("No runs to rank - skipping error ranking report")
+        return
+    
+    # Get best run score for percentage calculations
+    best_run_name, best_scores = sorted_all_runs[0]
+    best_score = best_scores['combined']
+    
+    console.print("\n")
+    console.print("╔" + "═" * 78 + "╗")
+    console.print("║" + " " * 25 + "ERROR RANKING REPORT" + " " * 33 + "║")
+    console.print("╚" + "═" * 78 + "╝")
+    console.print("\n")
+    
+    # Create main ranking table
+    ranking_table = Table(
+        title=f"📊 Complete Error Ranking - {experiment_name}",
+        title_style="bold cyan",
+        border_style="cyan",
+        show_header=True,
+        header_style="bold"
+    )
+    
+    ranking_table.add_column("Rank", style="bold yellow", justify="center", width=6)
+    ranking_table.add_column("Run Name", style="cyan", width=30)
+    ranking_table.add_column("Combined Error", justify="right", style="green", width=14)
+    ranking_table.add_column("% Diff from Best", justify="right", style="yellow", width=16)
+    
+    # Add rows for all runs
+    for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
+        # Use format_short_experiment_name for consistent shortened naming
+        short_name = format_short_experiment_name(run_name, experiment_name)
+        
+        # Calculate percentage difference from best
+        if rank == 1:
+            pct_diff = "0.00%"
+            pct_style = "bold green"
+        else:
+            pct_diff_val = ((scores['combined'] - best_score) / best_score) * 100
+            pct_diff = f"+{pct_diff_val:.2f}%"
+            
+            # Color code based on difference magnitude
+            if pct_diff_val < 10:
+                pct_style = "green"
+            elif pct_diff_val < 50:
+                pct_style = "yellow"
+            else:
+                pct_style = "red"
+        
+        # Rank emoji for top 3
+        if rank == 1:
+            rank_display = "🥇 1"
+        elif rank == 2:
+            rank_display = "🥈 2"
+        elif rank == 3:
+            rank_display = "🥉 3"
+        else:
+            rank_display = str(rank)
+        
+        ranking_table.add_row(
+            rank_display,
+            short_name,
+            f"{scores['combined']:.6e}",
+            f"[{pct_style}]{pct_diff}[/{pct_style}]"
+        )
+    
+    console.print(ranking_table)
+    
+    # Create per-metric breakdown table for top 10
+    console.print("\n")
+    metrics_detail_table = Table(
+        title="📈 Per-Metric Breakdown (Top 10)",
+        title_style="bold blue",
+        border_style="blue"
+    )
+    
+    metrics_detail_table.add_column("Rank", style="bold yellow", justify="center", width=6)
+    metrics_detail_table.add_column("Run Name", style="cyan", width=25)
+    
+    for metric in metrics:
+        metrics_detail_table.add_column(
+            metric.upper(), 
+            justify="right", 
+            style="magenta",
+            width=13
+        )
+    
+    for rank, (run_name, scores) in enumerate(sorted_all_runs[:10], 1):
+        # Use format_short_experiment_name for consistent shortened naming
+        short_name = format_short_experiment_name(run_name, experiment_name)
+        row_data = [str(rank), short_name]
+        
+        for metric in metrics:
+            score = scores['per_metric'].get(metric, float('nan'))
+            row_data.append(f"{score:.4e}")
+        
+        metrics_detail_table.add_row(*row_data)
+    
+    console.print(metrics_detail_table)
+    
+    # Statistics summary
+    console.print("\n")
+    
+    worst_run_name, worst_scores = sorted_all_runs[-1]
+    worst_score = worst_scores['combined']
+    total_range = worst_score - best_score
+    range_pct = (total_range / best_score) * 100
+    
+    # Get short names for statistics
+    best_short = best_scores['branch']
+    worst_short = worst_scores['branch']
+    
+    stats_text = (
+        f"[bold]📊 Ranking Statistics:[/bold]\n"
+        f"   • Total runs ranked: [cyan]{len(sorted_all_runs)}[/cyan]\n"
+        f"   • Best score: [green]{best_score:.6e}[/green] ({best_short})\n"
+        f"   • Worst score: [red]{worst_score:.6e}[/red] ({worst_short})\n"
+        f"   • Score range: [yellow]{total_range:.6e}[/yellow] ({range_pct:.1f}% variation)\n"
+        f"   • Metrics used: {', '.join([m.upper() for m in metrics])}"
+    )
+    
+    console.print(Panel(
+        stats_text,
+        title="📈 Summary Statistics",
+        border_style="blue"
+    ))
+    
+    # Save to file
+    output_file = output_dir / f"{experiment_name}_error_ranking.txt"
+    
+    with open(output_file, 'w', encoding='utf-8') as f:
+        # Create a console that writes to file
+        file_console = Console(file=f, width=120)
+        
+        file_console.print(f"\n{'='*120}\n")
+        file_console.print(f"ERROR RANKING REPORT - {experiment_name}\n")
+        file_console.print(f"{'='*120}\n")
+        
+        # Recreate the table for file output
+        file_table = Table(
+            title=f"Complete Error Ranking (Sorted by Combined Error)",
+            show_header=True,
+            header_style="bold"
+        )
+        
+        file_table.add_column("Rank", justify="center", width=6)
+        file_table.add_column("Run Name", width=30)
+        file_table.add_column("Combined Error", justify="right", width=14)
+        file_table.add_column("% Diff from Best", justify="right", width=16)
+        
+        for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
+            # Use format_short_experiment_name for consistent shortened naming
+            short_name = format_short_experiment_name(run_name, experiment_name)
+            
+            if rank == 1:
+                pct_diff = "0.00%"
+            else:
+                pct_diff_val = ((scores['combined'] - best_score) / best_score) * 100
+                pct_diff = f"+{pct_diff_val:.2f}%"
+            
+            file_table.add_row(
+                str(rank),
+                short_name,
+                f"{scores['combined']:.6e}",
+                pct_diff
+            )
+        
+        file_console.print(file_table)
+        
+        file_console.print(f"\n\nStatistics:")
+        file_console.print(f"  - Total runs ranked: {len(sorted_all_runs)}")
+        file_console.print(f"  - Best score: {best_score:.6e} ({best_short})")
+        file_console.print(f"  - Worst score: {worst_score:.6e} ({worst_short})")
+        file_console.print(f"  - Score range: {total_range:.6e} ({range_pct:.1f}% variation)")
+        file_console.print(f"  - Metrics used: {', '.join([m.upper() for m in metrics])}")
+    
+    logger.success(f"Saved error ranking report to {output_file}")
+    console.print(f"\n[green]✓ Report saved to:[/green] [cyan]{output_file}[/cyan]\n")
+
+
 def generate_final_rich_report(experiment_name, video_dir, error_norms_dir, 
-                               n_runs_analyzed, top_5, branch_best, 
+                               n_runs_analyzed, top_10, branch_best, 
                                combined_scores, metrics):
     """Generate comprehensive final Rich report with all analysis results."""
     from rich.console import Console
@@ -948,33 +1538,41 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
         border_style="cyan"
     ))
     
-    # ============ TOP 5 OVERALL PERFORMERS ============
+    # ============ TOP 10 OVERALL PERFORMERS ============
     console.print("\n")
-    top_5_table = Table(
-        title="🥇 Top 5 Overall Best Performers",
+    top_10_table = Table(
+        title="🥇 Top 10 Overall Best Performers",
         title_style="bold yellow",
         border_style="yellow",
         show_header=True,
         header_style="bold"
     )
     
-    top_5_table.add_column("Rank", style="bold", justify="center", width=6)
-    top_5_table.add_column("Run Name", style="cyan")
-    top_5_table.add_column("Branch", style="magenta")
-    top_5_table.add_column("Combined Score", justify="right", style="green")
+    top_10_table.add_column("Rank", style="bold", justify="center", width=6)
+    top_10_table.add_column("Run Name", style="cyan")
+    top_10_table.add_column("Branch", style="magenta")
+    top_10_table.add_column("Combined Score", justify="right", style="green")
     
-    rank_emojis = {1: "🥇", 2: "🥈", 3: "🥉", 4: "4️⃣", 5: "5️⃣"}
+    # Use simple numbers for ranks 4+
+    rank_emojis = {1: "🥇", 2: "🥈", 3: "🥉"}
     
-    for idx, (run_name, scores) in enumerate(top_5, 1):
-        emoji = rank_emojis.get(idx, f"{idx}")
-        top_5_table.add_row(
-            emoji,
-            run_name,
+    for idx, (run_name, scores) in enumerate(top_10, 1):
+        if idx <= 3:
+            rank_display = rank_emojis[idx]
+        else:
+            rank_display = f"#{idx}"
+        
+        # Use format_short_experiment_name for consistent shortened naming
+        short_name = format_short_experiment_name(run_name, experiment_name)
+        
+        top_10_table.add_row(
+            rank_display,
+            short_name,
             scores['branch'],
             f"{scores['combined']:.6e}"
         )
     
-    console.print(top_5_table)
+    console.print(top_10_table)
     
     # ============ PER-METRIC SCORES FOR TOP 3 ============
     console.print("\n")
@@ -988,7 +1586,7 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
     for metric in metrics:
         metrics_table.add_column(metric.upper(), justify="right", style="cyan")
     
-    for idx, (run_name, scores) in enumerate(top_5[:3], 1):
+    for idx, (run_name, scores) in enumerate(top_10[:3], 1):
         row_data = [rank_emojis[idx]]
         for metric in metrics:
             score = scores['per_metric'].get(metric, float('nan'))
@@ -1042,7 +1640,7 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
     # ============ KEY FINDINGS ============
     console.print("\n")
     
-    best_run_name, best_scores = top_5[0]
+    best_run_name, best_scores = top_10[0]
     best_l1 = best_scores['per_metric'].get('l1', float('nan'))
     best_l2 = best_scores['per_metric'].get('l2', float('nan'))
     best_linf = best_scores['per_metric'].get('linf', float('nan'))
@@ -1071,11 +1669,20 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
     # ============ RECOMMENDATIONS ============
     console.print("\n")
     
-    improvement_pct = ((top_5[-1][1]['combined'] - best_scores['combined']) / best_scores['combined']) * 100
+    # Calculate improvement based on available data
+    if len(top_10) >= 10:
+        improvement_pct = ((top_10[9][1]['combined'] - best_scores['combined']) / best_scores['combined']) * 100
+        comparison_text = "worst of top 10"
+    elif len(top_10) >= 5:
+        improvement_pct = ((top_10[-1][1]['combined'] - best_scores['combined']) / best_scores['combined']) * 100
+        comparison_text = f"worst of top {len(top_10)}"
+    else:
+        improvement_pct = 0.0
+        comparison_text = "other runs"
     
     recommendations_text = (
         f"[bold green]✓[/bold green] The best parameter set ([cyan]{best_run_name}[/cyan]) shows:\n"
-        f"   • {improvement_pct:.1f}% better performance than the worst of top 5\n"
+        f"   • {improvement_pct:.1f}% better performance than the {comparison_text}\n"
         f"   • Consistent low error across all metrics (L1, L2, L∞)\n"
         f"   • Recommended for production use\n\n"
         f"[bold yellow]📌 Next Steps:[/bold yellow]\n"

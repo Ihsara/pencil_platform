@@ -1,0 +1,11 @@
+format: makefile
+data:
+  MPICOMM: nompicomm
+  GRAVITY: nogravity
+  FORCING: noforcing
+  ENTROPY: entropy
+  MAGNETIC: nomagnetic
+  HYDRO: hydro
+  DENSITY: density
+  SHOCK: shock_highorder
+  POWER: nopower_spectrum

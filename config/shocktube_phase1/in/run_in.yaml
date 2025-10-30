@@ -7,7 +7,7 @@ data:
     cdtv: 0.005
     cdts: 0.005
     cvsid: "9a97ecc83"
-    dsnap: 1.0e-5
+    dsnap: 1.0e-4
     dtmin: 1.0e-12
     dvid: 0.02
     isave: 10000

@@ -1,0 +1,33 @@
+# config/shocktube_base/in/start_in.yaml
+format: namelist
+data:
+  init_pars:
+    cvsid: "9a97ecc83"
+    lperi: [false, true, true]
+    lwrite_ic: true
+    # Using Lxyz as the standard parameter
+    xyz0: [-0.5, -0.5, -0.5]
+    Lxyz: [1.0, 1.0, 1.0]
+    unit_length: 3.08567758e+21
+    unit_velocity: 9.778122994895071e+4
+    unit_density: 1.6737236e-24
+    lfix_unit_std: true
+
+  density_init_pars:
+    initlnrho: 'xjump'
+    ldensity_nolog: true
+    rho_left: 1.0
+    rho_right: 0.025
+    widthlnrho: 0.0125
+    xjump_mid: 0.0
+
+  entropy_init_pars:
+    initss: 'xjump'
+    ss_left: 10.0
+    ss_right: 8.0
+    widthss: 0.0125
+    xjump_mid: 0.0
+
+  # These must be present but empty
+  eos_init_pars: {}
+  hydro_init_pars: {}

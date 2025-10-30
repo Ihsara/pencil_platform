@@ -233,6 +233,135 @@ def calculate_absolute_deviation_per_var(sim_data_list: List[dict], analytical_d
     return results
 
 
+def calculate_normalized_spatial_errors(
+    sim_data_list: List[dict],
+    analytical_data_list: List[dict],
+    variables: List[str],
+    normalize_by_space: bool = False,
+    normalize_by_time: bool = False
+) -> Dict:
+    """
+    Calculate normalized spatial-temporal errors for point-wise error tracking.
+    
+    This function computes 2D error fields [timestep, space] for each variable,
+    enabling spatial-temporal error visualization and analysis.
+    
+    Args:
+        sim_data_list: List of simulation data dictionaries from all VAR files
+        analytical_data_list: List of corresponding analytical solutions
+        variables: List of variable names to analyze (from config)
+        normalize_by_space: If True, divide errors by spatial resolution (dx)
+        normalize_by_time: If True, divide errors by temporal resolution (dt)
+        
+    Returns:
+        Dictionary containing 2D error fields for each variable:
+        {
+            'var_name': {
+                'error_field': np.ndarray,           # Absolute errors [timestep, space]
+                'relative_error_field': np.ndarray,  # Relative errors [timestep, space]
+                'x_coords': np.ndarray,              # Spatial coordinates
+                'timesteps': list,                   # List of timestep values
+                'dx': float,                         # Spatial resolution
+                'dt': float,                         # Temporal resolution (if available)
+                'max_error_location': {              # Maximum error location
+                    'value': float,
+                    'time_index': int,
+                    'space_index': int,
+                    'time': float,
+                    'x': float
+                }
+            }
+        }
+    """
+    # Validation
+    if len(sim_data_list) != len(analytical_data_list):
+        logger.error(f"List length mismatch: {len(sim_data_list)} sim vs {len(analytical_data_list)} analytical")
+        return {}
+    
+    if not sim_data_list:
+        logger.error("Empty data lists provided")
+        return {}
+    
+    logger.debug(f"Calculating normalized spatial-temporal errors for {len(sim_data_list)} timesteps")
+    
+    normalized_errors = {}
+    
+    for var in variables:
+        # Collect spatial errors for all timesteps
+        errors_per_timestep = []
+        relative_errors_per_timestep = []
+        x_coords = None
+        timesteps = []
+        
+        for idx, (sim_data, analytical_data) in enumerate(zip(sim_data_list, analytical_data_list)):
+            if var not in sim_data or var not in analytical_data:
+                logger.warning(f"Variable '{var}' not found in data at timestep {idx}")
+                continue
+            
+            # Get spatial coordinates (once)
+            if x_coords is None:
+                x_coords = sim_data['x']
+            
+            # Calculate absolute error
+            absolute_error = np.abs(sim_data[var] - analytical_data[var])
+            
+            # Calculate relative error (avoid division by zero)
+            analytical_safe = np.where(
+                np.abs(analytical_data[var]) < 1e-10,
+                1e-10,
+                analytical_data[var]
+            )
+            relative_error = np.abs(sim_data[var] - analytical_data[var]) / np.abs(analytical_safe)
+            
+            errors_per_timestep.append(absolute_error)
+            relative_errors_per_timestep.append(relative_error)
+            timesteps.append(sim_data.get('t', idx))
+        
+        if not errors_per_timestep or x_coords is None:
+            logger.warning(f"No valid data found for variable '{var}'")
+            continue
+        
+        # Convert to 2D arrays [timestep, space]
+        error_field = np.array(errors_per_timestep)
+        relative_error_field = np.array(relative_errors_per_timestep)
+        
+        # Calculate spatial and temporal resolutions
+        dx = x_coords[1] - x_coords[0] if len(x_coords) > 1 else 1.0
+        dt = timesteps[1] - timesteps[0] if len(timesteps) > 1 else 1.0
+        
+        # Optional normalization
+        if normalize_by_space:
+            error_field = error_field / dx
+            relative_error_field = relative_error_field / dx
+        
+        if normalize_by_time:
+            error_field = error_field / dt
+            relative_error_field = relative_error_field / dt
+        
+        # Find maximum error location (use relative error for tracking)
+        max_idx = np.unravel_index(np.argmax(relative_error_field), relative_error_field.shape)
+        max_time_idx, max_space_idx = max_idx
+        
+        normalized_errors[var] = {
+            'error_field': error_field,
+            'relative_error_field': relative_error_field,
+            'x_coords': x_coords,
+            'timesteps': timesteps,
+            'dx': dx,
+            'dt': dt,
+            'max_error_location': {
+                'value': float(relative_error_field[max_time_idx, max_space_idx]),
+                'time_index': int(max_time_idx),
+                'space_index': int(max_space_idx),
+                'time': float(timesteps[max_time_idx]),
+                'x': float(x_coords[max_space_idx])
+            }
+        }
+    
+    logger.debug(f"Calculated normalized errors for {len(normalized_errors)} variables")
+    return normalized_errors
+
+
 class ExperimentErrorAnalyzer:
     """
     Analyzes and compares errors across multiple experiments and branches.

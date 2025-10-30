@@ -1,0 +1,102 @@
+# ===================================================================
+# Plan for the Shocktube Phase 2 Parameter Sweep
+# ===================================================================
+# This file defines the hyperdiffusion parameter sweep.
+# Phase 2 focuses on finding the best nu_hyper3 and chi_hyper3 values
+# while keeping shock parameters fixed at their optimal values from Phase 1.
+# 
+# Updated to run 3 scenarios based on top 3 L1 performers from Phase 1
+---
+
+# --- HPC Execution Parameters ---
+hpc:
+  source_base_dir: '/scratch/project_2008296/chau/chausims/generated_sims_project_group/sod_10_test_proj/quick_test_sod'
+  run_base_dir: '/scratch/project_2008296/chau/runs/shocktube_phase2'
+
+  module_loads: |
+    module load gcc/11.2.0
+    module load openmpi/4.1.2
+    module load openblas/0.3.18-omp
+    module load csc-tools
+    module load StdEnv
+    module load hdf5/1.10.7-mpi
+
+  sbatch:
+    job_name: "shock_sweep_ph2"
+    account: "project_2001062"
+    partition: "small"
+    time: "01:00:00"
+    nodes: 1
+    ntasks: 1
+    cpus_per_task: 1
+    mail_user: "chau.c.tran@aalto.fi"
+    mail_type: "END"
+
+# --- Post-Processing Automation (Optional) ---
+auto_check: true
+auto_postprocessing: true
+
+# --- Error Analysis Configuration ---
+# Using L1 error metric for consistency with Phase 1
+error_analysis:
+  metrics: ['l1']
+  combine_in_videos: true
+
+# --- Experiment Generation Parameters ---
+base_experiment: 'shocktube_base'
+output_prefix: 'res{{ data.nxgrid }}_hyper3'
+
+# Naming scheme for Phase 2 runs
+run_name_template: "{{ output_prefix }}_nu{{ nu_hyper3 | fs_safe }}_chi{{ chi_hyper3 | fs_safe }}_{{ branch.name }}"
+
+# --- Global Modifications ---
+# No global modifications - each branch defines its own parameters
+
+# --- Parameter Sweeps ---
+# Sweep hyperdiffusion parameters while keeping them equal (nu_hyper3 = chi_hyper3)
+parameter_sweeps:
+  - type: linked
+    variables: [nu_hyper3, chi_hyper3]
+    values: [9.0e-15, 9.0e-14, 9.0e-13, 9.0e-12, 9.0e-11, 9.0e-10, 9.0e-9, 9.0e-8]
+
+# --- Branches ---
+# Three scenarios based on top 3 L1 performers from Phase 1
+branches:
+  # Scenario 1: Best L1 performer (rank 1)
+  # nu=0.5, chi=0.5, diffrho=0.5, default_gamma
+  - name: "r1_nu0.5_dg"
+    settings:
+      run_in.yaml:
+        density_run_pars: 
+          diffrho_shock: 0.5
+          lgamma_is_1: false
+        viscosity_run_pars: 
+          nu_shock: 0.5
+        entropy_run_pars: 
+          chi_shock: 0.5
+
+  # Scenario 2: Second best L1 performer (rank 2)
+  # nu=0.5, chi=0.5, diffrho=0.5, gamma_is_1
+  - name: "r2_nu0.5_g1"
+    settings:
+      run_in.yaml:
+        density_run_pars: 
+          diffrho_shock: 0.5
+          lgamma_is_1: true
+        viscosity_run_pars: 
+          nu_shock: 0.5
+        entropy_run_pars: 
+          chi_shock: 0.5
+
+  # Scenario 3: Third best L1 performer (rank 3)
+  # nu=1.0, chi=1.0, diffrho=1.0, default_gamma
+  - name: "r3_nu1.0_dg"
+    settings:
+      run_in.yaml:
+        density_run_pars: 
+          diffrho_shock: 1.0
+          lgamma_is_1: false
+        viscosity_run_pars: 
+          nu_shock: 1.0
+        entropy_run_pars: 
+          chi_shock: 1.0

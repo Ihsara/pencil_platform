@@ -1,0 +1,45 @@
+2025-10-25 00:21:17.035 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/generation/shocktube_phase1/sub_202510250021/generation.log
+2025-10-25 00:21:17.035 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/generation/shocktube_phase1/sub_202510250021
+2025-10-25 00:21:17.035 | INFO     | src.experiment.generator:run_suite:104 - Loading experiment plan from: /scratch/project_2008296/chau/pencil_platform/config/shocktube_phase1/plan/sweep.yaml
+2025-10-25 00:21:17.156 | INFO     | src.experiment.generator:run_suite:110 - Loaded 7 config file(s) from base experiment 'shocktube_base'
+2025-10-25 00:21:17.272 | INFO     | src.experiment.generator:run_suite:118 - Loaded 7 config file(s) from specific experiment 'shocktube_phase1'
+2025-10-25 00:21:17.272 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'video_in.yaml': base + specific overrides
+2025-10-25 00:21:17.272 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'run_in.yaml': base + specific overrides
+2025-10-25 00:21:17.273 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'print_in.yaml': base + specific overrides
+2025-10-25 00:21:17.273 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'start_in.yaml': base + specific overrides
+2025-10-25 00:21:17.273 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'Makefile_local.yaml': base + specific overrides
+2025-10-25 00:21:17.274 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'yzaver_in.yaml': base + specific overrides
+2025-10-25 00:21:17.274 | INFO     | src.experiment.generator:run_suite:122 -   Merging 'cparam_local.yaml': base + specific overrides
+2025-10-25 00:21:17.299 | INFO     | src.experiment.generator:run_suite:232 - Removing existing experiment directory: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1
+2025-10-25 00:21:17.719 | SUCCESS  | src.experiment.generator:run_suite:241 - Generated config files for 12 run(s) in '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1/generated_configs'
+2025-10-25 00:21:17.721 | SUCCESS  | src.experiment.generator:run_suite:245 - Generated run manifest at '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1/run_manifest.txt'
+2025-10-25 00:21:17.745 | SUCCESS  | src.experiment.generator:run_suite:260 - Generated submission script at '/scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1/submit_suite.sh'
+2025-10-25 00:21:17.745 | INFO     | src.experiment.generator:run_suite:261 - --- Experiment Summary ---
+Total Simulations to Generate: 12
+2025-10-25 00:21:17.753 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/submission/shocktube_phase1/sub_202510250021/submission.log
+2025-10-25 00:21:17.754 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/submission/shocktube_phase1/sub_202510250021
+2025-10-25 00:21:17.754 | INFO     | src.experiment.job_manager:submit_suite:21 - Attempting to submit job to SLURM...
+2025-10-25 00:21:17.784 | INFO     | src.experiment.job_manager:submit_suite:33 - ==================================================
+2025-10-25 00:21:17.785 | INFO     | src.experiment.job_manager:submit_suite:34 -            JOB SUBMITTED SUCCESSFULLY
+2025-10-25 00:21:17.785 | INFO     | src.experiment.job_manager:submit_suite:35 - ==================================================
+2025-10-25 00:21:17.785 | INFO     | src.experiment.job_manager:submit_suite:36 -   Submission Script: /scratch/project_2008296/chau/pencil_platform/runs/shocktube_phase1/submit_suite.sh
+2025-10-25 00:21:17.786 | INFO     | src.experiment.job_manager:submit_suite:37 -   HPC Run Directory: /scratch/project_2008296/chau/runs/shocktube_phase1
+2025-10-25 00:21:17.787 | INFO     | src.experiment.job_manager:submit_suite:38 -   SLURM Batch Job ID: 5320916
+2025-10-25 00:21:17.787 | INFO     | src.experiment.job_manager:submit_suite:39 -   You can check the status with: python main.py shocktube_phase1 --check
+2025-10-25 00:21:17.787 | INFO     | __main__:main:198 - Auto-check enabled, checking job status...
+2025-10-25 00:21:17.796 | INFO     | src.core.logging:setup_file_logging:63 - 📝 Logging to file: logs/status/shocktube_phase1/sub_202510250021/status.log
+2025-10-25 00:21:17.796 | DEBUG    | src.core.logging:setup_file_logging:64 - Log directory: logs/status/shocktube_phase1/sub_202510250021
+2025-10-25 00:21:17.797 | INFO     | src.experiment.job_manager:check_suite_status:66 - --- STATUS CHECK MODE for 'shocktube_phase1' ---
+2025-10-25 00:21:17.799 | INFO     | src.experiment.job_manager:check_suite_status:85 - Querying SLURM for batch job ID: 5320916
+2025-10-25 00:21:17.831 | INFO     | src.experiment.job_manager:check_suite_status:123 - Job 5320916 is queued or just starting (not yet in sacct)
+2025-10-25 00:21:17.831 | INFO     | src.experiment.job_manager:check_suite_status:154 - --- Job Status Summary ---
+2025-10-25 00:21:17.832 | INFO     | src.experiment.job_manager:check_suite_status:155 -   Total Simulations: 12
+2025-10-25 00:21:17.832 | INFO     | src.experiment.job_manager:check_suite_status:156 -   Completed: 0
+2025-10-25 00:21:17.832 | INFO     | src.experiment.job_manager:check_suite_status:157 -   Failed/Cancelled: 0
+2025-10-25 00:21:17.833 | INFO     | src.experiment.job_manager:check_suite_status:158 -   Running: 0
+2025-10-25 00:21:17.834 | INFO     | src.experiment.job_manager:check_suite_status:159 -   Pending: 12
+2025-10-25 00:21:17.834 | INFO     | __main__:main:203 - Waiting for job completion...
+2025-10-25 00:21:17.835 | INFO     | __main__:main:205 - (Use Ctrl+C to exit, then run with --monitor to check progress)
+2025-10-25 00:22:24.034 | INFO     | src.experiment.job_manager:monitor_job_progress:364 - Found 12 job ID(s) with 12 total array task(s)
+2025-10-25 00:22:24.187 | SUCCESS  | src.experiment.job_manager:wait_for_completion:574 - Job array completed successfully!
+2025-10-25 00:22:24.188 | SUCCESS  | __main__:main:212 - Job completed!

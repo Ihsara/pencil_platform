@@ -49,6 +49,7 @@ class AnalysisOrganizer:
         self.error_evolution_dir = self.error_dir / "evolution"
         self.error_frames_dir = self.error_dir / "frames"
         self.error_norms_dir = self.error_dir / "norms"
+        self.spacetime_maps_dir = self.error_dir / "spacetime_maps"
         
         self.var_dir = self.base_dir / "var"
         self.var_evolution_dir = self.var_dir / "evolution"
@@ -64,6 +65,7 @@ class AnalysisOrganizer:
         self.error_evolution_dir.mkdir(parents=True, exist_ok=True)
         self.error_frames_dir.mkdir(parents=True, exist_ok=True)
         self.error_norms_dir.mkdir(parents=True, exist_ok=True)
+        self.spacetime_maps_dir.mkdir(parents=True, exist_ok=True)
         
         self.var_evolution_dir.mkdir(parents=True, exist_ok=True)
         
