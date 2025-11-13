@@ -15,7 +15,7 @@ data:
     it1: 1000
     itorder: 3
     lpencil_check: false
-    nt: 1200000
+    nt: 10000000
 
   density_run_pars:
     diffrho_shock: 1.0
