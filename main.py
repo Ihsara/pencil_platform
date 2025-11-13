@@ -107,8 +107,12 @@ def main():
             monitor_job_progress(experiment_name, show_details=True)
         elif args.wait and not any([args.monitor, args.analyze, args.viz, args.error_norms]):
             # Wait only (for already-submitted job, standalone)
+            # Step 0: Cleanup OLD data FIRST before waiting
+            logger.info("Cleaning up old simulation data before waiting for new results...")
+            clean_all_simulation_data(experiment_name)
+            
             if wait_for_completion(experiment_name):
-                # Step 1: Run verification checks FIRST (needs all VAR files)
+                # Step 1: Run verification checks on the NEW data
                 from rich.console import Console
                 console = Console()
                 console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
@@ -131,10 +135,6 @@ def main():
                     logger.error(f"Integrity verification encountered an error: {e}")
                     console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
                     sys.exit(1)
-                
-                # Step 2: Cleanup AFTER verification passes
-                logger.info("Starting automatic cleanup...")
-                clean_all_simulation_data(experiment_name)
                 
                 logger.success("Job completed! You can now run analysis or visualization.")
                 logger.info(f"Analysis: python main.py {experiment_name} --analyze")
@@ -144,8 +144,12 @@ def main():
                 sys.exit(1)
         elif args.wait and args.analyze and not any([args.viz, args.error_norms]):
             # Wait + Analyze (for already-submitted job)
+            # Step 0: Cleanup OLD data FIRST before waiting
+            logger.info("Cleaning up old simulation data before waiting for new results...")
+            clean_all_simulation_data(experiment_name)
+            
             if wait_for_completion(experiment_name):
-                # Step 1: Run verification checks FIRST (needs all VAR files)
+                # Step 1: Run verification checks on the NEW data
                 from rich.console import Console
                 console = Console()
                 console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
@@ -169,11 +173,7 @@ def main():
                     console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
                     sys.exit(1)
                 
-                # Step 2: Cleanup AFTER verification passes
-                logger.info("Starting automatic cleanup...")
-                clean_all_simulation_data(experiment_name)
-                
-                # Step 3: Analysis
+                # Step 2: Analysis
                 logger.info("Starting video-only analysis...")
                 analyze_suite_videos_only(experiment_name)
             else:
@@ -263,12 +263,16 @@ def main():
                 
                 # Handle -w (wait) flag in submission mode
                 if args.wait:
+                    # Step 0: Cleanup OLD data FIRST before waiting
+                    logger.info("Cleaning up old simulation data before waiting for new results...")
+                    clean_all_simulation_data(experiment_name)
+                    
                     logger.info("Waiting for job completion...")
                     if args.monitor:
                         logger.info("(Monitoring enabled - detailed progress will be shown)")
                     
                     if wait_for_completion(experiment_name):
-                        # Step 1: Run verification checks FIRST (needs all VAR files)
+                        # Step 1: Run verification checks on the NEW data
                         from rich.console import Console
                         console = Console()
                         console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
@@ -292,11 +296,7 @@ def main():
                             console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
                             sys.exit(1)
                         
-                        # Step 2: Cleanup AFTER verification passes
-                        logger.info("Job completed! Starting automatic cleanup...")
-                        clean_all_simulation_data(experiment_name)
-                        
-                        # Step 3: Analysis (if requested)
+                        # Step 2: Analysis (if requested)
                         if args.analyze:
                             logger.info("Starting video-only analysis...")
                             analyze_suite_videos_only(experiment_name)
