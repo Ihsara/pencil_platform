@@ -65,8 +65,8 @@ def create_cumulative_error_over_time(
         subplot_titles=[label for _, label in valid_vars],
         vertical_spacing=0.12,
         horizontal_spacing=0.10,
-        specs=[[{"secondary_x": True}, {"secondary_x": True}],
-               [{"secondary_x": True}, {"secondary_x": True}]]
+        specs=[[{}, {}],
+               [{}, {}]]
     )
     
     positions = [(1, 1), (1, 2), (2, 1), (2, 2)]
@@ -123,8 +123,7 @@ def create_cumulative_error_over_time(
             tickmode='array',
             tickvals=var_tick_positions,
             ticktext=var_tick_labels,
-            row=row, col=col,
-            secondary_x=True
+            row=row, col=col
         )
         
         # Update y-axis
