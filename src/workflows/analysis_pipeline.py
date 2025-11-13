@@ -1214,6 +1214,71 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
         border_style="cyan"
     ))
     
+    # ============ COMPLETE ERROR RANKING (ALL RUNS) ============
+    console.print("\n")
+    
+    # Sort all runs by combined score (lowest is best)
+    sorted_all_runs = sorted(combined_scores.items(), key=lambda x: x[1]['combined'])
+    
+    if sorted_all_runs:
+        # Get best run score for percentage calculations
+        best_run_name, best_scores = sorted_all_runs[0]
+        best_score = best_scores['combined']
+        
+        # Create complete ranking table
+        ranking_table = Table(
+            title=f"📊 Complete Error Ranking - {experiment_name}",
+            title_style="bold cyan",
+            border_style="cyan",
+            show_header=True,
+            header_style="bold"
+        )
+        
+        ranking_table.add_column("Rank", style="bold yellow", justify="center", width=7)
+        ranking_table.add_column("Run Name", style="cyan", width=32)
+        ranking_table.add_column("Combined\nError", justify="right", style="green", width=15)
+        ranking_table.add_column("% Diff", justify="right", style="yellow", width=11)
+        
+        # Add rows for all runs
+        for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
+            # Use format_short_experiment_name for consistent shortened naming
+            short_name = format_short_experiment_name(run_name, experiment_name)
+            
+            # Calculate percentage difference from best
+            if rank == 1:
+                pct_diff = "0.00%"
+                pct_style = "bold green"
+            else:
+                pct_diff_val = ((scores['combined'] - best_score) / best_score) * 100
+                pct_diff = f"+{pct_diff_val:.2f}%"
+                
+                # Color code based on difference magnitude
+                if pct_diff_val < 10:
+                    pct_style = "green"
+                elif pct_diff_val < 50:
+                    pct_style = "yellow"
+                else:
+                    pct_style = "red"
+            
+            # Rank emoji for top 3
+            if rank == 1:
+                rank_display = "🥇 1"
+            elif rank == 2:
+                rank_display = "🥈 2"
+            elif rank == 3:
+                rank_display = "🥉 3"
+            else:
+                rank_display = f"  {rank}"
+            
+            ranking_table.add_row(
+                rank_display,
+                short_name,
+                f"{scores['combined']:.6e}",
+                f"[{pct_style}]{pct_diff}[/{pct_style}]"
+            )
+        
+        console.print(ranking_table)
+    
     # ============ TOP 10 OVERALL PERFORMERS ============
     console.print("\n")
     top_10_table = Table(
@@ -1250,27 +1315,6 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
     
     console.print(top_10_table)
     
-    # ============ PER-METRIC SCORES FOR TOP 3 ============
-    console.print("\n")
-    metrics_table = Table(
-        title="📈 Per-Metric Scores (Top 3)",
-        title_style="bold blue",
-        border_style="blue"
-    )
-    
-    metrics_table.add_column("Rank", style="bold yellow", width=6)
-    for metric in metrics:
-        metrics_table.add_column(metric.upper(), justify="right", style="cyan")
-    
-    for idx, (run_name, scores) in enumerate(top_10[:3], 1):
-        row_data = [rank_emojis[idx]]
-        for metric in metrics:
-            score = scores['per_metric'].get(metric, float('nan'))
-            row_data.append(f"{score:.4e}")
-        metrics_table.add_row(*row_data)
-    
-    console.print(metrics_table)
-    
     # ============ BEST PER BRANCH ============
     console.print("\n")
     branch_table = Table(
@@ -1292,87 +1336,77 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
     
     console.print(branch_table)
     
-    # ============ OUTPUT LOCATIONS ============
-    console.print("\n")
-    console.print(Panel(
-        f"[bold green]✓[/bold green] Video Analysis Results:\n"
-        f"   📁 {video_dir}\n"
-        f"   🎬 Individual error evolution videos\n"
-        f"   🎬 Branch overlay comparison videos\n"
-        f"   🎬 Top 3 performers overlay video\n\n"
-        f"[bold green]✓[/bold green] Error Norm Analysis Results:\n"
-        f"   📁 {error_norms_dir}\n"
-        f"   📊 Combined scores comparison plot\n"
-        f"   📊 Per-metric comparison plots (L1, L2, L∞)\n"
-        f"   📊 Top 5 detailed comparison\n"
-        f"   📊 Branch comparison plot\n"
-        f"   📊 Error evolution plots (top 3)\n"
-        f"   📄 JSON summary report\n"
-        f"   📄 Markdown summary report",
-        title="📂 Output Locations",
-        border_style="green"
-    ))
-    
-    # ============ KEY FINDINGS ============
+    # ============ TOP 3 & WORST 3 COMPARISON ============
     console.print("\n")
     
-    best_run_name, best_scores = top_10[0]
-    best_l1 = best_scores['per_metric'].get('l1', float('nan'))
-    best_l2 = best_scores['per_metric'].get('l2', float('nan'))
-    best_linf = best_scores['per_metric'].get('linf', float('nan'))
+    # Get worst 3 runs (last 3 from sorted list)
+    worst_3 = sorted_all_runs[-3:] if len(sorted_all_runs) >= 3 else sorted_all_runs[-len(sorted_all_runs):]
     
-    findings_text = (
-        f"[bold]🎯 Best Overall Parameter Set:[/bold]\n"
-        f"   • Run: [cyan]{best_run_name}[/cyan]\n"
-        f"   • Branch: [magenta]{best_scores['branch']}[/magenta]\n"
-        f"   • Combined Score: [green]{best_scores['combined']:.6e}[/green]\n"
-        f"   • L1 Error: [yellow]{best_l1:.6e}[/yellow]\n"
-        f"   • L2 Error: [yellow]{best_l2:.6e}[/yellow]\n"
-        f"   • L∞ Error: [yellow]{best_linf:.6e}[/yellow]\n\n"
-        f"[bold]📊 Analysis Summary:[/bold]\n"
-        f"   • Total runs analyzed: {n_runs_analyzed}\n"
-        f"   • Branches evaluated: {len(branch_best)}\n"
-        f"   • Error metrics used: {', '.join([m.upper() for m in metrics])}\n"
-        f"   • Scoring method: Average of all metrics across all variables"
+    comparison_table = Table(
+        title="⚖️ Best vs Worst Performers",
+        title_style="bold magenta",
+        border_style="magenta",
+        show_header=True,
+        header_style="bold"
     )
     
-    console.print(Panel(
-        findings_text,
-        title="🔍 Key Findings",
-        border_style="bold green"
-    ))
+    comparison_table.add_column("Category", style="bold", width=12)
+    comparison_table.add_column("Run Name", style="cyan", width=40)
+    comparison_table.add_column("Combined Error", justify="right", style="yellow", width=15)
     
-    # ============ RECOMMENDATIONS ============
+    # Add top 3
+    for idx, (run_name, scores) in enumerate(sorted_all_runs[:3], 1):
+        short_name = format_short_experiment_name(run_name, experiment_name)
+        comparison_table.add_row(
+            f"[green]🥇 Top {idx}[/green]",
+            short_name,
+            f"[green]{scores['combined']:.6e}[/green]"
+        )
+    
+    # Add separator
+    comparison_table.add_row("", "...", "")
+    
+    # Add worst 3 (in reverse order to show worst first)
+    for idx, (run_name, scores) in enumerate(reversed(worst_3), 1):
+        short_name = format_short_experiment_name(run_name, experiment_name)
+        comparison_table.add_row(
+            f"[red]⚠️ Worst {idx}[/red]",
+            short_name,
+            f"[red]{scores['combined']:.6e}[/red]"
+        )
+    
+    console.print(comparison_table)
+    
+    # ============ USEFUL LINKS ============
     console.print("\n")
     
-    # Calculate improvement based on available data
-    if len(top_10) >= 10:
-        improvement_pct = ((top_10[9][1]['combined'] - best_scores['combined']) / best_scores['combined']) * 100
-        comparison_text = "worst of top 10"
-    elif len(top_10) >= 5:
-        improvement_pct = ((top_10[-1][1]['combined'] - best_scores['combined']) / best_scores['combined']) * 100
-        comparison_text = f"worst of top {len(top_10)}"
-    else:
-        improvement_pct = 0.0
-        comparison_text = "other runs"
-    
-    recommendations_text = (
-        f"[bold green]✓[/bold green] The best parameter set ([cyan]{best_run_name}[/cyan]) shows:\n"
-        f"   • {improvement_pct:.1f}% better performance than the {comparison_text}\n"
-        f"   • Consistent low error across all metrics (L1, L2, L∞)\n"
-        f"   • Recommended for production use\n\n"
-        f"[bold yellow]📌 Next Steps:[/bold yellow]\n"
-        f"   • Review detailed plots in [cyan]{error_norms_dir}/plots/[/cyan]\n"
-        f"   • Check error evolution videos in [cyan]{video_dir}/[/cyan]\n"
-        f"   • Compare branch-specific results if testing parameter variations\n"
-        f"   • Consider running additional convergence studies with the best parameters"
+    links_table = Table(
+        title="📂 Analysis Output Locations",
+        title_style="bold blue",
+        border_style="blue"
     )
     
-    console.print(Panel(
-        recommendations_text,
-        title="💡 Recommendations",
-        border_style="yellow"
-    ))
+    links_table.add_column("Resource", style="bold cyan", width=30)
+    links_table.add_column("Path", style="yellow")
+    
+    links_table.add_row(
+        "📊 Error Norm Plots",
+        str(error_norms_dir / "plots")
+    )
+    links_table.add_row(
+        "🎬 Error Evolution Videos",
+        str(video_dir)
+    )
+    links_table.add_row(
+        "📁 Run Data Directory",
+        str(DIRS.runs / experiment_name)
+    )
+    links_table.add_row(
+        "📈 Analysis Results",
+        str(DIRS.root / "analysis" / experiment_name)
+    )
+    
+    console.print(links_table)
     
     console.print("\n")
     console.print(Panel(
