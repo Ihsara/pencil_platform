@@ -108,13 +108,38 @@ source /usr/share/lmod/lmod/init/bash
 module purge
 {{ module_loads | indent(0) }}
 
-# Build the code, cleaning previous artifacts first
+# Create task-specific temporary build directory to avoid race conditions
+# This isolates build artifacts and prevents parallel tasks from interfering
+BUILD_TMPDIR="/tmp/pcbuild_${SLURM_JOB_ID}_${SLURM_ARRAY_TASK_ID}_$$"
+export TMPDIR="${BUILD_TMPDIR}"
+mkdir -p "${BUILD_TMPDIR}"
+
+# Set Pencil Code build directories to use isolated temp space
+export PC_TMP="${BUILD_TMPDIR}"
+export SCRATCH="${BUILD_TMPDIR}"
+
+echo "INFO: Using isolated build temp directory: ${BUILD_TMPDIR}" | tee -a $LOGFILE
+
+# Build the code with isolated temporary directory
+# Note: cleanall is safer with isolated TMPDIR - no interference between parallel builds
 echo "INFO: Running pc_build --cleanall..." | tee -a $LOGFILE
 pc_build --cleanall >> "${PC_BUILD_LOG}" 2>&1
+
 echo "INFO: Running pc_build..." | tee -a $LOGFILE
 pc_build >> "${PC_BUILD_LOG}" 2>&1
-if [ $? -ne 0 ]; then echo "ERROR: pc_build failed. Check ${PC_BUILD_LOG}" | tee -a $LOGFILE >&2; exit 1; fi
+
+if [ $? -ne 0 ]; then 
+    echo "ERROR: pc_build failed. Check ${PC_BUILD_LOG}" | tee -a $LOGFILE >&2
+    # Clean up temp directory on failure
+    rm -rf "${BUILD_TMPDIR}"
+    exit 1
+fi
+
 echo "INFO: Build finished. Full output in ${PC_BUILD_LOG}" | tee -a $LOGFILE
+
+# Clean up temporary build directory to save space
+echo "INFO: Cleaning up build temp directory" | tee -a $LOGFILE
+rm -rf "${BUILD_TMPDIR}"
 {% endif %}
 
 # --- 6. Run the simulation ---

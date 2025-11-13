@@ -545,15 +545,23 @@ class SimulationIntegrityChecker:
                         )
                         
                         # Check for successful completion (no fatal errors)
+                        # More comprehensive error detection
                         error_indicators = [
                             'ERROR:',
                             'FATAL',
-                            'make: *** [',  # Make error
+                            'make: ***',  # Make error (any make error, not just with bracket)
                             'compilation failed',
-                            'build failed'
+                            'build failed',
+                            'failed:',  # Generic failure messages
+                            'make cleanall\' failed',  # Specific cleanall failures
+                            'ln: target',  # Symlink errors
+                            'ln: failed',  # Symlink failures
+                            'Can\'t open',  # File open failures
+                            'No such file:',  # Missing files
+                            'getcwd: No such file or directory',  # CWD errors
                         ]
                         has_errors = any(
-                            error.lower() in log_content.lower() 
+                            error in log_content  # Don't lowercase - preserve exact matches
                             for error in error_indicators
                         )
                         info['build_log_shows_success'] = not has_errors

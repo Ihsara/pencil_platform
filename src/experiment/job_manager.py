@@ -523,7 +523,7 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     console.print(f"  Completed: {stage_counts['completed']}")
     console.print(f"  Failed: {stage_counts['failed']}")
     
-    # Show detailed error information for failed tasks
+    # Show detailed error information for failed tasks (using rich)
     if failed_tasks:
         console.print("\n[bold red]═══ FAILED TASKS - ERROR DETAILS ═══[/bold red]")
         for failure in failed_tasks:
@@ -538,7 +538,6 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
                     for line in failure['error_tail']:
                         if line.strip():  # Skip empty lines
                             console.print(f"  [dim]{line.rstrip()}[/dim]")
-            console.print()  # Blank line between failures
 
 
 def clean_all_simulation_data(experiment_name: str, keep_final_var: bool = True, auto_confirm: bool = False):
