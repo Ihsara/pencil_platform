@@ -55,7 +55,7 @@ def display_message(console: Console, text: str, level):
         text: Message text
         level: MessageLevel enum value
     """
-    from src.core.interface import MessageLevel
+    from src.core.communication.interface import MessageLevel
     
     # Truncate for terminal width
     display_text = text[:TERM_WIDTH-10] if len(text) > TERM_WIDTH-10 else text

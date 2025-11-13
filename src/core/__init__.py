@@ -39,22 +39,16 @@ The interface is modular, with separate components for:
 - display.py: Legacy display utilities (deprecated, use interface instead)
 """
 
-# Main unified interface
-from src.core.interface import (
+# Main unified interface from communication subfolder
+from src.core.communication import (
     Communicator,
     MessageLevel,
     TaskStatus,
     create_communicator,
-)
-
-# Modular components (for advanced usage)
-from src.core.logging import (
+    # Modular components (for advanced usage)
     setup_file_logging,
     remove_file_handlers,
     setup_console_logging,
-)
-
-from src.core.terminal import (
     create_console,
     display_header,
     display_message,

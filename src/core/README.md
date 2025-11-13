@@ -6,12 +6,14 @@ This module provides the **unified communication interface** for all platform op
 
 ```
 src/core/
-├── interface.py      # Main Communicator class (USE THIS)
-├── terminal.py       # Terminal display functions (Rich)
-├── logging.py        # File logging setup (Loguru)
-├── communicator.py   # DEPRECATED - backward compatibility only
-├── display.py        # DEPRECATED - legacy display utilities
-└── __init__.py       # Module exports
+├── communication/               # Communication interface subfolder
+│   ├── __init__.py             # Subfolder exports
+│   ├── interface.py            # Main Communicator class
+│   ├── terminal.py             # Terminal display (Rich)
+│   └── logging.py              # File logging (Loguru)
+├── communicator.py             # DEPRECATED - backward compatibility
+├── display.py                  # DEPRECATED - legacy utilities
+└── __init__.py                 # Module exports
 ```
 
 ## Quick Start
@@ -66,9 +68,9 @@ Communicator (interface.py)
 
 ## Module Components
 
-### interface.py (Primary)
+### communication/interface.py (Primary)
 
-Main communication interface with the `Communicator` class.
+Main communication interface with the `Communicator` class, now organized in the `communication` subfolder.
 
 **Classes:**
 - `Communicator`: Main interface class
@@ -84,9 +86,9 @@ Main communication interface with the `Communicator` class.
 - `summary()`: Display operation summary
 - `validation_table()`: Show validation results
 
-### terminal.py (Modular)
+### communication/terminal.py (Modular)
 
-Terminal display functionality using Rich.
+Terminal display functionality using Rich, located in the `communication` subfolder.
 
 **Functions:**
 - `create_console()`: Create Rich console with fixed width (72 chars)
@@ -98,9 +100,9 @@ Terminal display functionality using Rich.
 **Constants:**
 - `TERM_WIDTH = 72`: Fixed terminal width for optimal readability
 
-### logging.py (Modular)
+### communication/logging.py (Modular)
 
-File logging configuration using Loguru.
+File logging configuration using Loguru, located in the `communication` subfolder.
 
 **Functions:**
 - `setup_file_logging()`: Configure file logging with timestamps
@@ -121,7 +123,7 @@ logs/
 
 **⚠️ This file is maintained for backward compatibility only.**
 
-Old imports still work:
+It re-exports from the `communication` subfolder. Old imports still work:
 ```python
 from src.core.communicator import Communicator  # Still works
 ```
@@ -130,6 +132,8 @@ But prefer the new import:
 ```python
 from src.core import Communicator  # Recommended
 ```
+
+All functionality is now in `src/core/communication/`.
 
 ### display.py (DEPRECATED)
 
@@ -305,3 +309,4 @@ comm.summary()
 
 - [Full Documentation](../../docs/UNIFIED-COMMUNICATION-INTERFACE.md)
 - [Examples](communicator_examples.py)
+- [Communication Subfolder](communication/) - Core implementation files

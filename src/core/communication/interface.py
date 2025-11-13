@@ -35,8 +35,8 @@ from pathlib import Path
 import time
 
 # Import modular components
-from src.core.logging import setup_file_logging
-from src.core.terminal import (
+from src.core.communication.logging import setup_file_logging
+from src.core.communication.terminal import (
     create_console,
     display_header,
     display_message,
