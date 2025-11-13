@@ -544,6 +544,7 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
 def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait: int = None, initial_delay: int = 5):
     """
     Waits for a SLURM job array to complete by polling status and monitoring log files.
+    After completion, AUTOMATICALLY runs integrity verification checks.
     
     Args:
         experiment_name: Name of the experiment
@@ -552,7 +553,7 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
         initial_delay: Seconds to wait before first check (default: 5, gives job time to start)
         
     Returns:
-        True if job completed successfully, False if failed or timed out
+        True if job completed successfully and passed verification, False otherwise
     """
     import time
     from rich.console import Console
@@ -641,7 +642,29 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
                     return False
                 else:
                     logger.success(f"Job array completed successfully!")
-                    return True
+                    
+                    # MANDATORY: Always run integrity verification after successful completion
+                    console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
+                    console.print("[dim]This check is required to ensure simulation validity[/dim]\n")
+                    
+                    from src.experiment.verification import verify_simulation_integrity
+                    try:
+                        integrity_passed = verify_simulation_integrity(
+                            experiment_name, 
+                            sample_size=3, 
+                            fail_on_critical=False  # Don't exit, but return False
+                        )
+                        if not integrity_passed:
+                            console.print("\n[bold red]⚠ CRITICAL: Integrity checks FAILED![/bold red]")
+                            console.print("[yellow]Please fix simulation issues before proceeding to analysis![/yellow]\n")
+                            return False
+                        else:
+                            console.print("\n[bold green]✓ All integrity checks PASSED![/bold green]\n")
+                            return True
+                    except Exception as e:
+                        logger.error(f"Integrity verification encountered an error: {e}")
+                        console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
+                        return False
             
             # Update progress description
             progress.update(task, description=f"[cyan]Running: {status['RUNNING']}, Pending: {status['PENDING']}, Completed: {status['COMPLETED']}, Failed: {status['FAILED']}")

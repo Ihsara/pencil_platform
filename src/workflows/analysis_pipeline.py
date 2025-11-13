@@ -271,6 +271,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     """Comprehensive analysis: Creates videos, calculates L1/L2 error norms, and generates final report.
     
     Workflow:
+    0. MANDATORY: Verify simulation integrity (always runs)
     1. Load all VAR files and calculate errors (cached)
     2. Create individual error evolution videos (and combined, if requested)
     3. Find best performer in each branch → create overlay videos
@@ -292,6 +293,29 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     if combined_video:
         logger.info("Combined error video generation ENABLED.")
     logger.info(f"=" * 80)
+    
+    # MANDATORY: Always run integrity verification before analysis
+    logger.info("\n" + "=" * 80)
+    logger.info("MANDATORY PRE-ANALYSIS INTEGRITY VERIFICATION")
+    logger.info("=" * 80 + "\n")
+    
+    from src.experiment.verification import verify_simulation_integrity
+    try:
+        integrity_passed = verify_simulation_integrity(
+            experiment_name,
+            sample_size=5,  # Sample more runs for analysis verification
+            fail_on_critical=True  # Always fail if critical issues found
+        )
+        if not integrity_passed:
+            logger.error("Integrity verification failed - analysis would produce invalid results")
+            logger.error("Please fix the simulation issues before proceeding with analysis")
+            sys.exit(1)
+    except SystemExit:
+        raise  # Re-raise SystemExit from fail_on_critical
+    except Exception as e:
+        logger.error(f"Integrity verification encountered an error: {e}")
+        logger.error("Cannot proceed with analysis due to verification failure")
+        sys.exit(1)
     
     plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
     with open(plan_file, 'r') as f: 
