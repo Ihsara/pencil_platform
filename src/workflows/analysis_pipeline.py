@@ -64,23 +64,53 @@ def clear_directory(directory: Path):
 
 
 def get_analytical_solution(params, x: np.ndarray, t: float) -> dict | None:
-    """Calculates the analytical Sod shock tube solution."""
+    """Calculates the analytical Sod shock tube solution.
+    
+    CRITICAL: Creates a deep copy of params to avoid cross-contamination between runs.
+    Each run must have its own independent analytical solution calculated from its
+    specific parameters.
+    """
     try:
-        if not hasattr(params, 'rho0'): setattr(params, 'rho0', 1.0)
-        if not hasattr(params, 'cs0'): setattr(params, 'cs0', 1.0)
+        import copy
         
-        solution = sod(x, [t], par=params, lplot=False, magic=['ee'])
+        # CRITICAL FIX: Deep copy params to prevent cross-contamination between runs
+        # Without this, all runs share the same params object and get identical analytical solutions
+        params_copy = copy.deepcopy(params)
+        
+        # Set defaults on the COPY, not the original
+        if not hasattr(params_copy, 'rho0'): 
+            setattr(params_copy, 'rho0', 1.0)
+        if not hasattr(params_copy, 'cs0'): 
+            setattr(params_copy, 'cs0', 1.0)
+        
+        # Calculate analytical solution with the isolated params copy
+        solution = sod(x, [t], par=params_copy, lplot=False, magic=['ee'])
+        
+        # Log key parameters for debugging (only in debug mode)
+        if logger.level == "DEBUG":
+            gamma_val = getattr(params_copy, 'gamma', 'N/A')
+            nu_val = getattr(params_copy, 'nu_shock', 'N/A')
+            chi_val = getattr(params_copy, 'chi_shock', 'N/A')
+            logger.debug(f"Analytical solution calculated with: gamma={gamma_val}, nu_shock={nu_val}, chi_shock={chi_val}, t={t:.6e}")
+        
         return {
             'rho': np.squeeze(solution.rho), 'ux': np.squeeze(solution.ux),
             'pp': np.squeeze(solution.pp), 'ee': np.squeeze(solution.ee), 'x': x, 't': t
         }
     except Exception as e:
-        logger.error(f"Failed to calculate analytical solution: {e}")
+        logger.error(f"Failed to calculate analytical solution at t={t:.6e}: {e}")
         return None
 
 def load_all_var_files(run_path: Path) -> list[dict] | None:
-    """Loads and processes all VAR files from a simulation run."""
+    """Loads and processes all VAR files from a simulation run.
+    
+    CRITICAL: Creates a deep copy of params for each run to prevent cross-contamination.
+    This ensures each run gets its own independent params object with its specific
+    configuration (gamma, nu_shock, chi_shock, etc.).
+    """
     try:
+        import copy
+        
         if not run_path.is_dir():
             logger.warning(f"Run directory not found: {run_path}")
             return None
@@ -97,8 +127,20 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         
         logger.info(f"Loading all {len(var_files)} VAR files from {run_path}")
         
-        # Read params once - it's the same for all VAR files
-        params = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
+        # CRITICAL FIX: Read params and create a deep copy IMMEDIATELY
+        # The Pencil Code read.param() might cache results or return shared references
+        # Deep copying ensures this run gets its own independent params object
+        params_original = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
+        params = copy.deepcopy(params_original)
+        
+        # Log key parameters for debugging (run name should be in path)
+        run_name = run_path.name
+        if logger.level == "DEBUG":
+            gamma_val = getattr(params, 'gamma', 'N/A')
+            nu_val = getattr(params, 'nu_shock', 'N/A')
+            chi_val = getattr(params, 'chi_shock', 'N/A')
+            lgamma_is_1 = getattr(params, 'lgamma_is_1', 'N/A')
+            logger.debug(f"Loaded params for {run_name}: gamma={gamma_val}, nu_shock={nu_val}, chi_shock={chi_val}, lgamma_is_1={lgamma_is_1}")
         
         all_data = []
         for var_file in var_files:
@@ -976,10 +1018,10 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         header_style="bold"
     )
     
-    ranking_table.add_column("Rank", style="bold yellow", justify="center", width=6)
-    ranking_table.add_column("Run Name", style="cyan", width=30)
-    ranking_table.add_column("Combined Error", justify="right", style="green", width=14)
-    ranking_table.add_column("% Diff from Best", justify="right", style="yellow", width=16)
+    ranking_table.add_column("Rank", style="bold yellow", justify="center", width=5)
+    ranking_table.add_column("Run Name", style="cyan", width=32)
+    ranking_table.add_column("Combined Error", justify="right", style="green", width=13)
+    ranking_table.add_column("% Diff", justify="right", style="yellow", width=9)
     
     # Add rows for all runs
     for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
@@ -1029,15 +1071,15 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
         border_style="blue"
     )
     
-    metrics_detail_table.add_column("Rank", style="bold yellow", justify="center", width=6)
-    metrics_detail_table.add_column("Run Name", style="cyan", width=25)
+    metrics_detail_table.add_column("Rank", style="bold yellow", justify="center", width=5)
+    metrics_detail_table.add_column("Run Name", style="cyan", width=28)
     
     for metric in metrics:
         metrics_detail_table.add_column(
             metric.upper(), 
             justify="right", 
             style="magenta",
-            width=13
+            width=10
         )
     
     for rank, (run_name, scores) in enumerate(sorted_all_runs[:10], 1):
@@ -1098,10 +1140,10 @@ def generate_error_ranking_report(experiment_name, combined_scores, metrics, out
             header_style="bold"
         )
         
-        file_table.add_column("Rank", justify="center", width=6)
-        file_table.add_column("Run Name", width=30)
-        file_table.add_column("Combined Error", justify="right", width=14)
-        file_table.add_column("% Diff from Best", justify="right", width=16)
+        file_table.add_column("Rank", justify="center", width=5)
+        file_table.add_column("Run Name", width=32)
+        file_table.add_column("Combined Error", justify="right", width=13)
+        file_table.add_column("% Diff", justify="right", width=9)
         
         for rank, (run_name, scores) in enumerate(sorted_all_runs, 1):
             # Use format_short_experiment_name for consistent shortened naming
