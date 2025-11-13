@@ -768,8 +768,11 @@ class SimulationIntegrityChecker:
             # Look for common parameter patterns in names
             import re
             
-            nu_match = re.search(r'nu([\d.e\-+]+)', run_name)
-            chi_match = re.search(r'chi([\d.e\-+]+)', run_name)
+            # Match filesystem-safe format: nu0p1 (where 'p' replaces '.')
+            # Also match scientific notation: nu9e-15
+            nu_match = re.search(r'nu([\d.pe\-+]+)', run_name)
+            chi_match = re.search(r'chi([\d.pe\-+]+)', run_name)
+            diffrho_match = re.search(r'diffrho([\d.pe\-+]+)', run_name)
             
             if nu_match:
                 nu_val = nu_match.group(1)
@@ -780,6 +783,11 @@ class SimulationIntegrityChecker:
                 chi_val = chi_match.group(1)
                 if chi_val not in param_patterns.get('chi', set()):
                     param_patterns.setdefault('chi', set()).add(chi_val)
+            
+            if diffrho_match:
+                diffrho_val = diffrho_match.group(1)
+                if diffrho_val not in param_patterns.get('diffrho', set()):
+                    param_patterns.setdefault('diffrho', set()).add(diffrho_val)
         
         # Check if we have variation in parameters
         total_unique = sum(len(v) for v in param_patterns.values())
