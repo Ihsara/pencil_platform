@@ -10,11 +10,12 @@ from src.experiment.generator import run_suite
 from src.workflows.analysis_pipeline import visualize_suite, analyze_suite_videos_only, analyze_suite_with_error_norms
 from src.experiment.job_manager import submit_suite, check_suite_status, wait_for_completion, monitor_job_progress, clean_all_simulation_data
 from src.core.constants import DIRS, FILES
+from src.core.logging import setup_console_logging
+from src.core.display import show_header, show_warning, show_error, show_info, show_success
 
 def configure_logging():
-    """Configures the loguru logger for clean, formatted output."""
-    logger.remove()
-    logger.add(sys.stderr, level="INFO", format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>")
+    """Configure console-only logging for interactive mode."""
+    setup_console_logging()
 
 def find_available_experiments() -> list:
     """Scans the configuration directory to find all available experiments."""
@@ -28,20 +29,23 @@ def main():
     # Detect if running from Windows - warn user
     import platform
     if platform.system() == "Windows":
-        logger.warning("=" * 70)
-        logger.warning("⚠️  DETECTED: Running from Windows")
-        logger.warning("=" * 70)
-        logger.warning("This platform is designed to run ON the HPC system (Mahti).")
-        logger.warning("Running from Windows will cause monitoring to show incorrect status.")
-        logger.warning("")
-        logger.warning("RECOMMENDED: SSH to Mahti and run commands there:")
-        logger.warning("  1. ssh mahti.csc.fi")
-        logger.warning("  2. cd /scratch/project_2008296/chau/pencil_platform")
-        logger.warning("  3. python main.py <experiment> [options]")
-        logger.warning("")
-        logger.warning("See docs/IMPORTANT-RUN-ON-HPC.md for details.")
-        logger.warning("=" * 70)
-        logger.warning("")
+        from rich.console import Console
+        from rich.panel import Panel
+        console = Console(width=72)
+        
+        warning_text = (
+            "[yellow]⚠️  Running from Windows[/yellow]\n\n"
+            "This platform is designed for HPC (Mahti).\n"
+            "Monitoring will show incorrect status.\n\n"
+            "[cyan]RECOMMENDED:[/cyan]\n"
+            "  1. ssh mahti.csc.fi\n"
+            "  2. cd /scratch/project_2008296/chau/pencil_platform\n"
+            "  3. python main.py <experiment> [options]\n\n"
+            "See docs/IMPORTANT-RUN-ON-HPC.md"
+        )
+        console.print(Panel(warning_text, title="Platform Warning", border_style="yellow"))
+        console.print()
+        logger.warning("Running from Windows - monitoring may be unreliable")
 
     parser = argparse.ArgumentParser(
         description="Pencil Code Experiment Suite Generator and Manager.",
@@ -75,32 +79,41 @@ def main():
     available_experiments = find_available_experiments()
 
     if not available_experiments:
-        logger.error(f"No experiment plans found in '{DIRS.config}/*/{DIRS.plan_subdir}/{FILES.plan}'.")
+        show_error(f"No plans found in {DIRS.config}/*/{DIRS.plan_subdir}/")
         sys.exit(1)
 
     if not experiment_name:
-        logger.info("Available experiments:")
+        from rich.console import Console
+        console = Console(width=72)
+        console.print("[cyan]Available experiments:[/cyan]")
         for i, name in enumerate(available_experiments):
-            print(f"  {i+1}: {name}")
+            console.print(f"  {i+1}. {name}")
+        
         try:
-            choice = int(input("Please choose an experiment number: ")) - 1
+            choice = int(input("\nSelect number: ")) - 1
             if 0 <= choice < len(available_experiments):
                 experiment_name = available_experiments[choice]
             else:
-                logger.error("Invalid selection."); sys.exit(1)
+                show_error("Invalid selection")
+                sys.exit(1)
         except (ValueError, IndexError):
-            logger.error("Invalid input."); sys.exit(1)
+            show_error("Invalid input")
+            sys.exit(1)
         except KeyboardInterrupt:
-            logger.info("\nOperation cancelled."); sys.exit(0)
+            show_info("Operation cancelled")
+            sys.exit(0)
 
     if experiment_name not in available_experiments:
-        logger.error(f"Experiment '{experiment_name}' not found."); sys.exit(1)
-        
-    logger.info(f"Selected experiment: '{experiment_name}'")
+        show_error(f"Experiment '{experiment_name}' not found")
+        sys.exit(1)
+    
+    show_info(f"Selected: {experiment_name}")
+    logger.info(f"Selected experiment: {experiment_name}")
     
     try:
-        # Check for standalone monitoring/analysis modes (no submission)
+        # Check for standalone monitoring/analysis modes
         if args.check:
+            show_header("Status Check", experiment_name)
             check_suite_status(experiment_name)
         elif args.monitor and not args.wait and not args.analyze:
             # Monitor only (standalone)
@@ -114,9 +127,9 @@ def main():
             if wait_for_completion(experiment_name):
                 # Step 1: Run verification checks on the NEW data
                 from rich.console import Console
-                console = Console()
-                console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
-                console.print("[dim]This check is required to ensure simulation validity[/dim]\n")
+                console = Console(width=72)
+                console.print("\n[cyan]═══ INTEGRITY VERIFICATION ═══[/cyan]")
+                console.print("[dim]Required to ensure simulation validity[/dim]\n")
                 
                 from src.experiment.verification import verify_simulation_integrity
                 try:
@@ -126,34 +139,32 @@ def main():
                         fail_on_critical=False
                     )
                     if not integrity_passed:
-                        console.print("\n[bold red]⚠ CRITICAL: Integrity checks FAILED![/bold red]")
-                        console.print("[yellow]Please fix simulation issues before proceeding to analysis![/yellow]\n")
+                        show_error("CRITICAL: Integrity checks FAILED!")
+                        show_warning("Fix issues before proceeding")
                         sys.exit(1)
                     else:
-                        console.print("\n[bold green]✓ All integrity checks PASSED![/bold green]\n")
+                        show_success("All integrity checks PASSED")
                 except Exception as e:
-                    logger.error(f"Integrity verification encountered an error: {e}")
-                    console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
+                    logger.error(f"Verification error: {e}")
+                    show_error("Integrity verification failed")
                     sys.exit(1)
                 
-                logger.success("Job completed! You can now run analysis or visualization.")
-                logger.info(f"Analysis: python main.py {experiment_name} --analyze")
-                logger.info(f"Visualization: python main.py {experiment_name} --viz")
+                show_success("Job completed")
+                show_info(f"Next: python main.py {experiment_name} --analyze")
             else:
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
         elif args.wait and args.analyze and not any([args.viz, args.error_norms]):
-            # Wait + Analyze (for already-submitted job)
-            # Step 0: Cleanup OLD data FIRST before waiting
-            logger.info("Cleaning up old simulation data before waiting for new results...")
+            # Wait + Analyze
+            show_info("Cleaning up old data...")
             clean_all_simulation_data(experiment_name, auto_confirm=True)
             
             if wait_for_completion(experiment_name):
-                # Step 1: Run verification checks on the NEW data
+                # Step 1: Verification checks
                 from rich.console import Console
-                console = Console()
-                console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
-                console.print("[dim]This check is required to ensure simulation validity[/dim]\n")
+                console = Console(width=72)
+                console.print("\n[cyan]═══ INTEGRITY VERIFICATION ═══[/cyan]")
+                console.print("[dim]Required for simulation validity[/dim]\n")
                 
                 from src.experiment.verification import verify_simulation_integrity
                 try:
@@ -163,35 +174,32 @@ def main():
                         fail_on_critical=False
                     )
                     if not integrity_passed:
-                        console.print("\n[bold red]⚠ CRITICAL: Integrity checks FAILED![/bold red]")
-                        console.print("[yellow]Please fix simulation issues before proceeding to analysis![/yellow]\n")
+                        show_error("CRITICAL: Integrity checks FAILED!")
                         sys.exit(1)
                     else:
-                        console.print("\n[bold green]✓ All integrity checks PASSED![/bold green]\n")
+                        show_success("All integrity checks PASSED")
                 except Exception as e:
-                    logger.error(f"Integrity verification encountered an error: {e}")
-                    console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
+                    logger.error(f"Verification error: {e}")
+                    show_error("Integrity verification failed")
                     sys.exit(1)
                 
                 # Step 2: Analysis
-                logger.info("Starting video-only analysis...")
+                show_header("Analysis Pipeline", experiment_name)
                 analyze_suite_videos_only(experiment_name)
             else:
-                logger.error("Job did not complete successfully")
+                show_error("Job did not complete")
                 sys.exit(1)
         elif args.cleanall:
-            # Standalone cleanall (without waiting)
-            logger.info("--- CLEANUP MODE ---")
+            show_header("Cleanup Mode", experiment_name)
             clean_all_simulation_data(experiment_name)
         elif args.error_norms:
-            logger.info("--- L1/L2 ERROR NORM ANALYSIS MODE ---")
+            show_header("Error Norm Analysis", experiment_name)
             analyze_suite_with_error_norms(experiment_name)
         elif args.analyze and not args.wait:
-            # Analyze only (standalone)
-            logger.info("--- VIDEO-ONLY ANALYSIS MODE ---")
+            show_header("Video Analysis", experiment_name)
             analyze_suite_videos_only(experiment_name, combined_video=True)
         elif args.viz is not None:
-            logger.info("--- VISUALIZATION MODE ---")
+            show_header("Visualization", experiment_name)
             
             # Handle interactive mode
             if args.viz and args.viz[0] == '?':
@@ -201,7 +209,9 @@ def main():
                     with open(manifest_file, 'r') as f:
                         available_runs = [line.strip() for line in f if line.strip()]
                     
-                    logger.info(f"Available runs ({len(available_runs)}):")
+                    from rich.console import Console
+                    console = Console(width=72)
+                    console.print(f"[cyan]Available runs ({len(available_runs)}):[/cyan]")
                     for i, run in enumerate(available_runs, 1):
                         print(f"  {i}: {run}")
                     
@@ -223,13 +233,13 @@ def main():
                             # Branch name
                             specific_runs = [r for r in available_runs if choice in r]
                             if not specific_runs:
-                                logger.warning(f"No runs found matching '{choice}'")
+                                show_warning(f"No runs matching '{choice}'")
                                 specific_runs = None
                     except (ValueError, IndexError, KeyboardInterrupt) as e:
-                        logger.error(f"Invalid selection: {e}")
+                        show_error(f"Invalid selection: {e}")
                         sys.exit(1)
                 else:
-                    logger.error(f"Manifest file not found: {manifest_file}")
+                    show_error(f"Manifest not found: {manifest_file}")
                     sys.exit(1)
             elif args.viz:
                 # Specific runs provided
@@ -240,7 +250,7 @@ def main():
             
             visualize_suite(experiment_name, specific_runs=specific_runs, var_selection=args.var)
         else:
-            logger.info("--- GENERATION & SUBMISSION MODE ---")
+            show_header("Generation & Submission", experiment_name)
             plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
             
             # Check for auto-postprocessing flags
@@ -258,25 +268,24 @@ def main():
                 auto_postprocessing = plan_config.get('auto_postprocessing', False)
                 
                 if auto_check:
-                    logger.info("Auto-check enabled, checking job status...")
+                    show_info("Auto-check enabled")
                     check_suite_status(experiment_name)
                 
-                # Handle -w (wait) flag in submission mode
+                # Handle wait flag in submission mode
                 if args.wait:
-                    # Step 0: Cleanup OLD data FIRST before waiting
-                    logger.info("Cleaning up old simulation data before waiting for new results...")
+                    show_info("Cleaning up old data...")
                     clean_all_simulation_data(experiment_name, auto_confirm=True)
                     
-                    logger.info("Waiting for job completion...")
+                    show_info("Waiting for job completion...")
                     if args.monitor:
-                        logger.info("(Monitoring enabled - detailed progress will be shown)")
+                        show_info("(Monitoring enabled)")
                     
                     if wait_for_completion(experiment_name):
-                        # Step 1: Run verification checks on the NEW data
+                        # Verification checks
                         from rich.console import Console
-                        console = Console()
-                        console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
-                        console.print("[dim]This check is required to ensure simulation validity[/dim]\n")
+                        console = Console(width=72)
+                        console.print("\n[cyan]═══ INTEGRITY VERIFICATION ═══[/cyan]")
+                        console.print("[dim]Required for simulation validity[/dim]\n")
                         
                         from src.experiment.verification import verify_simulation_integrity
                         try:
@@ -286,30 +295,27 @@ def main():
                                 fail_on_critical=False
                             )
                             if not integrity_passed:
-                                console.print("\n[bold red]⚠ CRITICAL: Integrity checks FAILED![/bold red]")
-                                console.print("[yellow]Please fix simulation issues before proceeding to analysis![/yellow]\n")
+                                show_error("CRITICAL: Checks FAILED!")
                                 sys.exit(1)
                             else:
-                                console.print("\n[bold green]✓ All integrity checks PASSED![/bold green]\n")
+                                show_success("All checks PASSED")
                         except Exception as e:
-                            logger.error(f"Integrity verification encountered an error: {e}")
-                            console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
+                            logger.error(f"Verification error: {e}")
+                            show_error("Verification failed")
                             sys.exit(1)
                         
-                        # Step 2: Analysis (if requested)
+                        # Analysis if requested
                         if args.analyze:
-                            logger.info("Starting video-only analysis...")
+                            show_header("Analysis Pipeline", experiment_name)
                             analyze_suite_videos_only(experiment_name)
                     else:
-                        logger.error("Job did not complete successfully")
+                        show_error("Job did not complete")
                         sys.exit(1)
                 elif auto_postprocessing:
-                    logger.info("Auto-postprocessing enabled.")
-                    logger.info("Note: Postprocessing should be run after jobs complete.")
-                    logger.info("To run analysis: python main.py {} --analyze".format(experiment_name))
-                    logger.info("To run visualization: python main.py {} --viz".format(experiment_name))
+                    show_info("Auto-postprocessing enabled")
+                    show_info(f"Run after: python main.py {experiment_name} --analyze")
             elif args.test:
-                logger.warning("TEST MODE: Automatic submission is SKIPPED.")
+                show_warning("TEST MODE: Submission skipped")
 
     except Exception as e:
         logger.exception(f"An unexpected error occurred: {e}")

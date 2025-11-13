@@ -1,12 +1,13 @@
 """
-Logging utility module for setting up file-based logging with loguru.
+Logging utility module for file-based logging with loguru.
 
-This module provides centralized logging configuration that saves all console
-output to timestamped log files organized by command type and experiment name.
+Provides detailed file logging while keeping terminal output clean.
+Terminal display is handled separately via src.core.display module.
 """
 
 from datetime import datetime
 from pathlib import Path
+import sys
 from loguru import logger
 
 
@@ -38,6 +39,17 @@ def setup_file_logging(experiment_name: str, command_type: str) -> tuple[Path, P
         >>> full_log, shorter_log = setup_file_logging('my_experiment', 'analysis')
         >>> logger.info("This message goes to console and both log files")
     """
+    # Remove default console handler - terminal display handled by display.py
+    logger.remove()
+    
+    # Add minimal console handler (only for errors/critical)
+    logger.add(
+        sys.stderr,
+        format="<red>{level}:</red> {message}",
+        level="ERROR",  # Only show errors in console
+        colorize=True
+    )
+    
     # Create timestamp in format sub_YYYYMMDDHHMM
     timestamp = datetime.now().strftime("sub_%Y%m%d%H%M")
     
@@ -47,7 +59,7 @@ def setup_file_logging(experiment_name: str, command_type: str) -> tuple[Path, P
     
     # Create log file paths
     full_log_file = log_dir / f"{command_type}.log"
-    shorter_log_file = log_dir / f"{command_type}_shorter.log"
+    summary_log_file = log_dir / f"{command_type}_summary.log"
     
     # Add FULL detailed log file sink (everything)
     logger.add(
@@ -57,43 +69,54 @@ def setup_file_logging(experiment_name: str, command_type: str) -> tuple[Path, P
         backtrace=True,
         diagnose=True,
         enqueue=True,
-        catch=True,
-        filter=lambda record: True  # Accept all messages
+        catch=True
     )
     
-    # Add SHORTER summary log file sink (no verbose/debug)
-    # This filters out verbose library output and debug messages
+    # Add SUMMARY log file sink (key info only)
     logger.add(
-        shorter_log_file,
+        summary_log_file,
         format="{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {message}",
-        level="INFO",  # Only INFO and above (skip DEBUG/verbose)
+        level="INFO",  # Only INFO and above
         backtrace=False,
         diagnose=False,
         enqueue=True,
         catch=True,
-        filter=lambda record: not record["extra"].get("verbose", False)  # Skip messages marked as verbose
+        filter=lambda record: not record["extra"].get("verbose", False)
     )
     
-    # Log the setup (goes to both console and files)
-    logger.info(f"📝 Logging to files:")
-    logger.info(f"   ├─ Full log: {full_log_file}")
-    logger.info(f"   └─ Shorter log: {shorter_log_file}")
+    # Log setup complete
+    logger.info(f"Logging initialized for {experiment_name} - {command_type}")
+    logger.info(f"Full log: {full_log_file}")
+    logger.info(f"Summary log: {summary_log_file}")
     
-    return full_log_file, shorter_log_file
+    return full_log_file, summary_log_file
 
 
 def remove_file_handlers():
     """Remove all file handlers from loguru.
     
-    This is useful for cleanup or when switching between different log files.
-    Note: This only removes handlers added after the default handler (ID 0).
+    Useful for cleanup or when switching between different log files.
     """
-    # Remove all handlers except the default console handler (ID 0)
     logger.remove()
     
-    # Re-add default console handler
+    # Re-add minimal console handler (errors only)
     logger.add(
-        lambda msg: print(msg, end=""),
-        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>",
-        level="INFO"
+        sys.stderr,
+        format="<red>{level}:</red> {message}",
+        level="ERROR",
+        colorize=True
+    )
+
+
+def setup_console_logging():
+    """Setup console-only logging for simple operations.
+    
+    Use this when you don't need file logging, only terminal output.
+    """
+    logger.remove()
+    logger.add(
+        sys.stderr,
+        format="<level>{level}:</level> {message}",
+        level="INFO",
+        colorize=True
     )
