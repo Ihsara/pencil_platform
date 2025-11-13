@@ -179,14 +179,18 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
                     "params": params,
                     "var_file": var_file.name
                 })
-                
-                logger.critical(f"DIAGNOSTIC: Loading VAR files from: {run_path}")
-                logger.critical(f"DIAGNOSTIC: Found {len(var_files)} VAR files")
-                logger.critical(f"DIAGNOSTIC: First VAR rho sample: {all_data[0]['rho'][:5]}")
-                logger.critical(f"DIAGNOSTIC: First VAR max rho: {np.max(all_data[0]['rho']):.10e}")
             except Exception as e:
                 logger.warning(f"Failed to load {var_file.name}: {e}")
                 continue
+        
+        # DIAGNOSTIC: Check loaded data AFTER all VAR files are loaded (moved outside loop)
+        if all_data:
+            logger.critical(f"DIAGNOSTIC: Loading VAR files from: {run_path}")
+            logger.critical(f"DIAGNOSTIC: Found {len(var_files)} VAR files, successfully loaded {len(all_data)}")
+            logger.critical(f"DIAGNOSTIC: First VAR (t={all_data[0]['t']:.6e}) rho sample: {all_data[0]['rho'][:5]}")
+            logger.critical(f"DIAGNOSTIC: First VAR max rho: {np.max(all_data[0]['rho']):.10e}")
+            logger.critical(f"DIAGNOSTIC: LAST VAR (t={all_data[-1]['t']:.6e}) rho sample: {all_data[-1]['rho'][:5]}")
+            logger.critical(f"DIAGNOSTIC: LAST VAR max rho: {np.max(all_data[-1]['rho']):.10e}")
         
         return all_data if all_data else None
         
