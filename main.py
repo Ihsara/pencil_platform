@@ -109,7 +109,7 @@ def main():
             # Wait only (for already-submitted job, standalone)
             # Step 0: Cleanup OLD data FIRST before waiting
             logger.info("Cleaning up old simulation data before waiting for new results...")
-            clean_all_simulation_data(experiment_name)
+            clean_all_simulation_data(experiment_name, auto_confirm=True)
             
             if wait_for_completion(experiment_name):
                 # Step 1: Run verification checks on the NEW data
@@ -146,7 +146,7 @@ def main():
             # Wait + Analyze (for already-submitted job)
             # Step 0: Cleanup OLD data FIRST before waiting
             logger.info("Cleaning up old simulation data before waiting for new results...")
-            clean_all_simulation_data(experiment_name)
+            clean_all_simulation_data(experiment_name, auto_confirm=True)
             
             if wait_for_completion(experiment_name):
                 # Step 1: Run verification checks on the NEW data
@@ -265,7 +265,7 @@ def main():
                 if args.wait:
                     # Step 0: Cleanup OLD data FIRST before waiting
                     logger.info("Cleaning up old simulation data before waiting for new results...")
-                    clean_all_simulation_data(experiment_name)
+                    clean_all_simulation_data(experiment_name, auto_confirm=True)
                     
                     logger.info("Waiting for job completion...")
                     if args.monitor:

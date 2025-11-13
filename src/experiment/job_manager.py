@@ -541,7 +541,7 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
             console.print()  # Blank line between failures
 
 
-def clean_all_simulation_data(experiment_name: str, keep_final_var: bool = True):
+def clean_all_simulation_data(experiment_name: str, keep_final_var: bool = True, auto_confirm: bool = False):
     """
     Clean all simulation data (VAR files, logs) to free up disk space.
     This is typically done after analysis is complete.
@@ -549,6 +549,7 @@ def clean_all_simulation_data(experiment_name: str, keep_final_var: bool = True)
     Args:
         experiment_name: Name of the experiment
         keep_final_var: If True, keep the final VAR file for each run (default: True)
+        auto_confirm: If True, skip confirmation prompt (for automatic cleanup)
         
     Returns:
         True if cleaning was successful, False otherwise
@@ -586,22 +587,23 @@ def clean_all_simulation_data(experiment_name: str, keep_final_var: bool = True)
     console.print(f"[yellow]Found {len(run_names)} runs to clean[/yellow]")
     console.print(f"[dim]HPC directory: {hpc_run_base_dir}[/dim]\n")
     
-    # Ask for confirmation
-    if keep_final_var:
-        console.print("[yellow]This will delete all VAR files EXCEPT the final timestep.[/yellow]")
-    else:
-        console.print("[red]This will delete ALL VAR files![/red]")
-    
-    console.print("[yellow]This action cannot be undone![/yellow]")
-    
-    try:
-        response = input("\nProceed with cleaning? (yes/no): ").strip().lower()
-        if response not in ['yes', 'y']:
-            console.print("[yellow]Cleaning cancelled.[/yellow]")
+    # Ask for confirmation unless auto_confirm is True
+    if not auto_confirm:
+        if keep_final_var:
+            console.print("[yellow]This will delete all VAR files EXCEPT the final timestep.[/yellow]")
+        else:
+            console.print("[red]This will delete ALL VAR files![/red]")
+        
+        console.print("[yellow]This action cannot be undone![/yellow]")
+        
+        try:
+            response = input("\nProceed with cleaning? (yes/no): ").strip().lower()
+            if response not in ['yes', 'y']:
+                console.print("[yellow]Cleaning cancelled.[/yellow]")
+                return False
+        except KeyboardInterrupt:
+            console.print("\n[yellow]Cleaning cancelled.[/yellow]")
             return False
-    except KeyboardInterrupt:
-        console.print("\n[yellow]Cleaning cancelled.[/yellow]")
-        return False
     
     # Clean each run
     total_freed = 0

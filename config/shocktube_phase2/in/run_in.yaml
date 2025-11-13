@@ -28,7 +28,7 @@ data:
     iheatcond: ['shock', 'hyper3']
 
   viscosity_run_pars:
-    ivisc: ['nu-shock', 'hyper3-nu-const']
+    ivisc: ['nu-shock', 'hyper3']
     nu_shock: 1.0
   
   eos_run_pars: {}

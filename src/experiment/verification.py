@@ -93,6 +93,15 @@ class SimulationIntegrityChecker:
         table.add_column("Status", justify="center", width=10)
         table.add_column("Details", style="white", width=50)
         
+        # Module compatibility check
+        compat_status = self.experiment_checks.get('module_compat', 'pending')
+        compat_details = self.experiment_details.get('module_compat', 'Checking...')
+        table.add_row(
+            "Module/Method Compatibility",
+            self._format_status(compat_status),
+            compat_details
+        )
+        
         # Build check
         build_status = self.experiment_checks.get('build', 'pending')
         build_details = self.experiment_details.get('build', 'Checking...')
@@ -232,8 +241,20 @@ class SimulationIntegrityChecker:
         # Create live display with combined view
         with Live(self._create_combined_view(), console=self.console, refresh_per_second=4) as live:
             
-            # Check 0: Verify code was built (EXPERIMENT-LEVEL)
-            logger.info("Running Check 0: Build verification...")
+            # Check 0: Verify module/method compatibility (EXPERIMENT-LEVEL)
+            logger.info("Running Check 0: Module/method compatibility...")
+            compat_check = self.check_module_method_compatibility()
+            results['checks']['module_method_compatibility'] = compat_check
+            if not compat_check['passed']:
+                results['passed'] = False
+                results['issues'].extend(compat_check['issues'])
+                if compat_check.get('critical'):
+                    results['critical_issues'].extend(compat_check['issues'])
+            live.update(self._create_combined_view())
+            time.sleep(0.5)
+            
+            # Check 1: Verify code was built (EXPERIMENT-LEVEL)
+            logger.info("Running Check 1: Build verification...")
             build_check = self.check_build_status()
             results['checks']['build'] = build_check
             if not build_check['passed']:
@@ -244,8 +265,8 @@ class SimulationIntegrityChecker:
             live.update(self._create_combined_view())
             time.sleep(0.5)
             
-            # Check 1: Verify sweep parameters are different (EXPERIMENT-LEVEL)
-            logger.info("Running Check 1: Sweep parameter variation...")
+            # Check 2: Verify sweep parameters are different (EXPERIMENT-LEVEL)
+            logger.info("Running Check 2: Sweep parameter variation...")
             sweep_check = self.check_sweep_parameters()
             results['checks']['sweep_parameters'] = sweep_check
             if not sweep_check['passed']:
@@ -256,8 +277,8 @@ class SimulationIntegrityChecker:
             live.update(self._create_combined_view())
             time.sleep(0.5)
             
-            # Check 2: Verify VAR file diversity (RUN-LEVEL)
-            logger.info("Running Check 2: VAR file diversity...")
+            # Check 3: Verify VAR file diversity (RUN-LEVEL)
+            logger.info("Running Check 3: VAR file diversity...")
             var_check = self.check_var_file_diversity(sample_size=sample_size)
             results['checks']['var_diversity'] = var_check
             if not var_check['passed']:
@@ -268,8 +289,8 @@ class SimulationIntegrityChecker:
             live.update(self._create_combined_view())
             time.sleep(0.5)
             
-            # Check 3: Verify parameter files exist and are unique (RUN-LEVEL)
-            logger.info("Running Check 3: Parameter file uniqueness...")
+            # Check 4: Verify parameter files exist and are unique (RUN-LEVEL)
+            logger.info("Running Check 4: Parameter file uniqueness...")
             param_check = self.check_parameter_files(sample_size=sample_size)
             results['checks']['parameter_files'] = param_check
             if not param_check['passed']:
@@ -280,8 +301,8 @@ class SimulationIntegrityChecker:
             live.update(self._create_combined_view())
             time.sleep(0.5)
             
-            # Check 4: Verify simulations actually ran (RUN-LEVEL)
-            logger.info("Running Check 4: Simulation execution verification...")
+            # Check 5: Verify simulations actually ran (RUN-LEVEL)
+            logger.info("Running Check 5: Simulation execution verification...")
             exec_check = self.check_simulation_execution(sample_size=sample_size)
             results['checks']['simulation_execution'] = exec_check
             if not exec_check['passed']:
@@ -292,6 +313,151 @@ class SimulationIntegrityChecker:
             live.update(self._create_combined_view())
         
         return results
+    
+    def check_module_method_compatibility(self) -> Dict:
+        """
+        Check if Makefile modules match the methods specified in run_in.yaml.
+        This is EXPERIMENT-AGNOSTIC - it derives requirements from config files.
+        
+        Maps common Pencil Code methods to required modules:
+        - 'hyper3' in iheatcond/ivisc -> requires VISCOSITY module
+        - 'hyper3-nu-const' in ivisc -> requires VISCOSITY module  
+        - 'shock' methods -> requires SHOCK module
+        - etc.
+        
+        This is an EXPERIMENT-LEVEL check - configuration consistency.
+        """
+        from src.core.constants import DIRS
+        
+        # Method-to-module mapping (experiment-agnostic)
+        METHOD_MODULE_MAP = {
+            'hyper3': 'VISCOSITY',
+            'hyper3-nu-const': 'VISCOSITY',
+            'hyper3-csmesh': 'VISCOSITY',
+            'shock': 'SHOCK',
+            'shock_highorder': 'SHOCK',
+        }
+        
+        issues = []
+        required_modules = set()
+        configured_modules = set()
+        methods_found = {}
+        
+        # Load run_in.yaml to extract methods
+        run_in_file = DIRS.config / self.experiment_name / DIRS.in_subdir / "run_in.yaml"
+        try:
+            with open(run_in_file, 'r') as f:
+                run_in_config = yaml.safe_load(f)
+        except Exception as e:
+            self.experiment_checks['module_compat'] = 'fail'
+            self.experiment_details['module_compat'] = 'Failed to load run_in.yaml'
+            return {
+                'passed': False,
+                'issues': [f"CRITICAL: Could not load run_in.yaml: {e}"],
+                'critical': True,
+                'message': 'Failed to load configuration'
+            }
+        
+        # Load Makefile_local.yaml to extract configured modules
+        makefile_file = DIRS.config / self.experiment_name / DIRS.in_subdir / "Makefile_local.yaml"
+        try:
+            with open(makefile_file, 'r') as f:
+                makefile_config = yaml.safe_load(f)
+        except Exception as e:
+            self.experiment_checks['module_compat'] = 'fail'
+            self.experiment_details['module_compat'] = 'Failed to load Makefile_local.yaml'
+            return {
+                'passed': False,
+                'issues': [f"CRITICAL: Could not load Makefile_local.yaml: {e}"],
+                'critical': True,
+                'message': 'Failed to load Makefile'
+            }
+        
+        # Extract methods from run_in.yaml (agnostic approach)
+        data = run_in_config.get('data', {})
+        
+        # Check all *_run_pars sections for method specifications
+        for section_name, section_data in data.items():
+            if not isinstance(section_data, dict):
+                continue
+                
+            # Look for common method specification keys
+            method_keys = ['ivisc', 'iheatcond', 'idiff', 'iforcing']
+            
+            for method_key in method_keys:
+                if method_key in section_data:
+                    method_value = section_data[method_key]
+                    
+                    # Handle both single strings and lists
+                    if isinstance(method_value, str):
+                        methods = [method_value]
+                    elif isinstance(method_value, list):
+                        methods = method_value
+                    else:
+                        continue
+                    
+                    # Track methods found
+                    if section_name not in methods_found:
+                        methods_found[section_name] = {}
+                    methods_found[section_name][method_key] = methods
+                    
+                    # Map methods to required modules
+                    for method in methods:
+                        if method in METHOD_MODULE_MAP:
+                            required_modules.add(METHOD_MODULE_MAP[method])
+        
+        # Extract configured modules from Makefile
+        makefile_data = makefile_config.get('data', {})
+        for module_key, module_value in makefile_data.items():
+            # Skip if module is explicitly disabled (e.g., 'noviscosity')
+            if not module_value.startswith('no'):
+                configured_modules.add(module_key)
+        
+        # Check for mismatches
+        missing_modules = required_modules - configured_modules
+        
+        if missing_modules:
+            for module in missing_modules:
+                # Find which methods require this module
+                requiring_methods = [
+                    method for method, req_mod in METHOD_MODULE_MAP.items()
+                    if req_mod == module
+                ]
+                
+                # Find where these methods are used
+                locations = []
+                for section, method_dict in methods_found.items():
+                    for key, methods in method_dict.items():
+                        for method in methods:
+                            if method in requiring_methods:
+                                locations.append(f"{section}.{key}={methods}")
+                
+                issues.append(
+                    f"CRITICAL: Module '{module}' required but not in Makefile! "
+                    f"Needed for methods: {requiring_methods}. "
+                    f"Used in: {', '.join(locations)}"
+                )
+        
+        # Update experiment-level status
+        if len(issues) == 0:
+            self.experiment_checks['module_compat'] = 'pass'
+            self.experiment_details['module_compat'] = 'All required modules present'
+        else:
+            self.experiment_checks['module_compat'] = 'fail'
+            self.experiment_details['module_compat'] = f'{len(missing_modules)} missing module(s)'
+        
+        result = {
+            'passed': len(issues) == 0,
+            'issues': issues,
+            'required_modules': list(required_modules),
+            'configured_modules': list(configured_modules),
+            'missing_modules': list(missing_modules),
+            'methods_found': methods_found,
+            'critical': len(missing_modules) > 0,
+            'message': f'Modules: {len(configured_modules)} configured, {len(required_modules)} required, {len(missing_modules)} missing'
+        }
+        
+        return result
     
     def check_build_status(self) -> Dict:
         """

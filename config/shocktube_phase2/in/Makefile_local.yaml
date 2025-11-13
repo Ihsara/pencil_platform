@@ -7,5 +7,6 @@ data:
   MAGNETIC: nomagnetic
   HYDRO: hydro
   DENSITY: density
+  VISCOSITY: viscosity
   SHOCK: shock_highorder
   POWER: nopower_spectrum
