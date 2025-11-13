@@ -780,30 +780,6 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
         logger.info(f"     └─ ✓ Saved combined graph: {output_file.name}")
     
     # ============================================================
-    # PHASE 2.6: Create 3D error map with 3-tier dropdowns
-    # ============================================================
-    logger.info("\n" + "=" * 80)
-    logger.info("PHASE 2.6: Creating 3D error map with 3-tier dropdowns")
-    logger.info("=" * 80)
-    
-    from src.visualization.plots_plotly import show_3d_error_map
-    
-    # Create output directory for 3D maps
-    map_3d_dir = analysis_dir / "error" / "3d_maps"
-    
-    try:
-        show_3d_error_map(
-            experiment_name=experiment_name,
-            analysis_dir=analysis_dir,
-            output_dir=map_3d_dir,
-            analyze_variables=analyze_variables
-        )
-    except Exception as e:
-        logger.error(f"Failed to create 3D error map: {e}")
-        import traceback
-        traceback.print_exc()
-    
-    # ============================================================
     # PHASE 3: Calculate L1/L2 error norms (reusing loaded data)
     # ============================================================
     logger.info("\n" + "=" * 80)
