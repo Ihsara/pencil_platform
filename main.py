@@ -108,23 +108,73 @@ def main():
         elif args.wait and not any([args.monitor, args.analyze, args.viz, args.error_norms]):
             # Wait only (for already-submitted job, standalone)
             if wait_for_completion(experiment_name):
-                logger.success("Job completed! You can now run analysis or visualization.")
-                logger.info(f"Analysis: python main.py {experiment_name} --analyze")
-                logger.info(f"Visualization: python main.py {experiment_name} --viz")
-                # Cleanall is automatically included with -w
+                # Step 1: Cleanup first
                 logger.info("Starting automatic cleanup...")
                 clean_all_simulation_data(experiment_name)
+                
+                # Step 2: Run verification checks
+                from rich.console import Console
+                console = Console()
+                console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
+                console.print("[dim]This check is required to ensure simulation validity[/dim]\n")
+                
+                from src.experiment.verification import verify_simulation_integrity
+                try:
+                    integrity_passed = verify_simulation_integrity(
+                        experiment_name, 
+                        sample_size=3, 
+                        fail_on_critical=False
+                    )
+                    if not integrity_passed:
+                        console.print("\n[bold red]⚠ CRITICAL: Integrity checks FAILED![/bold red]")
+                        console.print("[yellow]Please fix simulation issues before proceeding to analysis![/yellow]\n")
+                        sys.exit(1)
+                    else:
+                        console.print("\n[bold green]✓ All integrity checks PASSED![/bold green]\n")
+                        logger.success("Job completed! You can now run analysis or visualization.")
+                        logger.info(f"Analysis: python main.py {experiment_name} --analyze")
+                        logger.info(f"Visualization: python main.py {experiment_name} --viz")
+                except Exception as e:
+                    logger.error(f"Integrity verification encountered an error: {e}")
+                    console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
+                    sys.exit(1)
             else:
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
         elif args.wait and args.analyze and not any([args.viz, args.error_norms]):
             # Wait + Analyze (for already-submitted job)
             if wait_for_completion(experiment_name):
-                logger.info("Job completed! Starting video-only analysis...")
-                analyze_suite_videos_only(experiment_name)
-                # Cleanall is automatically included with -w
-                logger.info("Analysis complete! Starting automatic cleanup...")
+                # Step 1: Cleanup first
+                logger.info("Starting automatic cleanup...")
                 clean_all_simulation_data(experiment_name)
+                
+                # Step 2: Run verification checks
+                from rich.console import Console
+                console = Console()
+                console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
+                console.print("[dim]This check is required to ensure simulation validity[/dim]\n")
+                
+                from src.experiment.verification import verify_simulation_integrity
+                try:
+                    integrity_passed = verify_simulation_integrity(
+                        experiment_name, 
+                        sample_size=3, 
+                        fail_on_critical=False
+                    )
+                    if not integrity_passed:
+                        console.print("\n[bold red]⚠ CRITICAL: Integrity checks FAILED![/bold red]")
+                        console.print("[yellow]Please fix simulation issues before proceeding to analysis![/yellow]\n")
+                        sys.exit(1)
+                    else:
+                        console.print("\n[bold green]✓ All integrity checks PASSED![/bold green]\n")
+                except Exception as e:
+                    logger.error(f"Integrity verification encountered an error: {e}")
+                    console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
+                    sys.exit(1)
+                
+                # Step 3: Analysis
+                logger.info("Starting video-only analysis...")
+                analyze_suite_videos_only(experiment_name)
             else:
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
@@ -217,17 +267,38 @@ def main():
                         logger.info("(Monitoring enabled - detailed progress will be shown)")
                     
                     if wait_for_completion(experiment_name):
+                        # Step 1: Cleanup first (before verification)
+                        logger.info("Job completed! Starting automatic cleanup...")
+                        clean_all_simulation_data(experiment_name)
+                        
+                        # Step 2: Run verification checks
+                        from rich.console import Console
+                        console = Console()
+                        console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
+                        console.print("[dim]This check is required to ensure simulation validity[/dim]\n")
+                        
+                        from src.experiment.verification import verify_simulation_integrity
+                        try:
+                            integrity_passed = verify_simulation_integrity(
+                                experiment_name, 
+                                sample_size=3, 
+                                fail_on_critical=False
+                            )
+                            if not integrity_passed:
+                                console.print("\n[bold red]⚠ CRITICAL: Integrity checks FAILED![/bold red]")
+                                console.print("[yellow]Please fix simulation issues before proceeding to analysis![/yellow]\n")
+                                sys.exit(1)
+                            else:
+                                console.print("\n[bold green]✓ All integrity checks PASSED![/bold green]\n")
+                        except Exception as e:
+                            logger.error(f"Integrity verification encountered an error: {e}")
+                            console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
+                            sys.exit(1)
+                        
+                        # Step 3: Analysis (if requested)
                         if args.analyze:
-                            logger.info("Job completed! Starting video-only analysis...")
+                            logger.info("Starting video-only analysis...")
                             analyze_suite_videos_only(experiment_name)
-                            # Cleanall is automatically included with -w
-                            logger.info("Analysis complete! Starting automatic cleanup...")
-                            clean_all_simulation_data(experiment_name)
-                        else:
-                            logger.success("Job completed!")
-                            # Cleanall is automatically included with -w
-                            logger.info("Starting automatic cleanup...")
-                            clean_all_simulation_data(experiment_name)
                     else:
                         logger.error("Job did not complete successfully")
                         sys.exit(1)

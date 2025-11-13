@@ -779,29 +779,7 @@ def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait:
                     return False
                 else:
                     logger.success(f"Job array completed successfully!")
-                    
-                    # MANDATORY: Always run integrity verification after successful completion
-                    console.print("\n[cyan]═══ MANDATORY INTEGRITY VERIFICATION ═══[/cyan]")
-                    console.print("[dim]This check is required to ensure simulation validity[/dim]\n")
-                    
-                    from src.experiment.verification import verify_simulation_integrity
-                    try:
-                        integrity_passed = verify_simulation_integrity(
-                            experiment_name, 
-                            sample_size=3, 
-                            fail_on_critical=False  # Don't exit, but return False
-                        )
-                        if not integrity_passed:
-                            console.print("\n[bold red]⚠ CRITICAL: Integrity checks FAILED![/bold red]")
-                            console.print("[yellow]Please fix simulation issues before proceeding to analysis![/yellow]\n")
-                            return False
-                        else:
-                            console.print("\n[bold green]✓ All integrity checks PASSED![/bold green]\n")
-                            return True
-                    except Exception as e:
-                        logger.error(f"Integrity verification encountered an error: {e}")
-                        console.print("\n[bold red]⚠ Integrity verification failed with error[/bold red]")
-                        return False
+                    return True
             
             # Update progress description
             progress.update(task, description=f"[cyan]Running: {status['RUNNING']}, Pending: {status['PENDING']}, Completed: {status['COMPLETED']}, Failed: {status['FAILED']}")

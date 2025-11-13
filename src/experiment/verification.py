@@ -23,6 +23,13 @@ from typing import Dict, List, Tuple, Optional
 from loguru import logger
 import yaml
 import sys
+from rich.console import Console, Group
+from rich.table import Table
+from rich.live import Live
+from rich.panel import Panel
+from rich.text import Text
+from rich import box
+import time
 
 # Import Pencil Code reader if available
 try:
@@ -54,10 +61,160 @@ class SimulationIntegrityChecker:
         self.hpc_run_base_dir = Path(hpc_run_base_dir)
         self.run_names = run_names
         self.issues = []
+        self.console = Console()
         
+        # Experiment-level check status
+        self.experiment_checks = {
+            'build': 'pending',
+            'sweep_params': 'pending'
+        }
+        self.experiment_details = {
+            'build': 'Checking...',
+            'sweep_params': 'Checking...'
+        }
+        
+        # Run-level check status
+        self.run_status = {run: {
+            'var_diversity': 'pending',
+            'param_files': 'pending',
+            'execution': 'pending'
+        } for run in run_names}
+        
+    def _create_experiment_table(self) -> Table:
+        """Create experiment-level status table"""
+        table = Table(
+            title=f"[bold cyan]Experiment Status[/bold cyan] - {self.experiment_name}",
+            box=box.ROUNDED,
+            show_header=True,
+            header_style="bold magenta"
+        )
+        
+        table.add_column("Check", style="yellow", width=30)
+        table.add_column("Status", justify="center", width=10)
+        table.add_column("Details", style="white", width=50)
+        
+        # Build check
+        build_status = self.experiment_checks.get('build', 'pending')
+        build_details = self.experiment_details.get('build', 'Checking...')
+        table.add_row(
+            "Code Build (pc_build)",
+            self._format_status(build_status),
+            build_details
+        )
+        
+        # Sweep parameters check
+        sweep_status = self.experiment_checks.get('sweep_params', 'pending')
+        sweep_details = self.experiment_details.get('sweep_params', 'Checking...')
+        table.add_row(
+            "Parameter Sweep Config",
+            self._format_status(sweep_status),
+            sweep_details
+        )
+        
+        return table
+    
+    def _create_run_status_table(self) -> Table:
+        """Create run-level status table"""
+        table = Table(
+            title=f"[bold cyan]Per-Run Verification[/bold cyan]",
+            box=box.ROUNDED,
+            show_header=True,
+            header_style="bold magenta"
+        )
+        
+        table.add_column("Run Name", style="cyan", no_wrap=False, width=40)
+        table.add_column("VAR Diversity", justify="center", width=14)
+        table.add_column("Param Files", justify="center", width=12)
+        table.add_column("Execution", justify="center", width=10)
+        
+        for run_name in self.run_names:
+            # Truncate long run names intelligently
+            display_name = self._truncate_run_name(run_name)
+            status = self.run_status[run_name]
+            
+            table.add_row(
+                display_name,
+                self._format_status(status['var_diversity']),
+                self._format_status(status['param_files']),
+                self._format_status(status['execution'])
+            )
+        
+        return table
+    
+    def _create_combined_view(self) -> Group:
+        """Create combined view with both tables"""
+        return Group(
+            self._create_experiment_table(),
+            Text(""),  # Spacer
+            self._create_run_status_table()
+        )
+    
+    def _truncate_run_name(self, name: str, max_len: int = 38) -> str:
+        """Intelligently extract distinguishing parts of run names"""
+        if len(name) <= max_len:
+            return name
+        
+        # Extract the SWEPT PARAMETERS which distinguish runs
+        import re
+        
+        # Extract key swept parameters
+        extracted_parts = []
+        
+        # Extract nu values (e.g., nu9e-15)
+        nu_match = re.search(r'nu(\d+e-\d+)', name)
+        if nu_match:
+            extracted_parts.append(f"nu{nu_match.group(1)}")
+        
+        # Extract chi values (e.g., chi9e-15)
+        chi_match = re.search(r'chi(\d+e-\d+)', name)
+        if chi_match:
+            extracted_parts.append(f"chi{chi_match.group(1)}")
+        
+        # Extract rank if present
+        rank_match = re.search(r'rank(\d+)', name)
+        if rank_match:
+            extracted_parts.append(f"r{rank_match.group(1)}")
+        
+        # Extract gamma variant
+        if 'gamma_is_1' in name:
+            extracted_parts.append('γ=1')
+        elif 'default_gamma' in name:
+            extracted_parts.append('γ≈1.67')
+        
+        # Build display name
+        if extracted_parts:
+            display_name = '_'.join(extracted_parts)
+            if len(display_name) <= max_len:
+                return display_name
+        
+        # Fallback: show first part and swept params
+        parts = name.split('_')
+        if len(parts) > 3:
+            # Get resolution/setup + swept params
+            swept = [p for p in parts if any(x in p for x in ['nu', 'chi', 'rank', 'gamma'])]
+            if swept:
+                display_name = '_'.join(swept[:4])
+                if len(display_name) <= max_len:
+                    return display_name
+        
+        # Last resort: default truncation
+        return name[:max_len-3] + "..."
+    
+    def _format_status(self, status: str) -> str:
+        """Format status with colors and symbols"""
+        if status == 'pending':
+            return "[dim white]○[/dim white]"
+        elif status == 'pass':
+            return "[bold green]✓[/bold green]"
+        elif status == 'fail':
+            return "[bold red]✗[/bold red]"
+        elif status == 'skip':
+            return "[dim yellow]-[/dim yellow]"
+        return status
+    
     def check_all(self, sample_size: int = 3) -> Dict:
         """
-        Run all integrity checks.
+        Run all integrity checks with live table updates.
         
         Args:
             sample_size: Number of runs to sample for expensive checks
@@ -72,47 +229,214 @@ class SimulationIntegrityChecker:
             'critical_issues': []
         }
         
-        # Check 1: Verify VAR file diversity
-        logger.info("Running Check 1: VAR file diversity...")
-        var_check = self.check_var_file_diversity(sample_size=sample_size)
-        results['checks']['var_diversity'] = var_check
-        if not var_check['passed']:
-            results['passed'] = False
-            results['issues'].extend(var_check['issues'])
-            if var_check.get('critical'):
-                results['critical_issues'].extend(var_check['issues'])
-        
-        # Check 2: Verify parameter files exist and are unique
-        logger.info("Running Check 2: Parameter file uniqueness...")
-        param_check = self.check_parameter_files(sample_size=sample_size)
-        results['checks']['parameter_files'] = param_check
-        if not param_check['passed']:
-            results['passed'] = False
-            results['issues'].extend(param_check['issues'])
-            if param_check.get('critical'):
-                results['critical_issues'].extend(param_check['issues'])
-        
-        # Check 3: Verify simulations actually ran (not just templates)
-        logger.info("Running Check 3: Simulation execution verification...")
-        exec_check = self.check_simulation_execution(sample_size=sample_size)
-        results['checks']['simulation_execution'] = exec_check
-        if not exec_check['passed']:
-            results['passed'] = False
-            results['issues'].extend(exec_check['issues'])
-            if exec_check.get('critical'):
-                results['critical_issues'].extend(exec_check['issues'])
-        
-        # Check 4: Verify sweep parameters are actually different
-        logger.info("Running Check 4: Sweep parameter variation...")
-        sweep_check = self.check_sweep_parameters()
-        results['checks']['sweep_parameters'] = sweep_check
-        if not sweep_check['passed']:
-            results['passed'] = False
-            results['issues'].extend(sweep_check['issues'])
-            if sweep_check.get('critical'):
-                results['critical_issues'].extend(sweep_check['issues'])
+        # Create live display with combined view
+        with Live(self._create_combined_view(), console=self.console, refresh_per_second=4) as live:
+            
+            # Check 0: Verify code was built (EXPERIMENT-LEVEL)
+            logger.info("Running Check 0: Build verification...")
+            build_check = self.check_build_status()
+            results['checks']['build'] = build_check
+            if not build_check['passed']:
+                results['passed'] = False
+                results['issues'].extend(build_check['issues'])
+                if build_check.get('critical'):
+                    results['critical_issues'].extend(build_check['issues'])
+            live.update(self._create_combined_view())
+            time.sleep(0.5)
+            
+            # Check 1: Verify sweep parameters are different (EXPERIMENT-LEVEL)
+            logger.info("Running Check 1: Sweep parameter variation...")
+            sweep_check = self.check_sweep_parameters()
+            results['checks']['sweep_parameters'] = sweep_check
+            if not sweep_check['passed']:
+                results['passed'] = False
+                results['issues'].extend(sweep_check['issues'])
+                if sweep_check.get('critical'):
+                    results['critical_issues'].extend(sweep_check['issues'])
+            live.update(self._create_combined_view())
+            time.sleep(0.5)
+            
+            # Check 2: Verify VAR file diversity (RUN-LEVEL)
+            logger.info("Running Check 2: VAR file diversity...")
+            var_check = self.check_var_file_diversity(sample_size=sample_size)
+            results['checks']['var_diversity'] = var_check
+            if not var_check['passed']:
+                results['passed'] = False
+                results['issues'].extend(var_check['issues'])
+                if var_check.get('critical'):
+                    results['critical_issues'].extend(var_check['issues'])
+            live.update(self._create_combined_view())
+            time.sleep(0.5)
+            
+            # Check 3: Verify parameter files exist and are unique (RUN-LEVEL)
+            logger.info("Running Check 3: Parameter file uniqueness...")
+            param_check = self.check_parameter_files(sample_size=sample_size)
+            results['checks']['parameter_files'] = param_check
+            if not param_check['passed']:
+                results['passed'] = False
+                results['issues'].extend(param_check['issues'])
+                if param_check.get('critical'):
+                    results['critical_issues'].extend(param_check['issues'])
+            live.update(self._create_combined_view())
+            time.sleep(0.5)
+            
+            # Check 4: Verify simulations actually ran (RUN-LEVEL)
+            logger.info("Running Check 4: Simulation execution verification...")
+            exec_check = self.check_simulation_execution(sample_size=sample_size)
+            results['checks']['simulation_execution'] = exec_check
+            if not exec_check['passed']:
+                results['passed'] = False
+                results['issues'].extend(exec_check['issues'])
+                if exec_check.get('critical'):
+                    results['critical_issues'].extend(exec_check['issues'])
+            live.update(self._create_combined_view())
         
         return results
+    
+    def check_build_status(self) -> Dict:
+        """
+        Check if pc_build was executed and completed successfully for the experiment.
+        This is an EXPERIMENT-LEVEL check - build happens once for all runs.
+        """
+        issues = []
+        build_info = {}
+        
+        for run_name in self.run_names:
+            run_path = self.hpc_run_base_dir / run_name
+            src_dir = run_path / "src"
+            
+            info = {
+                'has_src': src_dir.exists(),
+                'has_executable': False,
+                'has_makefile': False,
+                'build_success': False
+            }
+            
+            if src_dir.exists():
+                # Check for compiled executable
+                start_exe = src_dir / "start.x"
+                run_exe = src_dir / "run.x"
+                info['has_executable'] = start_exe.exists() or run_exe.exists()
+                
+                # Check for Makefile (indicates build was attempted)
+                makefile = src_dir / "Makefile"
+                info['has_makefile'] = makefile.exists()
+                
+                # Check for .build-history or .build-config (Pencil Code build artifacts)
+                build_history = src_dir / ".build-history"
+                build_config = src_dir / ".buildinfo"
+                info['build_success'] = info['has_executable'] and (build_history.exists() or build_config.exists())
+            
+            build_info[run_name] = info
+        
+        # Check if any runs were built
+        built_runs = sum(1 for info in build_info.values() if info['build_success'])
+        
+        if built_runs == 0:
+            self.experiment_checks['build'] = 'fail'
+            self.experiment_details['build'] = '0 runs built - pc_build may not have run'
+            issues.append("CRITICAL: No runs appear to have been built successfully!")
+        elif built_runs < len(self.run_names):
+            self.experiment_checks['build'] = 'fail'
+            self.experiment_details['build'] = f'Only {built_runs}/{len(self.run_names)} runs built'
+            issues.append(f"Partial build failure: {built_runs}/{len(self.run_names)} runs built")
+        else:
+            self.experiment_checks['build'] = 'pass'
+            self.experiment_details['build'] = f'All {built_runs} runs built successfully'
+        
+        result = {
+            'passed': len(issues) == 0,
+            'issues': issues,
+            'build_info': build_info,
+            'built_runs': built_runs,
+            'total_runs': len(self.run_names),
+            'critical': built_runs == 0,
+            'message': f'{built_runs}/{len(self.run_names)} runs built successfully'
+        }
+        
+        return result
+    
+    def check_sweep_parameters(self) -> Dict:
+        """
+        Verify that the sweep parameters in run names match expected patterns.
+        This is an EXPERIMENT-LEVEL check - validates sweep configuration.
+        """
+        from src.core.constants import DIRS
+        
+        # Load plan
+        plan_file = DIRS.config / self.experiment_name / DIRS.plan_subdir / "sweep.yaml"
+        try:
+            with open(plan_file, 'r') as f:
+                plan = yaml.safe_load(f)
+        except Exception as e:
+            self.experiment_checks['sweep_params'] = 'fail'
+            self.experiment_details['sweep_params'] = 'Failed to load plan file'
+            return {
+                'passed': False,
+                'issues': [f"Could not load plan file: {e}"],
+                'critical': True,
+                'message': 'Failed to load plan'
+            }
+        
+        branches = plan.get('branches', [])
+        if not branches:
+            self.experiment_checks['sweep_params'] = 'pass'
+            self.experiment_details['sweep_params'] = 'No parameter sweep defined'
+            return {
+                'passed': True,
+                'issues': [],
+                'message': 'No branches defined',
+                'critical': False
+            }
+        
+        issues = []
+        param_patterns = {}
+        
+        # Extract parameter patterns from run names
+        for run_name in self.run_names:
+            # Look for common parameter patterns in names
+            import re
+            
+            nu_match = re.search(r'nu([\d.e\-+]+)', run_name)
+            chi_match = re.search(r'chi([\d.e\-+]+)', run_name)
+            
+            if nu_match:
+                nu_val = nu_match.group(1)
+                if nu_val not in param_patterns.get('nu', set()):
+                    param_patterns.setdefault('nu', set()).add(nu_val)
+            
+            if chi_match:
+                chi_val = chi_match.group(1)
+                if chi_val not in param_patterns.get('chi', set()):
+                    param_patterns.setdefault('chi', set()).add(chi_val)
+        
+        # Check if we have variation in parameters
+        total_unique = sum(len(v) for v in param_patterns.values())
+        
+        for param_name, values in param_patterns.items():
+            if len(values) == 1:
+                issues.append(
+                    f"WARNING: All run names contain the same {param_name} value ({list(values)[0]}). "
+                    f"Expected variation in parameter sweep."
+                )
+        
+        # Update experiment-level status
+        if len(issues) == 0:
+            self.experiment_checks['sweep_params'] = 'pass'
+            self.experiment_details['sweep_params'] = f'{total_unique} unique parameter values found'
+        else:
+            self.experiment_checks['sweep_params'] = 'fail'
+            self.experiment_details['sweep_params'] = 'No parameter variation detected'
+        
+        result = {
+            'passed': len(issues) == 0,
+            'issues': issues,
+            'param_patterns': {k: list(v) for k, v in param_patterns.items()},
+            'critical': False,
+            'message': f'Found {total_unique} unique parameter values'
+        }
+        
+        return result
     
     def check_var_file_diversity(self, sample_size: int = 3) -> Dict:
         """
@@ -166,6 +490,9 @@ class SimulationIntegrityChecker:
                 continue
         
         if not var_signatures:
+            # Mark all sampled runs as failed
+            for run_name in sample_runs:
+                self.run_status[run_name]['var_diversity'] = 'fail'
             return {
                 'passed': False,
                 'issues': ["Could not read any VAR files for verification"],
@@ -194,6 +521,24 @@ class SimulationIntegrityChecker:
                 f"Expected variation based on parameter sweep."
             )
             critical = True
+        
+        # Update status for all runs
+        if len(unique_signatures) == 1:
+            # All sampled runs failed
+            for run_name in sample_runs:
+                self.run_status[run_name]['var_diversity'] = 'fail'
+            # Mark non-sampled as skipped
+            for run_name in self.run_names:
+                if run_name not in sample_runs:
+                    self.run_status[run_name]['var_diversity'] = 'skip'
+        else:
+            # Sampled runs passed
+            for run_name in sample_runs:
+                self.run_status[run_name]['var_diversity'] = 'pass'
+            # Mark non-sampled as skipped
+            for run_name in self.run_names:
+                if run_name not in sample_runs:
+                    self.run_status[run_name]['var_diversity'] = 'skip'
         
         result = {
             'passed': len(issues) == 0,
@@ -250,18 +595,9 @@ class SimulationIntegrityChecker:
             run_in = run_path / "run.in"
             start_in = run_path / "start.in"
             
-            logger.debug(f"Checking parameter files for {run_name}:")
-            logger.debug(f"  Looking for run.in at: {run_in}")
-            logger.debug(f"  run.in exists: {run_in.exists()}")
-            logger.debug(f"  Looking for start.in at: {start_in}")
-            logger.debug(f"  start.in exists: {start_in.exists()}")
-            
             if not run_in.exists() and not start_in.exists():
                 issues.append(f"Missing parameter files for run: {run_name}")
-                logger.warning(f"  ✗ No parameter files found at {run_path}")
                 continue
-            else:
-                logger.debug(f"  ✓ Parameter files found")
             
             # Try to read parameters using Pencil Code
             if PENCIL_AVAILABLE:
@@ -269,7 +605,7 @@ class SimulationIntegrityChecker:
                     data_dir = run_path / "data"
                     params = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
                     
-                    # Extract key swept parameters based on the experiment plan
+                    # Extract key swept parameters
                     param_values[run_name] = {
                         'nu_shock': getattr(params, 'nu_shock', None),
                         'chi_shock': getattr(params, 'chi_shock', None),
@@ -280,89 +616,20 @@ class SimulationIntegrityChecker:
                         'lgamma_is_1': getattr(params, 'lgamma_is_1', None)
                     }
                     
-                    logger.debug(f"  Read parameters: nu_shock={param_values[run_name]['nu_shock']}, "
-                               f"chi_shock={param_values[run_name]['chi_shock']}, "
-                               f"gamma={param_values[run_name]['gamma']}")
-                    
                 except Exception as e:
                     logger.warning(f"Could not read params for {run_name}: {e}")
         
-        # Display parameter values in a rich table
-        if param_values:
-            from rich.console import Console
-            from rich.table import Table
-            
-            console = Console()
-            
-            # Create detailed parameter table
-            param_table = Table(title="Parameter Values Across Sampled Runs", border_style="blue")
-            param_table.add_column("Run Name", style="cyan", no_wrap=False)
-            param_table.add_column("nu_shock", style="yellow")
-            param_table.add_column("chi_shock", style="yellow")
-            param_table.add_column("nu_hyper3", style="magenta")
-            param_table.add_column("chi_hyper3", style="magenta")
-            param_table.add_column("diffrho_shock", style="green")
-            param_table.add_column("gamma", style="white")
-            
-            for run_name, params in param_values.items():
-                # Truncate long run names
-                display_name = run_name if len(run_name) <= 40 else run_name[:37] + "..."
-                param_table.add_row(
-                    display_name,
-                    str(params['nu_shock']) if params['nu_shock'] is not None else "N/A",
-                    str(params['chi_shock']) if params['chi_shock'] is not None else "N/A",
-                    f"{params['nu_hyper3']:.2e}" if params['nu_hyper3'] is not None else "N/A",
-                    f"{params['chi_hyper3']:.2e}" if params['chi_hyper3'] is not None else "N/A",
-                    str(params['diffrho_shock']) if params['diffrho_shock'] is not None else "N/A",
-                    f"{params['gamma']:.3f}" if params['gamma'] is not None else "N/A"
-                )
-            
-            console.print("\n")
-            console.print(param_table)
-            console.print("\n")
-            
-            # Identify which parameters are being swept by checking for variation
-            params_to_check = []
-            
-            # Check nu_shock (commonly swept)
-            nu_vals = [v['nu_shock'] for v in param_values.values() if v['nu_shock'] is not None]
-            if len(set(nu_vals)) > 1:
-                params_to_check.append('nu_shock')
-            
-            # Check chi_shock (commonly swept)
-            chi_vals = [v['chi_shock'] for v in param_values.values() if v['chi_shock'] is not None]
-            if len(set(chi_vals)) > 1:
-                params_to_check.append('chi_shock')
-                
-            # Check hyperdiffusion parameters (phase2 sweep)
-            nu_hyper3_vals = [v['nu_hyper3'] for v in param_values.values() if v['nu_hyper3'] is not None]
-            if len(set(nu_hyper3_vals)) > 1:
-                params_to_check.append('nu_hyper3')
-                
-            chi_hyper3_vals = [v['chi_hyper3'] for v in param_values.values() if v['chi_hyper3'] is not None]
-            if len(set(chi_hyper3_vals)) > 1:
-                params_to_check.append('chi_hyper3')
-            
-            logger.info(f"Detected swept parameters: {params_to_check}")
-            
-            # Log all parameter values for debugging
-            logger.debug("All parameter values:")
-            for run_name, params in param_values.items():
-                logger.debug(f"  {run_name}:")
-                for key, val in params.items():
-                    if val is not None:
-                        logger.debug(f"    {key} = {val}")
-            
-            # Only report issues for parameters that show no variation but should
-            for param_name in params_to_check:
-                values = [v[param_name] for v in param_values.values() if v[param_name] is not None]
-                unique_values = set(values)
-                
-                if len(values) > 1 and len(unique_values) == 1:
-                    issues.append(
-                        f"WARNING: Parameter '{param_name}' has identical value ({values[0]}) "
-                        f"across all {len(values)} sampled runs despite being in sweep."
-                    )
+        # Update status
+        for run_name in sample_runs:
+            if run_name in param_values:
+                self.run_status[run_name]['param_files'] = 'pass'
+            else:
+                self.run_status[run_name]['param_files'] = 'fail'
+        
+        # Mark non-sampled as skipped
+        for run_name in self.run_names:
+            if run_name not in sample_runs:
+                self.run_status[run_name]['param_files'] = 'skip'
         
         result = {
             'passed': len(issues) == 0,
@@ -438,80 +705,28 @@ class SimulationIntegrityChecker:
             
             execution_info[run_name] = info
         
+        # Update status
+        for run_name in sample_runs:
+            if run_name in execution_info:
+                info = execution_info[run_name]
+                if info.get('time_evolved', False) or info.get('num_var_files', 0) > 1:
+                    self.run_status[run_name]['execution'] = 'pass'
+                else:
+                    self.run_status[run_name]['execution'] = 'fail'
+            else:
+                self.run_status[run_name]['execution'] = 'fail'
+        
+        # Mark non-sampled as skipped
+        for run_name in self.run_names:
+            if run_name not in sample_runs:
+                self.run_status[run_name]['execution'] = 'skip'
+        
         result = {
             'passed': len(issues) == 0,
             'issues': issues,
             'execution_info': execution_info,
             'critical': len(issues) > 0,
             'message': f'Checked execution for {len(sample_runs)} runs'
-        }
-        
-        return result
-    
-    def check_sweep_parameters(self) -> Dict:
-        """
-        Verify that the sweep parameters in run names match expected patterns.
-        This catches issues with parameter generation.
-        """
-        from src.core.constants import DIRS
-        
-        # Load plan
-        plan_file = DIRS.config / self.experiment_name / DIRS.plan_subdir / "sweep.yaml"
-        try:
-            with open(plan_file, 'r') as f:
-                plan = yaml.safe_load(f)
-        except Exception as e:
-            return {
-                'passed': False,
-                'issues': [f"Could not load plan file: {e}"],
-                'critical': True,
-                'message': 'Failed to load plan'
-            }
-        
-        branches = plan.get('branches', [])
-        if not branches:
-            return {
-                'passed': True,
-                'issues': [],
-                'message': 'No branches defined',
-                'critical': False
-            }
-        
-        issues = []
-        param_patterns = {}
-        
-        # Extract parameter patterns from run names
-        for run_name in self.run_names:
-            # Look for common parameter patterns in names
-            import re
-            
-            nu_match = re.search(r'nu([\d.e\-+]+)', run_name)
-            chi_match = re.search(r'chi([\d.e\-+]+)', run_name)
-            
-            if nu_match:
-                nu_val = nu_match.group(1)
-                if nu_val not in param_patterns.get('nu', set()):
-                    param_patterns.setdefault('nu', set()).add(nu_val)
-            
-            if chi_match:
-                chi_val = chi_match.group(1)
-                if chi_val not in param_patterns.get('chi', set()):
-                    param_patterns.setdefault('chi', set()).add(chi_val)
-        
-        # Check if we have variation in parameters
-        for param_name, values in param_patterns.items():
-            if len(values) == 1:
-                issues.append(
-                    f"WARNING: All run names contain the same {param_name} value ({list(values)[0]}). "
-                    f"Expected variation in parameter sweep."
-                )
-        
-        result = {
-            'passed': len(issues) == 0,
-            'issues': issues,
-            'param_patterns': {k: list(v) for k, v in param_patterns.items()},
-            'critical': False,
-            'message': f'Found {sum(len(v) for v in param_patterns.values())} unique parameter values'
         }
         
         return result
@@ -569,18 +784,14 @@ def verify_simulation_integrity(experiment_name: str, sample_size: int = 3,
     checker = SimulationIntegrityChecker(experiment_name, hpc_run_base_dir, run_names)
     results = checker.check_all(sample_size=sample_size)
     
-    # Display results
-    from rich.console import Console
-    from rich.panel import Panel
-    from rich.table import Table
-    
+    # Display results summary
     console = Console()
     
     # Create summary table
-    table = Table(title="Verification Results", border_style="cyan")
-    table.add_column("Check", style="yellow")
-    table.add_column("Status", style="green")
-    table.add_column("Details", style="white")
+    table = Table(title="Verification Summary", border_style="cyan", box=box.ROUNDED)
+    table.add_column("Check", style="yellow", width=30)
+    table.add_column("Status", style="green", justify="center", width=10)
+    table.add_column("Details", style="white", width=50)
     
     for check_name, check_result in results['checks'].items():
         status = "✓ PASS" if check_result['passed'] else "✗ FAIL"
@@ -593,6 +804,7 @@ def verify_simulation_integrity(experiment_name: str, sample_size: int = 3,
             message
         )
     
+    console.print("\n")
     console.print(table)
     
     # Show issues
