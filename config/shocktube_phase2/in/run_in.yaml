@@ -22,13 +22,13 @@ data:
     idiff: 'shock'
     lmassdiff_fix: true
 
-  # Include the hyper params in the base, as they exist in the working reference
+  # Include the hyperdiffusion methods for Phase 2 sweep
   entropy_run_pars:
     chi_shock: 1.0
-    iheatcond: ['shock']
+    iheatcond: ['shock', 'hyper3']
 
   viscosity_run_pars:
-    ivisc: ['nu-shock']
+    ivisc: ['nu-shock', 'hyper3-nu-const']
     nu_shock: 1.0
   
   eos_run_pars: {}

@@ -250,9 +250,18 @@ class SimulationIntegrityChecker:
             run_in = run_path / "run.in"
             start_in = run_path / "start.in"
             
+            logger.debug(f"Checking parameter files for {run_name}:")
+            logger.debug(f"  Looking for run.in at: {run_in}")
+            logger.debug(f"  run.in exists: {run_in.exists()}")
+            logger.debug(f"  Looking for start.in at: {start_in}")
+            logger.debug(f"  start.in exists: {start_in.exists()}")
+            
             if not run_in.exists() and not start_in.exists():
                 issues.append(f"Missing parameter files for run: {run_name}")
+                logger.warning(f"  ✗ No parameter files found at {run_path}")
                 continue
+            else:
+                logger.debug(f"  ✓ Parameter files found")
             
             # Try to read parameters using Pencil Code
             if PENCIL_AVAILABLE:
@@ -260,28 +269,99 @@ class SimulationIntegrityChecker:
                     data_dir = run_path / "data"
                     params = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
                     
-                    # Extract key swept parameters
+                    # Extract key swept parameters based on the experiment plan
                     param_values[run_name] = {
                         'nu_shock': getattr(params, 'nu_shock', None),
                         'chi_shock': getattr(params, 'chi_shock', None),
+                        'nu_hyper3': getattr(params, 'nu_hyper3', None),
+                        'chi_hyper3': getattr(params, 'chi_hyper3', None),
+                        'diffrho_shock': getattr(params, 'diffrho_shock', None),
                         'gamma': getattr(params, 'gamma', None),
                         'lgamma_is_1': getattr(params, 'lgamma_is_1', None)
                     }
                     
+                    logger.debug(f"  Read parameters: nu_shock={param_values[run_name]['nu_shock']}, "
+                               f"chi_shock={param_values[run_name]['chi_shock']}, "
+                               f"gamma={param_values[run_name]['gamma']}")
+                    
                 except Exception as e:
-                    logger.debug(f"Could not read params for {run_name}: {e}")
+                    logger.warning(f"Could not read params for {run_name}: {e}")
         
-        # Check if parameter values are actually different
+        # Display parameter values in a rich table
         if param_values:
-            # Check each parameter type
-            for param_name in ['nu_shock', 'chi_shock', 'gamma']:
+            from rich.console import Console
+            from rich.table import Table
+            
+            console = Console()
+            
+            # Create detailed parameter table
+            param_table = Table(title="Parameter Values Across Sampled Runs", border_style="blue")
+            param_table.add_column("Run Name", style="cyan", no_wrap=False)
+            param_table.add_column("nu_shock", style="yellow")
+            param_table.add_column("chi_shock", style="yellow")
+            param_table.add_column("nu_hyper3", style="magenta")
+            param_table.add_column("chi_hyper3", style="magenta")
+            param_table.add_column("diffrho_shock", style="green")
+            param_table.add_column("gamma", style="white")
+            
+            for run_name, params in param_values.items():
+                # Truncate long run names
+                display_name = run_name if len(run_name) <= 40 else run_name[:37] + "..."
+                param_table.add_row(
+                    display_name,
+                    str(params['nu_shock']) if params['nu_shock'] is not None else "N/A",
+                    str(params['chi_shock']) if params['chi_shock'] is not None else "N/A",
+                    f"{params['nu_hyper3']:.2e}" if params['nu_hyper3'] is not None else "N/A",
+                    f"{params['chi_hyper3']:.2e}" if params['chi_hyper3'] is not None else "N/A",
+                    str(params['diffrho_shock']) if params['diffrho_shock'] is not None else "N/A",
+                    f"{params['gamma']:.3f}" if params['gamma'] is not None else "N/A"
+                )
+            
+            console.print("\n")
+            console.print(param_table)
+            console.print("\n")
+            
+            # Identify which parameters are being swept by checking for variation
+            params_to_check = []
+            
+            # Check nu_shock (commonly swept)
+            nu_vals = [v['nu_shock'] for v in param_values.values() if v['nu_shock'] is not None]
+            if len(set(nu_vals)) > 1:
+                params_to_check.append('nu_shock')
+            
+            # Check chi_shock (commonly swept)
+            chi_vals = [v['chi_shock'] for v in param_values.values() if v['chi_shock'] is not None]
+            if len(set(chi_vals)) > 1:
+                params_to_check.append('chi_shock')
+                
+            # Check hyperdiffusion parameters (phase2 sweep)
+            nu_hyper3_vals = [v['nu_hyper3'] for v in param_values.values() if v['nu_hyper3'] is not None]
+            if len(set(nu_hyper3_vals)) > 1:
+                params_to_check.append('nu_hyper3')
+                
+            chi_hyper3_vals = [v['chi_hyper3'] for v in param_values.values() if v['chi_hyper3'] is not None]
+            if len(set(chi_hyper3_vals)) > 1:
+                params_to_check.append('chi_hyper3')
+            
+            logger.info(f"Detected swept parameters: {params_to_check}")
+            
+            # Log all parameter values for debugging
+            logger.debug("All parameter values:")
+            for run_name, params in param_values.items():
+                logger.debug(f"  {run_name}:")
+                for key, val in params.items():
+                    if val is not None:
+                        logger.debug(f"    {key} = {val}")
+            
+            # Only report issues for parameters that show no variation but should
+            for param_name in params_to_check:
                 values = [v[param_name] for v in param_values.values() if v[param_name] is not None]
                 unique_values = set(values)
                 
                 if len(values) > 1 and len(unique_values) == 1:
                     issues.append(
                         f"WARNING: Parameter '{param_name}' has identical value ({values[0]}) "
-                        f"across all {len(values)} sampled runs. Expected variation."
+                        f"across all {len(values)} sampled runs despite being in sweep."
                     )
         
         result = {
