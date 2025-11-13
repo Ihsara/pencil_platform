@@ -459,19 +459,104 @@ class SimulationIntegrityChecker:
         
         return result
     
+    def _display_build_logs(self, build_info: Dict, build_log_map: Dict):
+        """
+        Display build logs for all runs with Rich formatting.
+        
+        Args:
+            build_info: Dictionary with build information for each run
+            build_log_map: Mapping of task IDs to build log directories
+        """
+        from rich.panel import Panel
+        from rich.syntax import Syntax
+        
+        self.console.print("\n")
+        self.console.print(Panel(
+            "[bold yellow]BUILD LOG DETAILS[/bold yellow]\n"
+            "Showing last 15-20 lines of build logs for each run",
+            border_style="yellow",
+            title="🔍 Build Diagnostics"
+        ))
+        
+        for idx, (run_name, info) in enumerate(build_info.items(), start=1):
+            task_id = idx  # SLURM array tasks are 1-indexed
+            
+            # Create header showing run identification
+            header = f"Run {task_id} (array_{task_id}): {run_name}"
+            
+            if task_id in build_log_map:
+                build_log_file = build_log_map[task_id] / "pc_build.log"
+                
+                if build_log_file.exists():
+                    try:
+                        with open(build_log_file, 'r') as f:
+                            lines = f.readlines()
+                        
+                        # Get last 15-20 lines
+                        num_lines = min(20, len(lines))
+                        last_lines = lines[-num_lines:]
+                        log_content = ''.join(last_lines)
+                        
+                        # Determine status for coloring
+                        if info['build_success']:
+                            status_color = "green"
+                            status_icon = "✓"
+                            status_text = "Success"
+                        else:
+                            status_color = "red"
+                            status_icon = "✗"
+                            status_text = "Failed"
+                        
+                        # Display with syntax highlighting
+                        self.console.print(f"\n[bold {status_color}]{status_icon} {header}[/bold {status_color}]")
+                        self.console.print(f"[dim]Status: [{status_color}]{status_text}[/{status_color}][/dim]")
+                        self.console.print(f"[dim]Log: {build_log_file}[/dim]")
+                        self.console.print(f"[dim]Showing last {num_lines} lines:[/dim]\n")
+                        
+                        # Use Syntax for better formatting
+                        syntax = Syntax(log_content, "text", theme="monokai", line_numbers=False)
+                        self.console.print(Panel(syntax, border_style=status_color, expand=False))
+                        
+                    except Exception as e:
+                        self.console.print(f"\n[bold red]✗ {header}[/bold red]")
+                        self.console.print(f"[red]Error reading build log: {e}[/red]")
+                else:
+                    self.console.print(f"\n[bold yellow]⚠ {header}[/bold yellow]")
+                    self.console.print(f"[yellow]Build log not found at: {build_log_file}[/yellow]")
+            else:
+                self.console.print(f"\n[bold yellow]⚠ {header}[/bold yellow]")
+                self.console.print(f"[yellow]No build log directory found for task {task_id}[/yellow]")
+        
+        self.console.print("\n")
+    
     def check_build_status(self) -> Dict:
         """
         Check if pc_build was executed and completed successfully for the experiment.
         
-        CRITICAL: We cannot trust just finding .x files - they could be copied artifacts!
-        We must verify that pc_build ACTUALLY RAN by checking:
-        1. Build log exists and shows pc_build execution
-        2. Executables exist (start.x, run.x)
-        3. Build log shows successful completion (no errors)
+        There are two modes:
+        1. REBUILD MODE: pc_build runs for each task, creates pc_build.log
+        2. SYMLINK MODE: No build, uses existing executables via symlinks
         
-        This prevents false positives from copied executables.
+        For REBUILD mode:
+        - Check build logs exist and show successful compilation
+        For SYMLINK mode:
+        - Check that pc_start.log and pc_run.log exist (indicates job ran)
+        - No build verification needed since executables are pre-built
+        
         This is an EXPERIMENT-LEVEL check - tracks build success across all runs.
         """
+        from src.core.constants import DIRS
+        
+        # Check if rebuild was enabled for this experiment
+        plan_file = DIRS.config / self.experiment_name / DIRS.plan_subdir / "sweep.yaml"
+        try:
+            with open(plan_file, 'r') as f:
+                plan = yaml.safe_load(f)
+            rebuild_enabled = plan.get('rebuild', False)
+        except Exception as e:
+            logger.warning(f"Could not determine rebuild status from plan: {e}")
+            rebuild_enabled = None  # Unknown - will try to detect from logs
+        
         issues = []
         build_info = {}
         
@@ -522,17 +607,30 @@ class SimulationIntegrityChecker:
                 makefile = src_dir / "Makefile"
                 info['has_makefile'] = makefile.exists()
             
-            # CRITICAL CHECK: Verify pc_build actually ran by checking build log
+            # Check for build/run logs to verify job execution
             if task_id in build_log_map:
-                build_log_file = build_log_map[task_id] / "pc_build.log"
-                if build_log_file.exists():
+                log_dir = build_log_map[task_id]
+                build_log_file = log_dir / "pc_build.log"
+                start_log_file = log_dir / "pc_start.log"
+                run_log_file = log_dir / "pc_run.log"
+                
+                # Determine if this was a rebuild job by checking for pc_build.log
+                has_build_log = build_log_file.exists()
+                has_start_log = start_log_file.exists()
+                has_run_log = run_log_file.exists()
+                
+                # Auto-detect rebuild mode if not specified in plan
+                if rebuild_enabled is None:
+                    rebuild_enabled = has_build_log
+                
+                if rebuild_enabled and has_build_log:
+                    # REBUILD MODE: Verify build log
                     info['has_build_log'] = True
                     try:
                         with open(build_log_file, 'r') as f:
                             log_content = f.read()
                         
                         # Check if pc_build actually executed
-                        # Look for characteristic pc_build output
                         pc_build_indicators = [
                             'Compiling',
                             'Building',
@@ -545,85 +643,86 @@ class SimulationIntegrityChecker:
                         )
                         
                         # Check for successful completion (no fatal errors)
-                        # More comprehensive error detection
                         error_indicators = [
                             'ERROR:',
                             'FATAL',
-                            'make: ***',  # Make error (any make error, not just with bracket)
+                            'make: ***',
                             'compilation failed',
                             'build failed',
-                            'failed:',  # Generic failure messages
-                            'make cleanall\' failed',  # Specific cleanall failures
-                            'ln: target',  # Symlink errors
-                            'ln: failed',  # Symlink failures
-                            'Can\'t open',  # File open failures
-                            'No such file:',  # Missing files
-                            'getcwd: No such file or directory',  # CWD errors
+                            'failed:',
+                            'make cleanall\' failed',
+                            'ln: target',
+                            'ln: failed',
+                            'Can\'t open',
+                            'No such file:',
+                            'getcwd: No such file or directory',
                         ]
-                        has_errors = any(
-                            error in log_content  # Don't lowercase - preserve exact matches
-                            for error in error_indicators
-                        )
+                        has_errors = any(error in log_content for error in error_indicators)
                         info['build_log_shows_success'] = not has_errors
                         
                     except Exception as e:
                         logger.debug(f"Could not read build log for {run_name}: {e}")
+                
+                # For symlink mode, verify job ran by checking start/run logs exist
+                info['has_start_log'] = has_start_log
+                info['has_run_log'] = has_run_log
             
-            # Build is ONLY successful if ALL conditions are met:
-            # 1. Both executables exist
-            # 2. Build log exists and shows execution
-            # 3. Build log shows no errors
-            info['build_success'] = (
-                info['has_start_exe'] and 
-                info['has_run_exe'] and
-                info['has_build_log'] and
-                info['build_log_shows_execution'] and
-                info['build_log_shows_success']
-            )
-            
-            # Special case: if no build log available, fall back to executable check
-            # (for backwards compatibility or if logs haven't synced yet)
-            if not info['has_build_log']:
-                info['build_success'] = info['has_start_exe'] and info['has_run_exe']
+            # Determine success based on mode
+            if rebuild_enabled:
+                # REBUILD MODE: Build must have succeeded
+                info['build_success'] = (
+                    info['has_build_log'] and
+                    info['build_log_shows_execution'] and
+                    info['build_log_shows_success']
+                )
+            else:
+                # SYMLINK MODE: Just verify job ran (start and run logs exist)
+                # No build verification needed - executables are pre-built
+                info['build_success'] = info['has_start_log'] and info['has_run_log']
             
             build_info[run_name] = info
         
         # Analyze results
-        built_runs = sum(1 for info in build_info.values() if info['build_success'])
-        runs_with_executables = sum(1 for info in build_info.values() 
-                                    if info['has_start_exe'] and info['has_run_exe'])
-        runs_with_logs = sum(1 for info in build_info.values() if info['has_build_log'])
-        runs_with_verified_builds = sum(1 for info in build_info.values() 
-                                       if info['build_log_shows_execution'])
+        successful_runs = sum(1 for info in build_info.values() if info['build_success'])
+        runs_with_build_logs = sum(1 for info in build_info.values() if info.get('has_build_log', False))
+        runs_with_run_logs = sum(1 for info in build_info.values() if info.get('has_run_log', False))
         
-        if built_runs == 0:
+        mode_description = "REBUILD" if rebuild_enabled else "SYMLINK"
+        
+        if successful_runs == 0:
             self.experiment_checks['build'] = 'fail'
-            if runs_with_executables > 0 and runs_with_logs == 0:
-                self.experiment_details['build'] = f'{runs_with_executables} runs have .x files but no build logs'
-                issues.append(f"WARNING: Found {runs_with_executables} runs with executables but no build logs to verify pc_build ran")
-            elif runs_with_verified_builds == 0 and runs_with_logs > 0:
-                self.experiment_details['build'] = 'Build logs show pc_build did not execute'
-                issues.append("CRITICAL: Build logs exist but show no pc_build execution!")
+            if rebuild_enabled:
+                self.experiment_details['build'] = f'Build failed - no successful builds found'
+                issues.append(f"CRITICAL: No runs successfully built in REBUILD mode!")
             else:
-                self.experiment_details['build'] = 'No executables found - pc_build failed'
-                issues.append("CRITICAL: No runs appear to have been built successfully!")
-        elif built_runs < len(self.run_names):
+                self.experiment_details['build'] = f'No run logs found'
+                issues.append(f"CRITICAL: No runs have execution logs (pc_start.log, pc_run.log)!")
+        elif successful_runs < len(self.run_names):
             self.experiment_checks['build'] = 'fail'
-            self.experiment_details['build'] = f'Only {built_runs}/{len(self.run_names)} runs built'
-            issues.append(f"Partial build failure: {built_runs}/{len(self.run_names)} runs built successfully")
+            self.experiment_details['build'] = f'Only {successful_runs}/{len(self.run_names)} runs successful'
+            if rebuild_enabled:
+                issues.append(f"Partial build failure: {successful_runs}/{len(self.run_names)} builds succeeded")
+            else:
+                issues.append(f"Partial execution failure: {successful_runs}/{len(self.run_names)} runs have execution logs")
         else:
             self.experiment_checks['build'] = 'pass'
-            self.experiment_details['build'] = f'All {built_runs} runs built (verified via logs)'
+            if rebuild_enabled:
+                self.experiment_details['build'] = f'All {successful_runs} runs built successfully'
+            else:
+                self.experiment_details['build'] = f'All {successful_runs} runs executed (symlink mode)'
         
         result = {
             'passed': len(issues) == 0,
             'issues': issues,
             'build_info': build_info,
-            'built_runs': built_runs,
-            'runs_with_verified_builds': runs_with_verified_builds,
+            'build_log_map': build_log_map,
+            'rebuild_mode': rebuild_enabled,
+            'successful_runs': successful_runs,
+            'runs_with_build_logs': runs_with_build_logs,
+            'runs_with_run_logs': runs_with_run_logs,
             'total_runs': len(self.run_names),
-            'critical': built_runs == 0,
-            'message': f'{built_runs}/{len(self.run_names)} runs built successfully (verified)'
+            'critical': successful_runs == 0,
+            'message': f'{successful_runs}/{len(self.run_names)} runs successful ({mode_description} mode)'
         }
         
         return result
@@ -1087,6 +1186,17 @@ def verify_simulation_integrity(experiment_name: str, sample_size: int = 3,
                 console.print(f"  [red]• {issue}[/red]")
             else:
                 console.print(f"  [yellow]• {issue}[/yellow]")
+    
+    # Show build logs if build check exists and has issues (only in REBUILD mode)
+    if 'build' in results['checks']:
+        build_check = results['checks']['build']
+        rebuild_mode = build_check.get('rebuild_mode', False)
+        if rebuild_mode and (not build_check['passed'] or build_check.get('successful_runs', 0) < build_check.get('total_runs', 0)):
+            # Display build logs for all runs in REBUILD mode
+            build_info = build_check.get('build_info', {})
+            build_log_map = build_check.get('build_log_map', {})
+            if build_info and build_log_map:
+                checker._display_build_logs(build_info, build_log_map)
     
     # Show critical issues separately
     if results['critical_issues']:
