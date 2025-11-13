@@ -36,9 +36,7 @@ from src.visualization.videos import (
     create_combined_error_evolution_video
 )
 from src.visualization.plots_plotly import (
-    create_var_evolution_plotly,
-    create_error_evolution_plotly,
-    create_combined_error_evolution_plotly
+    create_cumulative_error_over_time
 )
 from src.experiment.naming import format_experiment_title, format_short_experiment_name
 from src.analysis.organizer import AnalysisOrganizer
@@ -400,57 +398,6 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
                     unit_length = all_sim_data[0]['params'].unit_length
                     logger.debug(f"     ├─ Using physical units (unit_length={unit_length:.3e})")
 
-            logger.info(f"     ├─ Creating var evolution video and frames...")
-            create_var_evolution_video(
-                all_sim_data, all_analytical_data, var_evolution_dir, run_name, fps=2, save_frames=True
-            )
-            
-            # Also create interactive plotly version
-            logger.info(f"     ├─ Creating interactive plotly var evolution...")
-            create_var_evolution_plotly(
-                all_sim_data, all_analytical_data, var_evo_plotly_dir, run_name
-            )
-            
-            # Create COMBINED error evolution with all configured metrics by DEFAULT
-            logger.info(f"     ├─ Creating combined error evolution (L1, L2, LINF) video and frames...")
-            if combine_in_videos and len(metrics) > 1:
-                # Calculate spatial errors for each error calculation method
-                spatial_errors_dict = {}
-                
-                # Map metrics to error calculation methods
-                # L1 and LINF use absolute error, L2 uses squared error
-                if 'l1' in metrics or 'linf' in metrics:
-                    spatial_errors_dict['L1/LINF (Absolute)'] = spatial_errors_abs
-                if 'l2' in metrics:
-                    spatial_errors_sq = calculate_spatial_errors(all_sim_data, all_analytical_data, error_method='squared')
-                    spatial_errors_dict['L2 (Squared)'] = spatial_errors_sq
-                
-                # Create combined video showing all metrics together
-                create_combined_error_evolution_video(
-                    spatial_errors_dict, error_evolution_dir, run_name, fps=2, 
-                    unit_length=unit_length, save_frames=True
-                )
-                
-                # Also create interactive plotly version
-                logger.info(f"     ├─ Creating interactive plotly combined error evolution...")
-                create_combined_error_evolution_plotly(
-                    spatial_errors_dict, error_evo_plotly_dir, run_name, unit_length=unit_length
-                )
-                logger.info(f"     └─ ✓ Created combined error evolution with {len(spatial_errors_dict)} error types")
-            else:
-                # Fallback: create single error evolution video
-                logger.info(f"     ├─ Creating single error evolution video and frames...")
-                create_error_evolution_video(
-                    spatial_errors_abs, error_evolution_dir, run_name, fps=2, 
-                    unit_length=unit_length, save_frames=True
-                )
-                
-                # Also create interactive plotly version
-                logger.info(f"     ├─ Creating interactive plotly error evolution...")
-                create_error_evolution_plotly(
-                    spatial_errors_abs, error_evo_plotly_dir, run_name, unit_length=unit_length
-                )
-                logger.info(f"     └─ ✓ Created error evolution video")
             # --- END: Modified section ---
             
             # Calculate normalized spatial-temporal errors (for notebook usage)
@@ -465,6 +412,12 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             
             # Cache normalized errors for later use (e.g., in notebooks)
             loaded_data_cache[run_name]['normalized_errors'] = normalized_errors
+            
+            # Create cumulative error over time plot (simplified visualization)
+            logger.info(f"     ├─ Creating cumulative error over time plot...")
+            create_cumulative_error_over_time(
+                normalized_errors, error_evo_plotly_dir, run_name, unit_length=unit_length, variables=analyze_variables
+            )
             
             # Save to pickle cache for fast notebook loading
             cache_dir = analysis_dir / "error" / "cache"
