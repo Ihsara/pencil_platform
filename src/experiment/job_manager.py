@@ -541,6 +541,143 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
             console.print()  # Blank line between failures
 
 
+def clean_all_simulation_data(experiment_name: str, keep_final_var: bool = True):
+    """
+    Clean all simulation data (VAR files, logs) to free up disk space.
+    This is typically done after analysis is complete.
+    
+    Args:
+        experiment_name: Name of the experiment
+        keep_final_var: If True, keep the final VAR file for each run (default: True)
+        
+    Returns:
+        True if cleaning was successful, False otherwise
+    """
+    from rich.console import Console
+    from rich.progress import Progress, SpinnerColumn, TextColumn
+    import shutil
+    
+    console = Console()
+    console.print(f"\n[cyan]═══ CLEANING SIMULATION DATA: {experiment_name} ═══[/cyan]\n")
+    
+    # Load experiment configuration
+    local_exp_dir = DIRS.runs / experiment_name
+    manifest_file = local_exp_dir / FILES.manifest
+    
+    if not manifest_file.exists():
+        logger.error(f"Manifest file not found: {manifest_file}")
+        return False
+    
+    # Load plan to get HPC run directory
+    plan_file = DIRS.config / experiment_name / DIRS.plan_subdir / FILES.plan
+    try:
+        with open(plan_file, 'r') as f:
+            plan = yaml.safe_load(f)
+    except Exception as e:
+        logger.error(f"Could not load plan file: {e}")
+        return False
+    
+    hpc_run_base_dir = Path(plan['hpc']['run_base_dir'])
+    
+    # Get run names
+    with open(manifest_file, 'r') as f:
+        run_names = [line.strip() for line in f if line.strip()]
+    
+    console.print(f"[yellow]Found {len(run_names)} runs to clean[/yellow]")
+    console.print(f"[dim]HPC directory: {hpc_run_base_dir}[/dim]\n")
+    
+    # Ask for confirmation
+    if keep_final_var:
+        console.print("[yellow]This will delete all VAR files EXCEPT the final timestep.[/yellow]")
+    else:
+        console.print("[red]This will delete ALL VAR files![/red]")
+    
+    console.print("[yellow]This action cannot be undone![/yellow]")
+    
+    try:
+        response = input("\nProceed with cleaning? (yes/no): ").strip().lower()
+        if response not in ['yes', 'y']:
+            console.print("[yellow]Cleaning cancelled.[/yellow]")
+            return False
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Cleaning cancelled.[/yellow]")
+        return False
+    
+    # Clean each run
+    total_freed = 0
+    cleaned_runs = 0
+    failed_runs = []
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console
+    ) as progress:
+        task = progress.add_task("[cyan]Cleaning runs...", total=len(run_names))
+        
+        for run_name in run_names:
+            run_path = hpc_run_base_dir / run_name
+            
+            if not run_path.exists():
+                logger.warning(f"Run directory not found: {run_path}")
+                failed_runs.append(run_name)
+                progress.advance(task)
+                continue
+            
+            data_dir = run_path / "data"
+            if not data_dir.exists():
+                progress.advance(task)
+                continue
+            
+            # Determine proc directory
+            proc_dir = data_dir / "proc0" if (data_dir / "proc0").is_dir() else data_dir
+            
+            # Get all VAR files
+            var_files = sorted(proc_dir.glob("VAR*"), key=lambda p: int(p.stem.replace('VAR', '')) if p.stem.replace('VAR', '').isdigit() else 0)
+            
+            if not var_files:
+                progress.advance(task)
+                continue
+            
+            # Delete VAR files (except final one if keep_final_var=True)
+            files_to_delete = var_files[:-1] if keep_final_var else var_files
+            
+            for var_file in files_to_delete:
+                try:
+                    file_size = var_file.stat().st_size
+                    var_file.unlink()
+                    total_freed += file_size
+                except Exception as e:
+                    logger.debug(f"Could not delete {var_file}: {e}")
+            
+            # Clean log files in the run directory
+            for log_file in run_path.glob("*.log"):
+                try:
+                    file_size = log_file.stat().st_size
+                    log_file.unlink()
+                    total_freed += file_size
+                except Exception as e:
+                    logger.debug(f"Could not delete {log_file}: {e}")
+            
+            cleaned_runs += 1
+            progress.advance(task)
+    
+    # Summary
+    total_freed_gb = total_freed / (1024**3)
+    console.print(f"\n[green]✓ Cleaning complete![/green]")
+    console.print(f"  Cleaned runs: {cleaned_runs}/{len(run_names)}")
+    console.print(f"  Disk space freed: {total_freed_gb:.2f} GB")
+    
+    if failed_runs:
+        console.print(f"\n[yellow]Warning: Could not clean {len(failed_runs)} runs:[/yellow]")
+        for run_name in failed_runs[:5]:  # Show first 5
+            console.print(f"  - {run_name}")
+        if len(failed_runs) > 5:
+            console.print(f"  ... and {len(failed_runs) - 5} more")
+    
+    return True
+
+
 def wait_for_completion(experiment_name: str, poll_interval: int = 60, max_wait: int = None, initial_delay: int = 5):
     """
     Waits for a SLURM job array to complete by polling status and monitoring log files.

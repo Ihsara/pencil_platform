@@ -213,7 +213,34 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
                     config_data = run_configs[file_name]['data']
                     for namelist, params in settings.items():
                         if namelist in config_data: config_data[namelist].update(params)
+            
+            # Explicit parameter injection with namelist mapping
+            # This ensures sweep parameters are properly injected even if not in base config
+            param_namelist_map = {
+                'nu_hyper3': ('run_in.yaml', 'viscosity_run_pars'),
+                'chi_hyper3': ('run_in.yaml', 'entropy_run_pars'),
+                'nu_shock': ('run_in.yaml', 'viscosity_run_pars'),
+                'chi_shock': ('run_in.yaml', 'entropy_run_pars'),
+                'diffrho_shock': ('run_in.yaml', 'density_run_pars'),
+                'gamma': ('run_in.yaml', 'eos_run_pars'),
+                'lgamma_is_1': ('run_in.yaml', 'density_run_pars'),
+            }
+            
+            # First pass: explicitly inject mapped parameters
+            for param_key, param_value in current_params.items():
+                if param_key in param_namelist_map:
+                    config_file, namelist = param_namelist_map[param_key]
+                    if config_file in run_configs:
+                        if namelist not in run_configs[config_file]['data']:
+                            run_configs[config_file]['data'][namelist] = {}
+                        run_configs[config_file]['data'][namelist][param_key] = param_value
+                        logger.debug(f"Injected sweep param {param_key}={param_value} into {config_file}:{namelist}")
+            
+            # Second pass: inject other context parameters (backward compatibility)
             for param_key, param_value in context.items():
+                # Skip if already handled by explicit injection
+                if param_key in param_namelist_map:
+                    continue
                 for config_file in run_configs.values():
                     for namelist, namelist_data in config_file.get('data', {}).items():
                         if isinstance(namelist_data, dict) and param_key in namelist_data:

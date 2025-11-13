@@ -8,7 +8,7 @@ from loguru import logger
 # Import logic from the src directory
 from src.experiment.generator import run_suite
 from src.workflows.analysis_pipeline import visualize_suite, analyze_suite_videos_only, analyze_suite_with_error_norms
-from src.experiment.job_manager import submit_suite, check_suite_status, wait_for_completion, monitor_job_progress
+from src.experiment.job_manager import submit_suite, check_suite_status, wait_for_completion, monitor_job_progress, clean_all_simulation_data
 from src.core.constants import DIRS, FILES
 
 def configure_logging():
@@ -67,6 +67,8 @@ def main():
                        help="Monitor detailed progress of running jobs by examining log files. Shows current stage (build/start/run) and iteration counts.")
     parser.add_argument("-w", "--wait", action="store_true",
                        help="Wait for job completion. Can be combined: -mwa = submit + wait + analyze.")
+    parser.add_argument("--cleanall", action="store_true",
+                       help="Clean all simulation data (VAR files, logs) after completion. Can be used with -w: -w --cleanall = wait then clean.")
     
     args = parser.parse_args()
     experiment_name = args.experiment_name
@@ -109,6 +111,9 @@ def main():
                 logger.success("Job completed! You can now run analysis or visualization.")
                 logger.info(f"Analysis: python main.py {experiment_name} --analyze")
                 logger.info(f"Visualization: python main.py {experiment_name} --viz")
+                # Cleanall is automatically included with -w
+                logger.info("Starting automatic cleanup...")
+                clean_all_simulation_data(experiment_name)
             else:
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
@@ -117,9 +122,16 @@ def main():
             if wait_for_completion(experiment_name):
                 logger.info("Job completed! Starting video-only analysis...")
                 analyze_suite_videos_only(experiment_name)
+                # Cleanall is automatically included with -w
+                logger.info("Analysis complete! Starting automatic cleanup...")
+                clean_all_simulation_data(experiment_name)
             else:
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
+        elif args.cleanall:
+            # Standalone cleanall (without waiting)
+            logger.info("--- CLEANUP MODE ---")
+            clean_all_simulation_data(experiment_name)
         elif args.error_norms:
             logger.info("--- L1/L2 ERROR NORM ANALYSIS MODE ---")
             analyze_suite_with_error_norms(experiment_name)
@@ -202,14 +214,20 @@ def main():
                 if args.wait:
                     logger.info("Waiting for job completion...")
                     if args.monitor:
-                        logger.info("(Use Ctrl+C to exit, then run with --monitor to check progress)")
+                        logger.info("(Monitoring enabled - detailed progress will be shown)")
                     
                     if wait_for_completion(experiment_name):
                         if args.analyze:
                             logger.info("Job completed! Starting video-only analysis...")
                             analyze_suite_videos_only(experiment_name)
+                            # Cleanall is automatically included with -w
+                            logger.info("Analysis complete! Starting automatic cleanup...")
+                            clean_all_simulation_data(experiment_name)
                         else:
                             logger.success("Job completed!")
+                            # Cleanall is automatically included with -w
+                            logger.info("Starting automatic cleanup...")
+                            clean_all_simulation_data(experiment_name)
                     else:
                         logger.error("Job did not complete successfully")
                         sys.exit(1)

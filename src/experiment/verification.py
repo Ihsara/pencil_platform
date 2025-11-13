@@ -246,9 +246,9 @@ class SimulationIntegrityChecker:
         for run_name in sample_runs:
             run_path = self.hpc_run_base_dir / run_name
             
-            # Check if run.in exists
-            run_in = run_path / "src" / "run.in"
-            start_in = run_path / "src" / "start.in"
+            # Check if run.in exists (runtime parameter files are in run directory root, not src/)
+            run_in = run_path / "run.in"
+            start_in = run_path / "start.in"
             
             if not run_in.exists() and not start_in.exists():
                 issues.append(f"Missing parameter files for run: {run_name}")
