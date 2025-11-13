@@ -11,7 +11,7 @@ from src.core.display import (
     show_header, show_error, show_warning, show_success, show_info,
     create_progress_bar, StatusBar
 )
-from src.core.logging import setup_file_logging
+from src.core.communication.logging import setup_file_logging
 from loguru import logger
 import time
 

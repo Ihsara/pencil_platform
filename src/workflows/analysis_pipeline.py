@@ -10,7 +10,7 @@ from loguru import logger
 from typing import Dict, List, Tuple
 
 from src.core.constants import DIRS, FILES
-from src.core.logging import setup_file_logging
+from src.core.communication.logging import setup_file_logging
 from src.core.config_loader import create_config_loader
 from src.core.console_utils import suppress_stdout_stderr, ProgressTracker
 from src.experiment.job_manager import _ensure_manifest_exists

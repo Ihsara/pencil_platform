@@ -8,7 +8,7 @@ from loguru import logger
 import yaml
 
 from src.core.constants import DIRS, FILES
-from src.core.logging import setup_file_logging
+from src.core.communication.logging import setup_file_logging
 from src.experiment.naming import format_short_experiment_name
 
 def _ensure_manifest_exists(experiment_name: str, local_exp_dir: Path) -> bool:

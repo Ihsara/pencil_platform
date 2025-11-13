@@ -10,7 +10,7 @@ from src.experiment.generator import run_suite
 from src.workflows.analysis_pipeline import visualize_suite, analyze_suite_videos_only, analyze_suite_with_error_norms
 from src.experiment.job_manager import submit_suite, check_suite_status, wait_for_completion, monitor_job_progress, clean_all_simulation_data
 from src.core.constants import DIRS, FILES
-from src.core.logging import setup_console_logging
+from src.core.communication.logging import setup_console_logging
 from src.core.display import show_header, show_warning, show_error, show_info, show_success
 
 def configure_logging():
