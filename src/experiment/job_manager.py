@@ -293,9 +293,18 @@ def get_job_stage_info(log_base_dir: Path):
                         latest_iteration = int(match.group(1))
                         break
                 
-                # Check if completed
-                if 'finished successfully' in ''.join(lines[-50:]).lower():
-                    return {'stage': 'completed', 'iteration': latest_iteration, 'details': 'Run finished successfully',
+                # Check if completed - look for multiple completion markers
+                last_lines = ''.join(lines[-50:]).lower()
+                if 'finished successfully' in last_lines or 'done' in last_lines or 'completed' in last_lines:
+                    # Additional check: "Done" often appears standalone on a line
+                    for line in lines[-10:]:
+                        if line.strip().lower() == 'done':
+                            return {'stage': 'completed', 'iteration': latest_iteration, 
+                                    'details': 'Run completed successfully',
+                                    'failed_log': None, 'error_tail': None}
+                    # Fall back to generic completion message
+                    return {'stage': 'completed', 'iteration': latest_iteration, 
+                            'details': 'Run finished successfully',
                             'failed_log': None, 'error_tail': None}
                 
                 if latest_iteration is not None:
@@ -463,8 +472,8 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
                     'details': details
                 })
             
-            # Show log tail if requested and job is running
-            if show_details and stage in ['build', 'start', 'run']:
+            # Show log tail if requested and job is running or completed
+            if show_details and stage in ['build', 'start', 'run', 'completed']:
                 console.print(f"\n[cyan]Task {task_id} - Last 5 lines:[/cyan]")
                 if stage == 'build':
                     log_file = job_dir / "pc_build.log"
@@ -472,6 +481,10 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
                     log_file = job_dir / "pc_start.log"
                 else:
                     log_file = job_dir / "pc_run.log"
+                
+                # Show location information
+                console.print(f"  [yellow]Run location: {DIRS.runs / experiment_name / run_name}[/yellow]")
+                console.print(f"  [yellow]Log file: {log_file}[/yellow]")
                 
                 tail_lines = tail_log_file(log_file, 5)
                 for line in tail_lines:
