@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple
 from src.core.constants import DIRS, FILES
 from src.core.logging import setup_file_logging
 from src.core.config_loader import create_config_loader
+from src.core.console_utils import suppress_stdout_stderr, ProgressTracker
 from src.experiment.job_manager import _ensure_manifest_exists
 from src.analysis.errors import (
     calculate_std_deviation_across_vars, 
@@ -125,12 +126,14 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
             logger.warning(f"No VAR files found in {proc_dir}")
             return None
         
-        logger.info(f"Loading all {len(var_files)} VAR files from {run_path}")
+        logger.bind(verbose=True).debug(f"Loading all {len(var_files)} VAR files from {run_path}")
         
         # CRITICAL FIX: Read params and create a deep copy IMMEDIATELY
         # The Pencil Code read.param() might cache results or return shared references
         # Deep copying ensures this run gets its own independent params object
-        params_original = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
+        # Suppress verbose output to console (still goes to full log file)
+        with suppress_stdout_stderr():
+            params_original = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
         params = copy.deepcopy(params_original)
         
         # Log key parameters for debugging (run name should be in path)
@@ -146,7 +149,9 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         for var_file in var_files:
             try:
                 # Read VAR file with trimall=True to remove ghost zones for 1D data
-                var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=True)
+                # Suppress verbose output to console (still goes to full log file)
+                with suppress_stdout_stderr():
+                    var = read.var(var_file.name, datadir=str(data_dir), quiet=True, trimall=True)
                 
                 density = np.exp(var.lnrho) if hasattr(var, 'lnrho') else var.rho
                 cp, gamma = params.cp, params.gamma
