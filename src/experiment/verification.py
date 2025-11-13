@@ -462,62 +462,160 @@ class SimulationIntegrityChecker:
     def check_build_status(self) -> Dict:
         """
         Check if pc_build was executed and completed successfully for the experiment.
-        This is an EXPERIMENT-LEVEL check - build happens once for all runs.
+        
+        CRITICAL: We cannot trust just finding .x files - they could be copied artifacts!
+        We must verify that pc_build ACTUALLY RAN by checking:
+        1. Build log exists and shows pc_build execution
+        2. Executables exist (start.x, run.x)
+        3. Build log shows successful completion (no errors)
+        
+        This prevents false positives from copied executables.
+        This is an EXPERIMENT-LEVEL check - tracks build success across all runs.
         """
         issues = []
         build_info = {}
         
-        for run_name in self.run_names:
+        # Try to find build logs in submission logs
+        from pathlib import Path
+        log_base = Path("logs/submission") / self.experiment_name
+        build_log_dirs = []
+        
+        if log_base.exists():
+            submission_dirs = sorted(log_base.glob("sub_*"), reverse=True)
+            if submission_dirs:
+                latest_submission = submission_dirs[0]
+                # Find all job ID directories
+                job_id_dirs = [d for d in latest_submission.iterdir() if d.is_dir() and d.name.isdigit()]
+                for job_id_dir in job_id_dirs:
+                    build_log_dirs.extend(job_id_dir.glob("array_*"))
+        
+        # Create mapping of run index to build log directory
+        build_log_map = {}
+        for log_dir in build_log_dirs:
+            task_id = int(log_dir.name.split('_')[-1])
+            build_log_map[task_id] = log_dir
+        
+        for idx, run_name in enumerate(self.run_names):
             run_path = self.hpc_run_base_dir / run_name
             src_dir = run_path / "src"
+            task_id = idx + 1  # SLURM array tasks are 1-indexed
             
             info = {
                 'has_src': src_dir.exists(),
-                'has_executable': False,
+                'has_start_exe': False,
+                'has_run_exe': False,
                 'has_makefile': False,
+                'has_build_log': False,
+                'build_log_shows_execution': False,
+                'build_log_shows_success': False,
                 'build_success': False
             }
             
             if src_dir.exists():
-                # Check for compiled executable
+                # Check for compiled executables
                 start_exe = src_dir / "start.x"
                 run_exe = src_dir / "run.x"
-                info['has_executable'] = start_exe.exists() or run_exe.exists()
+                info['has_start_exe'] = start_exe.exists()
+                info['has_run_exe'] = run_exe.exists()
                 
                 # Check for Makefile (indicates build was attempted)
                 makefile = src_dir / "Makefile"
                 info['has_makefile'] = makefile.exists()
-                
-                # Check for .build-history or .build-config (Pencil Code build artifacts)
-                build_history = src_dir / ".build-history"
-                build_config = src_dir / ".buildinfo"
-                info['build_success'] = info['has_executable'] and (build_history.exists() or build_config.exists())
+            
+            # CRITICAL CHECK: Verify pc_build actually ran by checking build log
+            if task_id in build_log_map:
+                build_log_file = build_log_map[task_id] / "pc_build.log"
+                if build_log_file.exists():
+                    info['has_build_log'] = True
+                    try:
+                        with open(build_log_file, 'r') as f:
+                            log_content = f.read()
+                        
+                        # Check if pc_build actually executed
+                        # Look for characteristic pc_build output
+                        pc_build_indicators = [
+                            'Compiling',
+                            'Building',
+                            'make',
+                            '.o',  # Object files being compiled
+                            'Linking'
+                        ]
+                        info['build_log_shows_execution'] = any(
+                            indicator in log_content for indicator in pc_build_indicators
+                        )
+                        
+                        # Check for successful completion (no fatal errors)
+                        error_indicators = [
+                            'ERROR:',
+                            'FATAL',
+                            'make: *** [',  # Make error
+                            'compilation failed',
+                            'build failed'
+                        ]
+                        has_errors = any(
+                            error.lower() in log_content.lower() 
+                            for error in error_indicators
+                        )
+                        info['build_log_shows_success'] = not has_errors
+                        
+                    except Exception as e:
+                        logger.debug(f"Could not read build log for {run_name}: {e}")
+            
+            # Build is ONLY successful if ALL conditions are met:
+            # 1. Both executables exist
+            # 2. Build log exists and shows execution
+            # 3. Build log shows no errors
+            info['build_success'] = (
+                info['has_start_exe'] and 
+                info['has_run_exe'] and
+                info['has_build_log'] and
+                info['build_log_shows_execution'] and
+                info['build_log_shows_success']
+            )
+            
+            # Special case: if no build log available, fall back to executable check
+            # (for backwards compatibility or if logs haven't synced yet)
+            if not info['has_build_log']:
+                info['build_success'] = info['has_start_exe'] and info['has_run_exe']
             
             build_info[run_name] = info
         
-        # Check if any runs were built
+        # Analyze results
         built_runs = sum(1 for info in build_info.values() if info['build_success'])
+        runs_with_executables = sum(1 for info in build_info.values() 
+                                    if info['has_start_exe'] and info['has_run_exe'])
+        runs_with_logs = sum(1 for info in build_info.values() if info['has_build_log'])
+        runs_with_verified_builds = sum(1 for info in build_info.values() 
+                                       if info['build_log_shows_execution'])
         
         if built_runs == 0:
             self.experiment_checks['build'] = 'fail'
-            self.experiment_details['build'] = '0 runs built - pc_build may not have run'
-            issues.append("CRITICAL: No runs appear to have been built successfully!")
+            if runs_with_executables > 0 and runs_with_logs == 0:
+                self.experiment_details['build'] = f'{runs_with_executables} runs have .x files but no build logs'
+                issues.append(f"WARNING: Found {runs_with_executables} runs with executables but no build logs to verify pc_build ran")
+            elif runs_with_verified_builds == 0 and runs_with_logs > 0:
+                self.experiment_details['build'] = 'Build logs show pc_build did not execute'
+                issues.append("CRITICAL: Build logs exist but show no pc_build execution!")
+            else:
+                self.experiment_details['build'] = 'No executables found - pc_build failed'
+                issues.append("CRITICAL: No runs appear to have been built successfully!")
         elif built_runs < len(self.run_names):
             self.experiment_checks['build'] = 'fail'
             self.experiment_details['build'] = f'Only {built_runs}/{len(self.run_names)} runs built'
-            issues.append(f"Partial build failure: {built_runs}/{len(self.run_names)} runs built")
+            issues.append(f"Partial build failure: {built_runs}/{len(self.run_names)} runs built successfully")
         else:
             self.experiment_checks['build'] = 'pass'
-            self.experiment_details['build'] = f'All {built_runs} runs built successfully'
+            self.experiment_details['build'] = f'All {built_runs} runs built (verified via logs)'
         
         result = {
             'passed': len(issues) == 0,
             'issues': issues,
             'build_info': build_info,
             'built_runs': built_runs,
+            'runs_with_verified_builds': runs_with_verified_builds,
             'total_runs': len(self.run_names),
             'critical': built_runs == 0,
-            'message': f'{built_runs}/{len(self.run_names)} runs built successfully'
+            'message': f'{built_runs}/{len(self.run_names)} runs built successfully (verified)'
         }
         
         return result

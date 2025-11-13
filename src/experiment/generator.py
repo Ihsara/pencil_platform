@@ -125,21 +125,28 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
                     logger.info(f"  Adding new config '{config_name}' from specific experiment")
                     base_configs[config_name] = specific_config
     
-    auto_rebuild = False
-    rebuild_reason = ""
-    critical_cparams = ['nxgrid', 'nygrid', 'nzgrid', 'ncpus', 'nprocx', 'nprocy', 'nprocz']
+    # SAFETY FIRST: Default to rebuild unless explicitly disabled in plan
+    # This ensures simulations are always built correctly
+    plan_disable_rebuild = plan.get('disable_auto_rebuild', False)
     
-    # Check if cparam_local differs from base experiment's cparam_local
+    auto_rebuild = not plan_disable_rebuild  # Default to True unless plan disables it
+    rebuild_reason = "Default: Rebuild enabled for safety"
+    
+    if plan_disable_rebuild:
+        logger.info("Plan has disabled automatic rebuild - will use symlinks")
+        auto_rebuild = False
+        rebuild_reason = "Disabled by plan configuration"
+    
+    # Check for critical parameter changes that FORCE rebuild regardless of plan settings
+    critical_cparams = ['nxgrid', 'nygrid', 'nzgrid', 'ncpus', 'nprocx', 'nprocy', 'nprocz']
     base_experiment_name = plan['base_experiment']
     base_cparam_path = DIRS.config / base_experiment_name / DIRS.in_subdir / 'cparam_local.yaml'
+    
     if base_cparam_path.exists():
         with open(base_cparam_path, 'r') as f:
             base_cparam = yaml.safe_load(f)
         
-        # Get the final merged cparam_local after all merging
         final_cparam = base_configs.get('cparam_local.yaml', {})
-        
-        # Compare critical parameters
         base_data = base_cparam.get('data', {})
         final_data = final_cparam.get('data', {})
         
@@ -148,32 +155,49 @@ def run_suite(plan_file: Path, limit: int = None, rebuild: bool = False):
             final_value = final_data.get(param)
             if base_value != final_value:
                 auto_rebuild = True
-                rebuild_reason = f"cparam_local.yaml parameter '{param}' differs from base experiment '{base_experiment_name}' ({base_value} vs {final_value})."
+                rebuild_reason = f"CRITICAL: cparam '{param}' differs from base ({base_value} vs {final_value})"
+                logger.warning(rebuild_reason)
                 break
     
-    # Check if parameter sweeps modify critical cparams
-    if not auto_rebuild:
-        for sweep in plan.get('parameter_sweeps', []):
-            if sweep.get('variable') in critical_cparams:
-                auto_rebuild = True; rebuild_reason = f"Sweep modifies '{sweep.get('variable')}'."
-                break
+    # Check if parameter sweeps modify critical cparams - FORCE rebuild
+    for sweep in plan.get('parameter_sweeps', []):
+        if sweep.get('variable') in critical_cparams:
+            auto_rebuild = True
+            rebuild_reason = f"CRITICAL: Sweep modifies critical cparam '{sweep.get('variable')}'"
+            logger.warning(rebuild_reason)
+            break
     
+    # Check if critical files are modified - FORCE rebuild
     critical_files = ['cparam_local.yaml', 'Makefile_local.yaml']
-    if not auto_rebuild:
-        for file in critical_files:
-            if file in plan.get('modifications', {}):
-                auto_rebuild = True; rebuild_reason = f"Plan modifies '{file}'."
-                break
-        if not auto_rebuild:
-            for branch in plan.get('branches', []):
-                for file in critical_files:
-                    if file in branch.get('settings', {}):
-                        auto_rebuild = True; rebuild_reason = f"Branch '{branch['name']}' modifies '{file}'."
-                        break
+    for file in critical_files:
+        if file in plan.get('modifications', {}):
+            auto_rebuild = True
+            rebuild_reason = f"CRITICAL: Plan modifies '{file}'"
+            logger.warning(rebuild_reason)
+            break
     
-    final_rebuild_flag = rebuild or auto_rebuild
-    if auto_rebuild:
-        logger.warning(f"AUTOMATIC REBUILD ENACTED. Reason: {rebuild_reason}")
+    # Check branch settings for critical file modifications
+    if not auto_rebuild or not rebuild_reason.startswith("CRITICAL"):
+        for branch in plan.get('branches', []):
+            for file in critical_files:
+                if file in branch.get('settings', {}):
+                    auto_rebuild = True
+                    rebuild_reason = f"CRITICAL: Branch '{branch['name']}' modifies '{file}'"
+                    logger.warning(rebuild_reason)
+                    break
+            if rebuild_reason.startswith("CRITICAL"):
+                break
+    
+    # Command-line --rebuild has ultimate priority
+    if rebuild:
+        final_rebuild_flag = True
+        logger.warning("REBUILD FORCED via --rebuild command-line flag")
+    else:
+        final_rebuild_flag = auto_rebuild
+        if auto_rebuild:
+            logger.info(f"Rebuild enabled: {rebuild_reason}")
+        else:
+            logger.info(f"Rebuild disabled: {rebuild_reason}")
     
     all_runs = []
     all_param_combinations = _generate_sweep_combinations(plan)
