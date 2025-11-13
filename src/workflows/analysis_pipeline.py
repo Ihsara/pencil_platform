@@ -128,10 +128,8 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
         
         logger.bind(verbose=True).debug(f"Loading all {len(var_files)} VAR files from {run_path}")
         
-        # CRITICAL FIX: Read params and create a deep copy IMMEDIATELY
-        # The Pencil Code read.param() might cache results or return shared references
-        # Deep copying ensures this run gets its own independent params object
-        # Suppress verbose output to console (still goes to full log file)
+
+
         with suppress_stdout_stderr():
             params_original = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
         params = copy.deepcopy(params_original)
@@ -181,6 +179,11 @@ def load_all_var_files(run_path: Path) -> list[dict] | None:
                     "params": params,
                     "var_file": var_file.name
                 })
+                
+                logger.critical(f"DIAGNOSTIC: Loading VAR files from: {run_path}")
+                logger.critical(f"DIAGNOSTIC: Found {len(var_files)} VAR files")
+                logger.critical(f"DIAGNOSTIC: First VAR rho sample: {all_data[0]['rho'][:5]}")
+                logger.critical(f"DIAGNOSTIC: First VAR max rho: {np.max(all_data[0]['rho']):.10e}")
             except Exception as e:
                 logger.warning(f"Failed to load {var_file.name}: {e}")
                 continue
