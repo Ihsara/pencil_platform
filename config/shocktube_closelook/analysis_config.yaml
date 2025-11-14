@@ -1,0 +1,93 @@
+# Shocktube Close Look - Example configuration for pairwise comparison
+# This experiment demonstrates detailed pairwise analysis of top performers
+
+# Inheritance
+base_config: 'shocktube_base'
+
+# Reference base files
+unit_system: 'unit_system.yaml'
+analytical_solution: 'analytical.yaml'
+
+# Variable definitions
+variables:
+  rho:
+    unit_type: 'density'
+    plot_label: r'$\rho$'
+  
+  ux:
+    unit_type: 'velocity'
+    plot_label: r'$u_x$'
+  
+  pp:
+    unit_type: 'pressure'
+    plot_label: r'$p$'
+  
+  ee:
+    unit_type: 'specific_energy'
+    plot_label: r'$e$'
+  
+  x:
+    unit_type: 'length'
+  
+  t:
+    unit_type: 'time'
+
+# Error analysis configuration
+error_analysis:
+  metrics: ['l1', 'l2', 'linf']  # Calculate multiple metrics
+  ranking_metric: 'l1'  # Use L1 for ranking
+  use_code_units: true
+  combine_in_videos: true
+  analyze_variables: ['rho', 'ux', 'pp', 'ee']
+
+# Pairwise comparison configuration (NEW!)
+pairwise_comparison:
+  enabled: true
+  
+  # Strategy options:
+  # - 'ranking_adjacent': Compare 1 vs 2, 2 vs 3, 3 vs 4, etc.
+  # - 'ranking_pairs': Compare specific pairs [[1,2], [3,4], [5,6]]
+  # - 'manual': Specify exact run names to compare
+  selection_strategy: 'ranking_pairs'
+  
+  # For 'ranking_pairs' strategy: specify which ranks to compare
+  # Example: [[1,2], [3,4], [5,6]] compares 1st vs 2nd, 3rd vs 4th, 5th vs 6th
+  pairs:
+    - [1, 2]  # Top 2 runs with identical/similar errors
+    - [3, 4]  # Next pair
+    - [5, 6]  # And so on...
+  
+  # Alternatively, for 'manual' strategy, specify exact run names:
+  # manual_pairs:
+  #   - ['run_name_1', 'run_name_2']
+  #   - ['run_name_3', 'run_name_4']
+  
+  # Comparison metrics (inherits from error_analysis if not specified)
+  metrics: ['l1', 'l2', 'linf']
+  variables: ['rho', 'ux', 'pp', 'ee']
+  
+  # Analysis depth
+  analyze_spatial_distribution: true  # Where do errors differ spatially?
+  analyze_temporal_evolution: true    # How do errors diverge over time?
+  analyze_parameter_correlation: true  # Correlate with parameter differences
+  
+  # Custom checks (optional)
+  custom_checks:
+    gamma_difference:
+      type: 'parameter_difference'
+      parameter: 'gamma'
+      description: 'Check if gamma value differs between runs'
+    
+    nu_difference:
+      type: 'parameter_difference'
+      parameter: 'nu_shock'
+      description: 'Check viscosity parameter difference'
+    
+    chi_difference:
+      type: 'parameter_difference'
+      parameter: 'chi_shock'
+      description: 'Check thermal diffusivity difference'
+  
+  # Output configuration
+  generate_plots: true
+  generate_detailed_report: true

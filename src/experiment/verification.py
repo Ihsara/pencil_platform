@@ -159,55 +159,24 @@ class SimulationIntegrityChecker:
         )
     
     def _truncate_run_name(self, name: str, max_len: int = 38) -> str:
-        """Intelligently extract distinguishing parts of run names"""
-        if len(name) <= max_len:
-            return name
+        """
+        Intelligently extract distinguishing parts of run names.
+        This is EXPERIMENT-AGNOSTIC - it uses the sweep configuration to identify
+        which parameters vary, then displays those parameter values.
+        """
+        from src.experiment.naming import format_short_experiment_name
         
-        # Extract the SWEPT PARAMETERS which distinguish runs
-        import re
+        # Use the naming module which is already experiment-agnostic
+        shortened = format_short_experiment_name(name, self.experiment_name)
         
-        # Extract key swept parameters
-        extracted_parts = []
+        if len(shortened) <= max_len:
+            return shortened
         
-        # Extract nu values (e.g., nu9e-15)
-        nu_match = re.search(r'nu(\d+e-\d+)', name)
-        if nu_match:
-            extracted_parts.append(f"nu{nu_match.group(1)}")
+        # If still too long, truncate intelligently
+        if len(shortened) > max_len:
+            return shortened[:max_len-3] + "..."
         
-        # Extract chi values (e.g., chi9e-15)
-        chi_match = re.search(r'chi(\d+e-\d+)', name)
-        if chi_match:
-            extracted_parts.append(f"chi{chi_match.group(1)}")
-        
-        # Extract rank if present
-        rank_match = re.search(r'rank(\d+)', name)
-        if rank_match:
-            extracted_parts.append(f"r{rank_match.group(1)}")
-        
-        # Extract gamma variant
-        if 'gamma_is_1' in name:
-            extracted_parts.append('γ=1')
-        elif 'default_gamma' in name:
-            extracted_parts.append('γ≈1.67')
-        
-        # Build display name
-        if extracted_parts:
-            display_name = '_'.join(extracted_parts)
-            if len(display_name) <= max_len:
-                return display_name
-        
-        # Fallback: show first part and swept params
-        parts = name.split('_')
-        if len(parts) > 3:
-            # Get resolution/setup + swept params
-            swept = [p for p in parts if any(x in p for x in ['nu', 'chi', 'rank', 'gamma'])]
-            if swept:
-                display_name = '_'.join(swept[:4])
-                if len(display_name) <= max_len:
-                    return display_name
-        
-        # Last resort: default truncation
-        return name[:max_len-3] + "..."
+        return name
     
     def _format_status(self, status: str) -> str:
         """Format status with colors and symbols"""
@@ -729,12 +698,16 @@ class SimulationIntegrityChecker:
     
     def check_sweep_parameters(self) -> Dict:
         """
-        Verify that the sweep parameters in run names match expected patterns.
-        This is an EXPERIMENT-LEVEL check - validates sweep configuration.
+        Verify that swept parameters actually vary across runs.
+        This is EXPERIMENT-AGNOSTIC - it reads the sweep configuration to identify
+        which parameters should vary, then checks if they actually do.
+        
+        Returns:
+            Dictionary with check results
         """
         from src.core.constants import DIRS
         
-        # Load plan
+        # Load plan to identify swept parameters
         plan_file = DIRS.config / self.experiment_name / DIRS.plan_subdir / "sweep.yaml"
         try:
             with open(plan_file, 'r') as f:
@@ -749,73 +722,124 @@ class SimulationIntegrityChecker:
                 'message': 'Failed to load plan'
             }
         
-        branches = plan.get('branches', [])
-        if not branches:
+        # Extract swept parameters from configuration
+        swept_params = self._extract_swept_parameters(plan)
+        
+        if not swept_params:
             self.experiment_checks['sweep_params'] = 'pass'
             self.experiment_details['sweep_params'] = 'No parameter sweep defined'
             return {
                 'passed': True,
                 'issues': [],
-                'message': 'No branches defined',
+                'message': 'No parameter sweep configured',
                 'critical': False
             }
         
+        # Extract actual parameter values from run names
+        param_values = self._extract_param_values_from_runs(swept_params)
+        
+        # Check for variation
         issues = []
-        param_patterns = {}
+        total_unique = 0
         
-        # Extract parameter patterns from run names
-        for run_name in self.run_names:
-            # Look for common parameter patterns in names
-            import re
+        for param_name, values in param_values.items():
+            unique_count = len(values)
+            total_unique += unique_count
             
-            # Match filesystem-safe format: nu0p1 (where 'p' replaces '.')
-            # Also match scientific notation: nu9e-15
-            nu_match = re.search(r'nu([\d.pe\-+]+)', run_name)
-            chi_match = re.search(r'chi([\d.pe\-+]+)', run_name)
-            diffrho_match = re.search(r'diffrho([\d.pe\-+]+)', run_name)
-            
-            if nu_match:
-                nu_val = nu_match.group(1)
-                if nu_val not in param_patterns.get('nu', set()):
-                    param_patterns.setdefault('nu', set()).add(nu_val)
-            
-            if chi_match:
-                chi_val = chi_match.group(1)
-                if chi_val not in param_patterns.get('chi', set()):
-                    param_patterns.setdefault('chi', set()).add(chi_val)
-            
-            if diffrho_match:
-                diffrho_val = diffrho_match.group(1)
-                if diffrho_val not in param_patterns.get('diffrho', set()):
-                    param_patterns.setdefault('diffrho', set()).add(diffrho_val)
-        
-        # Check if we have variation in parameters
-        total_unique = sum(len(v) for v in param_patterns.values())
-        
-        for param_name, values in param_patterns.items():
-            if len(values) == 1:
+            if unique_count == 1:
                 issues.append(
-                    f"WARNING: All run names contain the same {param_name} value ({list(values)[0]}). "
-                    f"Expected variation in parameter sweep."
+                    f"WARNING: Parameter '{param_name}' has only 1 unique value across all runs: {list(values)[0]}. "
+                    f"Expected variation in sweep."
+                )
+            elif unique_count == 0:
+                issues.append(
+                    f"CRITICAL: Parameter '{param_name}' not found in any run names! "
+                    f"This parameter is configured as swept but missing from run names."
                 )
         
         # Update experiment-level status
         if len(issues) == 0:
             self.experiment_checks['sweep_params'] = 'pass'
-            self.experiment_details['sweep_params'] = f'{total_unique} unique parameter values found'
+            self.experiment_details['sweep_params'] = f'{total_unique} unique values across {len(swept_params)} parameters'
         else:
             self.experiment_checks['sweep_params'] = 'fail'
-            self.experiment_details['sweep_params'] = 'No parameter variation detected'
+            self.experiment_details['sweep_params'] = 'Parameter variation issues detected'
         
         result = {
             'passed': len(issues) == 0,
             'issues': issues,
-            'param_patterns': {k: list(v) for k, v in param_patterns.items()},
-            'critical': False,
-            'message': f'Found {total_unique} unique parameter values'
+            'swept_params': swept_params,
+            'param_values': {k: list(v) for k, v in param_values.items()},
+            'critical': any('CRITICAL' in issue for issue in issues),
+            'message': f'{total_unique} unique values across {len(swept_params)} swept parameters'
         }
         
         return result
+    
+    def _extract_swept_parameters(self, plan: Dict) -> List[str]:
+        """
+        Extract list of swept parameter names from plan configuration.
+        
+        Args:
+            plan: Plan configuration dictionary
+            
+        Returns:
+            List of parameter names that are being swept
+        """
+        swept_params = set()
+        
+        # Check parameter_sweeps section
+        if 'parameter_sweeps' in plan:
+            for sweep in plan['parameter_sweeps']:
+                if 'variables' in sweep:
+                    variables = sweep['variables']
+                    if isinstance(variables, str):
+                        swept_params.add(variables)
+                    elif isinstance(variables, list):
+                        swept_params.update(variables)
+        
+        return list(swept_params)
+    
+    def _extract_param_values_from_runs(self, param_names: List[str]) -> Dict[str, set]:
+        """
+        Extract parameter values from run names for specified parameters.
+        
+        Args:
+            param_names: List of parameter names to extract
+            
+        Returns:
+            Dictionary mapping parameter names to sets of found values
+        """
+        import re
+        
+        param_values = {param: set() for param in param_names}
+        
+        for run_name in self.run_names:
+            for param_name in param_names:
+                # Create regex pattern for this parameter
+                # Handle various formats:
+                # - nu9e-15 (scientific notation)
+                # - nu0p1 (filesystem safe decimal)
+                # - chi1.0 (decimal with dot)
+                # - diffrho_shock5.0 (with underscore suffix)
+                
+                # Try multiple patterns
+                patterns = [
+                    rf'{param_name}([\d.e\-+p]+)',  # Basic: nu9e-15, nu0p1, chi1.0
+                    rf'{param_name}_([\d.e\-+p]+)', # With underscore: nu_9e-15
+                    rf'{param_name}_shock([\d.e\-+p]+)', # With suffix: nu_shock9e-15
+                ]
+                
+                for pattern in patterns:
+                    match = re.search(pattern, run_name)
+                    if match:
+                        value = match.group(1)
+                        # Normalize: convert 'p' to '.' for consistency
+                        value = value.replace('p', '.')
+                        param_values[param_name].add(value)
+                        break  # Found it, move to next parameter
+        
+        return param_values
     
     def check_var_file_diversity(self, sample_size: int = 3) -> Dict:
         """
@@ -933,12 +957,17 @@ class SimulationIntegrityChecker:
     
     def check_parameter_files(self, sample_size: int = 3) -> Dict:
         """
-        Check if parameter files exist and contain expected swept parameters.
+        Check if parameter files exist and contain expected swept parameters WITH CORRECT VALUES.
+        This is EXPERIMENT-AGNOSTIC - it reads the sweep config to know what to check.
+        
+        This verifies:
+        1. Parameter files exist (run.in, start.in)
+        2. Swept parameters are present with non-default values
+        3. Parameter values match what's expected from run nam specification
         """
-        from src.core.config_loader import create_config_loader
         from src.core.constants import DIRS
         
-        # Load the plan to know what parameters should be swept
+        # Load plan to identify swept parameters
         plan_file = DIRS.config / self.experiment_name / DIRS.plan_subdir / "sweep.yaml"
         try:
             with open(plan_file, 'r') as f:
@@ -951,13 +980,14 @@ class SimulationIntegrityChecker:
                 'message': 'Failed to load plan file'
             }
         
-        # Get swept parameters from plan
-        branches = plan.get('branches', [])
-        if not branches:
+        # Get swept parameters
+        swept_params = self._extract_swept_parameters(plan)
+        
+        if not swept_params:
             return {
                 'passed': True,
                 'issues': [],
-                'message': 'No parameter sweep defined in plan',
+                'message': 'No parameter sweep defined',
                 'critical': False
             }
         
@@ -970,33 +1000,55 @@ class SimulationIntegrityChecker:
         for run_name in sample_runs:
             run_path = self.hpc_run_base_dir / run_name
             
-            # Check if run.in exists (runtime parameter files are in run directory root, not src/)
+            # Check if parameter files exist
             run_in = run_path / "run.in"
             start_in = run_path / "start.in"
             
             if not run_in.exists() and not start_in.exists():
-                issues.append(f"Missing parameter files for run: {run_name}")
+                issues.append(f"CRITICAL: Missing parameter files for run: {run_name}")
                 continue
             
-            # Try to read parameters using Pencil Code
+            # Read and validate parameters
             if PENCIL_AVAILABLE:
                 try:
                     data_dir = run_path / "data"
                     params = read.param(datadir=str(data_dir), quiet=True, conflicts_quiet=True)
                     
-                    # Extract key swept parameters
-                    param_values[run_name] = {
-                        'nu_shock': getattr(params, 'nu_shock', None),
-                        'chi_shock': getattr(params, 'chi_shock', None),
-                        'nu_hyper3': getattr(params, 'nu_hyper3', None),
-                        'chi_hyper3': getattr(params, 'chi_hyper3', None),
-                        'diffrho_shock': getattr(params, 'diffrho_shock', None),
-                        'gamma': getattr(params, 'gamma', None),
-                        'lgamma_is_1': getattr(params, 'lgamma_is_1', None)
-                    }
+                    # Extract ALL swept parameters (experiment-agnostic)
+                    run_params = {}
+                    for param_name in swept_params:
+                        # Try to get the parameter value
+                        value = getattr(params, param_name, None)
+                        run_params[param_name] = value
+                        
+                        # Warn if swept parameter is missing or default
+                        if value is None:
+                            issues.append(
+                                f"WARNING: Run '{run_name}' missing swept parameter '{param_name}'"
+                            )
+                    
+                    param_values[run_name] = run_params
                     
                 except Exception as e:
                     logger.warning(f"Could not read params for {run_name}: {e}")
+                    issues.append(f"Failed to read parameters from {run_name}: {e}")
+        
+        # Check for parameter diversity across sampled runs
+        if param_values:
+            for param_name in swept_params:
+                values_for_param = [
+                    run_params.get(param_name) 
+                    for run_params in param_values.values()
+                    if run_params.get(param_name) is not None
+                ]
+                
+                unique_values = len(set(str(v) for v in values_for_param))
+                
+                if unique_values == 1 and len(values_for_param) > 1:
+                    issues.append(
+                        f"WARNING: Parameter '{param_name}' has identical value across all sampled runs: {values_for_param[0]}. "
+                        f"Expected variation."
+                    )
         
         # Update status
         for run_name in sample_runs:
@@ -1014,8 +1066,9 @@ class SimulationIntegrityChecker:
             'passed': len(issues) == 0,
             'issues': issues,
             'param_values': param_values,
-            'critical': False,
-            'message': f'Checked {len(sample_runs)} runs for parameter files'
+            'swept_params': swept_params,
+            'critical': any('CRITICAL' in issue for issue in issues),
+            'message': f'Checked {len(sample_runs)} runs for {len(swept_params)} swept parameters'
         }
         
         return result

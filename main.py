@@ -154,41 +154,6 @@ def main():
             else:
                 logger.error("Job did not complete successfully")
                 sys.exit(1)
-        elif args.wait and args.analyze and not any([args.viz, args.error_norms]):
-            # Wait + Analyze
-            show_info("Cleaning up old data...")
-            clean_all_simulation_data(experiment_name, auto_confirm=True)
-            
-            if wait_for_completion(experiment_name):
-                # Step 1: Verification checks
-                from rich.console import Console
-                console = Console(width=72)
-                console.print("\n[cyan]═══ INTEGRITY VERIFICATION ═══[/cyan]")
-                console.print("[dim]Required for simulation validity[/dim]\n")
-                
-                from src.experiment.verification import verify_simulation_integrity
-                try:
-                    integrity_passed = verify_simulation_integrity(
-                        experiment_name, 
-                        sample_size=3, 
-                        fail_on_critical=False
-                    )
-                    if not integrity_passed:
-                        show_error("CRITICAL: Integrity checks FAILED!")
-                        sys.exit(1)
-                    else:
-                        show_success("All integrity checks PASSED")
-                except Exception as e:
-                    logger.error(f"Verification error: {e}")
-                    show_error("Integrity verification failed")
-                    sys.exit(1)
-                
-                # Step 2: Analysis
-                show_header("Analysis Pipeline", experiment_name)
-                analyze_suite_videos_only(experiment_name)
-            else:
-                show_error("Job did not complete")
-                sys.exit(1)
         elif args.cleanall:
             show_header("Cleanup Mode", experiment_name)
             clean_all_simulation_data(experiment_name)

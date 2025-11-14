@@ -234,12 +234,110 @@ def check_suite_status(experiment_name: str, return_status: bool = False, silent
             return None
 
 
-def get_job_stage_info(log_base_dir: Path):
+def _extract_latest_iteration(log_file: Path) -> int | None:
+    """
+    Extracts the latest iteration number from a run log file.
+    
+    Args:
+        log_file: Path to the run log file
+        
+    Returns:
+        Latest iteration number, or None if not found
+    """
+    if not log_file.exists():
+        return None
+    
+    try:
+        with open(log_file, 'r') as f:
+            lines = f.readlines()
+            for line in reversed(lines):
+                # Look for iteration pattern: starts with whitespace and number
+                match = re.match(r'^\s+(\d+)\s+', line)
+                if match:
+                    return int(match.group(1))
+    except:
+        pass
+    
+    return None
+
+
+def _extract_error_context(log_file: Path, num_lines: int = 15) -> list[str] | None:
+    """
+    Extracts error context from a log file if errors are present.
+    
+    Args:
+        log_file: Path to the log file
+        num_lines: Number of context lines to extract (default: 15)
+        
+    Returns:
+        List of error context lines, or None if no errors found
+    """
+    if not log_file.exists():
+        return None
+    
+    try:
+        with open(log_file, 'r') as f:
+            content = f.read()
+            # Check for error indicators
+            if any(marker in content for marker in ['ERROR:', 'FATAL ERROR:', 'error', 'failed']):
+                lines = content.split('\n')
+                return lines[-num_lines:] if len(lines) > num_lines else lines
+    except:
+        pass
+    
+    return None
+
+
+def _has_completion_marker(log_file: Path) -> bool:
+    """
+    Checks if a log file contains completion markers indicating successful finish.
+    
+    Args:
+        log_file: Path to the log file
+        
+    Returns:
+        True if completion markers found, False otherwise
+    """
+    if not log_file.exists():
+        return False
+    
+    try:
+        with open(log_file, 'r') as f:
+            # Read last portion of file for efficiency
+            lines = f.readlines()
+            last_lines = ''.join(lines[-50:]).lower()
+            
+            # Check for various completion markers
+            completion_markers = [
+                'finished successfully',
+                'done',
+                'completed',
+                'simulation finished'
+            ]
+            
+            if any(marker in last_lines for marker in completion_markers):
+                return True
+            
+            # Additional check: "Done" often appears standalone
+            for line in lines[-10:]:
+                if line.strip().lower() == 'done':
+                    return True
+    except:
+        pass
+    
+    return False
+
+
+def get_job_stage_info(log_base_dir: Path, slurm_state: str = None):
     """
     Analyzes log files to determine the current stage of a job.
     
+    Design principle: SLURM state is authoritative. Log parsing provides supplementary detail.
+    
     Args:
         log_base_dir: Path to the submission log directory for a specific array task
+        slurm_state: Optional SLURM state (e.g., 'COMPLETED', 'RUNNING', 'FAILED') - if provided,
+                     this is treated as the authoritative source of truth
         
     Returns:
         Dict with stage information: {
@@ -259,62 +357,66 @@ def get_job_stage_info(log_base_dir: Path):
         return {'stage': 'unknown', 'iteration': None, 'details': 'Log directory not found', 
                 'failed_log': None, 'error_tail': None}
     
-    # Check for failures in any log
-    for log_file, stage_name in [(build_log, 'build'), (start_log, 'start'), (run_log, 'run')]:
-        if log_file.exists():
-            try:
-                with open(log_file, 'r') as f:
-                    content = f.read()
-                    if 'ERROR:' in content or 'FATAL ERROR:' in content or 'failed' in content.lower():
-                        # Get last 15 lines for error context
-                        lines = content.split('\n')
-                        error_tail = lines[-15:] if len(lines) > 15 else lines
+    # PRINCIPLE 1: If SLURM provides authoritative state, use it
+    # This prevents log parsing heuristics from overriding the scheduler's truth
+    if slurm_state:
+        if 'COMPLETED' in slurm_state:
+            # Task completed according to SLURM - extract iteration from logs if available
+            iteration = _extract_latest_iteration(run_log) if run_log.exists() else None
+            return {'stage': 'completed', 'iteration': iteration, 
+                    'details': 'Run completed successfully',
+                    'failed_log': None, 'error_tail': None}
+        
+        elif any(s in slurm_state for s in ['FAILED', 'CANCELLED', 'TIMEOUT']):
+            # Task failed according to SLURM - check logs for error details
+            for log_file, stage_name in [(run_log, 'run'), (start_log, 'start'), (build_log, 'build')]:
+                if log_file.exists():
+                    error_tail = _extract_error_context(log_file)
+                    if error_tail:
                         return {
-                            'stage': 'failed', 
-                            'iteration': None, 
+                            'stage': 'failed',
+                            'iteration': None,
                             'details': f'Failed in {stage_name} stage',
                             'failed_log': log_file,
                             'error_tail': error_tail
                         }
-            except:
-                pass
+            # No specific error found in logs, but SLURM says it failed
+            return {'stage': 'failed', 'iteration': None, 
+                    'details': f'Job reported as {slurm_state} by SLURM',
+                    'failed_log': None, 'error_tail': None}
     
-    # Determine current stage based on which logs exist and their completion
+    # PRINCIPLE 2: Without SLURM state, parse logs to infer current stage
+    # Check for errors in logs
+    for log_file, stage_name in [(build_log, 'build'), (start_log, 'start'), (run_log, 'run')]:
+        if log_file.exists():
+            error_tail = _extract_error_context(log_file)
+            if error_tail:
+                return {
+                    'stage': 'failed',
+                    'iteration': None,
+                    'details': f'Failed in {stage_name} stage',
+                    'failed_log': log_file,
+                    'error_tail': error_tail
+                }
+    
+    # Determine current stage based on which logs exist
     if run_log.exists():
-        # In run stage - extract latest iteration
-        try:
-            with open(run_log, 'r') as f:
-                lines = f.readlines()
-                latest_iteration = None
-                for line in reversed(lines):
-                    # Look for iteration pattern: starts with whitespace and number
-                    match = re.match(r'^\s+(\d+)\s+', line)
-                    if match:
-                        latest_iteration = int(match.group(1))
-                        break
-                
-                # Check if completed - look for multiple completion markers
-                last_lines = ''.join(lines[-50:]).lower()
-                if 'finished successfully' in last_lines or 'done' in last_lines or 'completed' in last_lines:
-                    # Additional check: "Done" often appears standalone on a line
-                    for line in lines[-10:]:
-                        if line.strip().lower() == 'done':
-                            return {'stage': 'completed', 'iteration': latest_iteration, 
-                                    'details': 'Run completed successfully',
-                                    'failed_log': None, 'error_tail': None}
-                    # Fall back to generic completion message
-                    return {'stage': 'completed', 'iteration': latest_iteration, 
-                            'details': 'Run finished successfully',
-                            'failed_log': None, 'error_tail': None}
-                
-                if latest_iteration is not None:
-                    return {'stage': 'run', 'iteration': latest_iteration, 'details': f'Running iteration {latest_iteration}',
-                            'failed_log': None, 'error_tail': None}
-                else:
-                    return {'stage': 'run', 'iteration': None, 'details': 'Run started, no iterations yet',
-                            'failed_log': None, 'error_tail': None}
-        except:
-            return {'stage': 'run', 'iteration': None, 'details': 'Run stage (reading error)',
+        latest_iteration = _extract_latest_iteration(run_log)
+        
+        # Check for completion markers in log
+        if _has_completion_marker(run_log):
+            return {'stage': 'completed', 'iteration': latest_iteration,
+                    'details': 'Run finished successfully',
+                    'failed_log': None, 'error_tail': None}
+        
+        # Still running
+        if latest_iteration is not None:
+            return {'stage': 'run', 'iteration': latest_iteration,
+                    'details': f'Running iteration {latest_iteration}',
+                    'failed_log': None, 'error_tail': None}
+        else:
+            return {'stage': 'run', 'iteration': None,
+                    'details': 'Run started, no iterations yet',
                     'failed_log': None, 'error_tail': None}
     
     elif start_log.exists():
@@ -404,6 +506,27 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     with open(manifest_file, 'r') as f:
         run_names = [line.strip() for line in f.readlines()]
     
+    # Get SLURM status for all tasks to cross-reference with log files
+    try:
+        cmd = ["sacct", "-j", batch_id, "--format=JobID,State", "-n", "-P"]
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        status_lines = result.stdout.strip().split('\n')
+        
+        slurm_status_map = {}
+        for line in status_lines:
+            if not line.strip(): 
+                continue
+            parts = line.split('|')
+            if len(parts) >= 2:
+                job_id_str, state = parts[0], parts[1].strip()
+                if '_' in job_id_str:
+                    task_id_str = job_id_str.split('_')[-1]
+                    if task_id_str.isdigit():
+                        slurm_status_map[int(task_id_str)] = state
+    except:
+        # If we can't get SLURM status, continue without it
+        slurm_status_map = {}
+    
     # Find submission log directories
     log_base = Path("logs/submission") / experiment_name
     if not log_base.exists():
@@ -454,10 +577,14 @@ def monitor_job_progress(experiment_name: str, show_details: bool = True):
     for task_id in range(1, len(run_names) + 1):
         run_name = run_names[task_id - 1]
         
+        # Get SLURM state for this task
+        slurm_state = slurm_status_map.get(task_id)
+        
         # Check if this task has a log directory
         if task_id in job_dir_map:
             job_dir = job_dir_map[task_id]
-            stage_info = get_job_stage_info(job_dir)
+            # Pass SLURM state to help with completion detection
+            stage_info = get_job_stage_info(job_dir, slurm_state=slurm_state)
             stage = stage_info['stage']
             iteration = stage_info['iteration']
             details = stage_info['details']

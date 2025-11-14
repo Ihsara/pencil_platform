@@ -22,6 +22,12 @@ from src.analysis.errors import (
     calculate_normalized_spatial_errors,
     ExperimentErrorAnalyzer
 )
+from src.analysis.validators import (
+    SimulationValidator,
+    ValidationCriteria,
+    ValidationStatus,
+    SimulationHealth
+)
 from src.analysis.metrics import calculate_errors_over_time
 from src.visualization.plots import (
     create_combined_scores_plot,
@@ -41,6 +47,10 @@ from src.visualization.plots_plotly import (
 )
 from src.experiment.naming import format_experiment_title, format_short_experiment_name
 from src.analysis.organizer import AnalysisOrganizer
+from src.analysis.pairwise import (
+    PairwiseAnalyzer,
+    load_pairwise_config_from_yaml
+)
 
 # --- Add Pencil Code Python Library to Path ---
 PENCIL_CODE_PYTHON_PATH = DIRS.root.parent / "pencil-code" / "python"
@@ -534,43 +544,122 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
             logger.info(f"     └─ ✓ Calculated errors for {len(analyze_variables)} variables")
     
     # ============================================================
-    # PHASE 2: Calculate run scores for ranking
+    # PHASE 2: Validate simulations and calculate run scores
     # ============================================================
     logger.info("\n" + "=" * 80)
-    logger.info("PHASE 2: Calculating run scores for ranking")
+    logger.info("PHASE 2: Validating simulations and calculating weighted scores")
     logger.info("=" * 80)
+    
+    # Initialize simulation validator with appropriate criteria
+    validation_criteria = ValidationCriteria(
+        min_var_files=10,           # Require at least 10 VAR files
+        min_time_coverage=0.8,       # Require at least 80% time coverage
+        min_evolution_threshold=0.01, # Must evolve by at least 1%
+        max_evolution_threshold=100.0, # Detect blow-ups
+        allow_warnings=True          # Allow warnings in ranking (but penalize them)
+    )
+    
+    validator = SimulationValidator(validation_criteria)
+    
+    # Get expected end time from plan (if available)
+    expected_end_time = error_config.get('expected_end_time', None)
     
     # Use the explicitly configured ranking_metric (already validated above)
     logger.info(f"Using configured ranking metric: {ranking_metric.upper()}")
+    logger.info(f"Validation criteria: min_var_files={validation_criteria.min_var_files}, "
+                f"min_time_coverage={validation_criteria.min_time_coverage:.0%}")
     
-    # Calculate average error for each run using ONLY DENSITY (rho)
+    # Validate and calculate scores for each run
     run_scores = {}
+    validation_results = {}
+    
     for run_name, cached in loaded_data_cache.items():
+        sim_data = cached['sim_data']
         spatial_errors = cached['spatial_errors']
         
-        # Calculate average error for DENSITY ONLY across all timesteps using configured ranking metric
+        # Validate simulation health
+        health = validator.validate(
+            sim_data,
+            expected_end_time=expected_end_time,
+            variables=analyze_variables
+        )
+        
+        validation_results[run_name] = health
+        
+        # Log validation status with clear communication
+        if health.is_valid():
+            logger.info(f"  ✓ {run_name}: VALID (successful simulation)")
+        elif health.status == ValidationStatus.WARNING:
+            logger.warning(f"  ⚠ {run_name}: WARNING - {'; '.join(health.issues)}")
+        elif health.status == ValidationStatus.FAILED_AS_EXPECTED:
+            logger.info(f"  ○ {run_name}: FAILED AT EXTREME PARAMETERS (expected for sweep) - {'; '.join(health.issues)}")
+        elif health.status == ValidationStatus.INCOMPLETE:
+            logger.error(f"  ✗ {run_name}: INCOMPLETE (unexpected crash) - {'; '.join(health.issues)}")
+        
+        logger.info(f"      VAR files: {health.n_var_files}, "
+                   f"Time coverage: {health.time_coverage:.1%}, "
+                   f"Evolution: {health.max_evolution:.2e}, "
+                   f"Completeness: {health.completeness_factor:.1%}")
+        
+        # Calculate raw error using configured ranking metric
         total_error = 0
         count = 0
         if 'rho' in spatial_errors:
             for errors in spatial_errors['rho']['errors_per_timestep']:
                 if ranking_metric == 'l1':
-                    # L1 norm: mean absolute error
                     total_error += np.mean(np.abs(errors))
                 elif ranking_metric == 'l2':
-                    # L2 norm: root mean square error
                     total_error += np.sqrt(np.mean(errors**2))
                 elif ranking_metric == 'linf':
-                    # L∞ norm: maximum absolute error
                     total_error += np.max(np.abs(errors))
                 else:
-                    # Default to L1 if somehow an invalid metric got through
                     logger.warning(f"Unknown ranking metric '{ranking_metric}', using L1")
                     total_error += np.mean(np.abs(errors))
                 count += 1
         
-        avg_error = total_error / count if count > 0 else float('inf')
-        run_scores[run_name] = avg_error
-        logger.info(f"  {run_name}: avg {ranking_metric.upper()} error (rho only) = {avg_error:.6e}")
+        raw_error = total_error / count if count > 0 else float('inf')
+        
+        # Calculate weighted score based on completeness
+        # Invalid simulations get infinite score (excluded from ranking)
+        # Valid/Warning simulations get weighted by completeness factor
+        if not health.is_usable():
+            # Invalid simulation - exclude from ranking
+            weighted_score = float('inf')
+            logger.warning(f"      Excluding from ranking (invalid simulation)")
+        else:
+            # Weight the error by inverse of completeness
+            # Lower completeness = higher penalty
+            # Formula: weighted_error = raw_error / completeness_factor
+            # This means incomplete sims get higher (worse) scores
+            if health.completeness_factor > 0:
+                weighted_score = raw_error / health.completeness_factor
+            else:
+                weighted_score = float('inf')
+            
+            penalty_pct = ((weighted_score - raw_error) / raw_error * 100) if raw_error > 0 else 0
+            
+            logger.info(f"      Raw {ranking_metric.upper()}: {raw_error:.6e}, "
+                       f"Weighted: {weighted_score:.6e} "
+                       f"({'no penalty' if penalty_pct < 0.1 else f'+{penalty_pct:.1f}% penalty'})")
+        
+        run_scores[run_name] = weighted_score
+    
+    # Log summary of validation results with proper categorization
+    logger.info(f"\nValidation Summary:")
+    valid_count = sum(1 for h in validation_results.values() if h.status == ValidationStatus.VALID)
+    warning_count = sum(1 for h in validation_results.values() if h.status == ValidationStatus.WARNING)
+    incomplete_count = sum(1 for h in validation_results.values() if h.status == ValidationStatus.INCOMPLETE)
+    failed_expected_count = sum(1 for h in validation_results.values() if h.status == ValidationStatus.FAILED_AS_EXPECTED)
+    
+    logger.info(f"  ✓ Valid (successful): {valid_count}")
+    logger.info(f"  ⚠ Warnings (usable with penalty): {warning_count}")
+    logger.info(f"  ○ Failed at extreme parameters (EXPECTED): {failed_expected_count}")
+    logger.info(f"  ✗ Incomplete (unexpected crash): {incomplete_count}")
+    
+    usable_count = valid_count + warning_count
+    excluded_count = incomplete_count + failed_expected_count
+    logger.info(f"\n  → Included in ranking: {usable_count} ({usable_count}/{len(validation_results)})")
+    logger.info(f"  → Excluded from ranking: {excluded_count} ({excluded_count}/{len(validation_results)})")
     
     # ============================================================
     # PHASE 3: Calculate L1/L2 error norms (reusing loaded data)
@@ -653,9 +742,7 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     save_error_norms_summary(sorted_runs, branch_best, error_norms_cache, 
                             combined_scores, metrics, error_norms_dir, experiment_name)
     
-    # Generate complete error ranking report with all runs
-    logger.info("\n  ├─ Generating complete error ranking report...")
-    generate_error_ranking_report(experiment_name, combined_scores, metrics, error_norms_dir)
+    # NOTE: Complete error ranking is now part of final report (no duplicate header)
     
     # ============================================================
     # PHASE 6: Populate best performers folders
@@ -669,16 +756,88 @@ def analyze_suite_videos_only(experiment_name: str, error_method: str = 'absolut
     )
     
     # ============================================================
-    # FINAL RICH REPORT
+    # PHASE 7: Pairwise Comparison (if enabled)
+    # ============================================================
+    pairwise_config = load_pairwise_config_from_yaml(analysis_config)
+    
+    if pairwise_config:
+        logger.info("\n" + "=" * 80)
+        logger.info("PHASE 7: Pairwise Comparison Analysis")
+        logger.info("=" * 80)
+        
+        # Create pairwise analyzer
+        pairwise_output_dir = analysis_dir / "pairwise_comparison"
+        pairwise_analyzer = PairwiseAnalyzer(pairwise_config, pairwise_output_dir)
+        
+        # Select pairs based on configuration
+        pairs_to_compare = pairwise_analyzer.select_pairs(sorted_runs)
+        
+        if pairs_to_compare:
+            pairwise_results = []
+            
+            for run1_name, run2_name in pairs_to_compare:
+                logger.info(f"\n  Analyzing pair: {run1_name} vs {run2_name}")
+                
+                # Get cached data for both runs
+                if run1_name not in loaded_data_cache or run2_name not in loaded_data_cache:
+                    logger.warning(f"  ⚠ Skipping pair - data not available")
+                    continue
+                
+                run1_cache = loaded_data_cache[run1_name]
+                run2_cache = loaded_data_cache[run2_name]
+                
+                # Extract parameters if available
+                run1_params = run1_cache['sim_data'][0]['params'] if run1_cache['sim_data'] else None
+                run2_params = run2_cache['sim_data'][0]['params'] if run2_cache['sim_data'] else None
+                
+                # Perform comparison
+                try:
+                    result = pairwise_analyzer.compare_pair(
+                        run1_name, run2_name,
+                        run1_cache['sim_data'], run1_cache['analytical_data'],
+                        run2_cache['sim_data'], run2_cache['analytical_data'],
+                        run1_params, run2_params
+                    )
+                    pairwise_results.append(result)
+                    logger.info(f"  ✓ Completed comparison")
+                except Exception as e:
+                    logger.error(f"  ✗ Comparison failed: {e}")
+                    continue
+            
+            # Generate comprehensive report
+            if pairwise_results:
+                logger.info(f"\n  Generating pairwise comparison report...")
+                pairwise_analyzer.generate_report(pairwise_results, experiment_name)
+                logger.success(f"  ✓ Pairwise comparison complete: {len(pairwise_results)} pairs analyzed")
+            else:
+                logger.warning("  No pairwise comparisons completed")
+        else:
+            logger.warning("  No pairs selected for comparison")
+    else:
+        logger.info("\n  ℹ Pairwise comparison disabled (not configured)")
+    
+    # ============================================================
+    # FINAL RICH REPORT (includes complete error ranking)
     # ============================================================
     logger.info("\n" + "=" * 80)
     logger.info("FINAL SUMMARY")
     logger.info("=" * 80)
     
     generate_final_rich_report(
-        experiment_name, organizer.error_evolution_dir, organizer.error_norms_dir, 
+        experiment_name, organizer.error_evolution_dir, error_norms_dir, 
         len(loaded_data_cache), sorted_runs[:10], branch_best, 
         combined_scores, metrics
+    )
+    
+    # ============================================================
+    # PHASE 8: Consecutive Pair Comparisons (for similar-scoring runs)
+    # ============================================================
+    logger.info("\n" + "=" * 80)
+    logger.info("PHASE 8: Consecutive Pair Comparisons (Top Ranked)")
+    logger.info("=" * 80)
+    
+    generate_consecutive_pair_comparisons(
+        experiment_name, sorted_runs, loaded_data_cache, error_norms_dir
     )
 
 
@@ -1440,3 +1599,164 @@ def generate_final_rich_report(experiment_name, video_dir, error_norms_dir,
         border_style="bold green"
     ))
     console.print("\n")
+
+
+def generate_consecutive_pair_comparisons(experiment_name, sorted_runs, loaded_data_cache, output_dir):
+    """
+    Generate comparisons between consecutively ranked runs (1 vs 2, 3 vs 4, etc.).
+    
+    This helps identify what distinguishes runs with similar performance, especially
+    useful when error scores are very close together.
+    
+    Args:
+        experiment_name: Name of the experiment
+        sorted_runs: List of (run_name, scores) tuples sorted by error
+        loaded_data_cache: Dictionary of loaded simulation data
+        output_dir: Directory to save the comparison report
+    """
+    from rich.console import Console
+    from rich.table import Table
+    from rich.panel import Panel
+    
+    console = Console()
+    
+    # Only compare the top-ranked pairs where differences are small
+    # Compare pairs: (1 vs 2), (3 vs 4), (5 vs 6), etc.
+    max_pairs = min(6, len(sorted_runs) // 2)  # Compare up to top 12 runs (6 pairs)
+    
+    if max_pairs < 1:
+        logger.info("  Not enough runs to perform consecutive pair comparisons")
+        return
+    
+    comparison_results = []
+    
+    for pair_idx in range(max_pairs):
+        rank1 = pair_idx * 2
+        rank2 = rank1 + 1
+        
+        if rank2 >= len(sorted_runs):
+            break
+        
+        run1_name, run1_scores = sorted_runs[rank1]
+        run2_name, run2_scores = sorted_runs[rank2]
+        
+        # Use short names for display
+        run1_short = format_short_experiment_name(run1_name, experiment_name)
+        run2_short = format_short_experiment_name(run2_name, experiment_name)
+        
+        # Calculate percent difference
+        score1 = run1_scores['combined']
+        score2 = run2_scores['combined']
+        pct_diff = ((score2 - score1) / score1) * 100 if score1 > 0 else 0
+        
+        logger.info(f"\n  Pair {pair_idx + 1}: Rank {rank1 + 1} vs Rank {rank2 + 1}")
+        logger.info(f"    {run1_short} ({score1:.6e})")
+        logger.info(f"    vs")
+        logger.info(f"    {run2_short} ({score2:.6e})")
+        logger.info(f"    Difference: {pct_diff:.2f}%")
+        
+        # Extract parameter differences if available
+        param_diffs = []
+        if run1_name in loaded_data_cache and run2_name in loaded_data_cache:
+            run1_cache = loaded_data_cache[run1_name]
+            run2_cache = loaded_data_cache[run2_name]
+            
+            if run1_cache['sim_data'] and run2_cache['sim_data']:
+                params1 = run1_cache['sim_data'][0]['params']
+                params2 = run2_cache['sim_data'][0]['params']
+                
+                # Check key parameters
+                param_keys = ['nu_shock', 'chi_shock', 'diffrho_shock', 'gamma']
+                for key in param_keys:
+                    val1 = getattr(params1, key, None)
+                    val2 = getattr(params2, key, None)
+                    
+                    if val1 is not None and val2 is not None and val1 != val2:
+                        param_diffs.append(f"{key}: {val1} → {val2}")
+        
+        if param_diffs:
+            logger.info(f"    Parameter differences: {', '.join(param_diffs)}")
+        else:
+            logger.info(f"    Parameter differences: Similar or metadata-only")
+        
+        comparison_results.append({
+            'pair_idx': pair_idx + 1,
+            'rank1': rank1 + 1,
+            'rank2': rank2 + 1,
+            'run1': run1_short,
+            'run2': run2_short,
+            'score1': score1,
+            'score2': score2,
+            'pct_diff': pct_diff,
+            'param_diffs': param_diffs
+        })
+    
+    # Create Rich table for summary
+    console.print("\n")
+    pair_table = Table(
+        title=f"🔍 Consecutive Pair Comparisons - {experiment_name}",
+        title_style="bold cyan",
+        border_style="cyan",
+        show_header=True,
+        header_style="bold"
+    )
+    
+    pair_table.add_column("Pair", style="bold yellow", justify="center", width=6)
+    pair_table.add_column("Ranks", style="cyan", justify="center", width=8)
+    pair_table.add_column("Run 1 → Run 2", style="magenta", width=50)
+    pair_table.add_column("Score Diff", justify="right", style="yellow", width=12)
+    
+    for result in comparison_results:
+        pair_display = f"#{result['pair_idx']}"
+        ranks_display = f"{result['rank1']} vs {result['rank2']}"
+        runs_display = f"{result['run1'][:23]}... → {result['run2'][:23]}..."
+        
+        # Color code percentage difference
+        if result['pct_diff'] < 1:
+            diff_display = f"[green]+{result['pct_diff']:.2f}%[/green]"
+        elif result['pct_diff'] < 5:
+            diff_display = f"[yellow]+{result['pct_diff']:.2f}%[/yellow]"
+        else:
+            diff_display = f"[red]+{result['pct_diff']:.2f}%[/red]"
+        
+        pair_table.add_row(
+            pair_display,
+            ranks_display,
+            runs_display,
+            diff_display
+        )
+    
+    console.print(pair_table)
+    
+    # Save to text file
+    output_file = output_dir / f"{experiment_name}_consecutive_pairs.txt"
+    
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write("=" * 100 + "\n")
+        f.write(f"CONSECUTIVE PAIR COMPARISONS - {experiment_name}\n")
+        f.write("=" * 100 + "\n\n")
+        f.write("This report compares consecutively ranked runs to identify what distinguishes\n")
+        f.write("similar-performing simulations (e.g., rank 1 vs 2, rank 3 vs 4, etc.).\n\n")
+        
+        for result in comparison_results:
+            f.write(f"\nPair {result['pair_idx']}: Ranks {result['rank1']} vs {result['rank2']}\n")
+            f.write("-" * 100 + "\n")
+            f.write(f"  Run 1 (Rank {result['rank1']}): {result['run1']}\n")
+            f.write(f"    Score: {result['score1']:.6e}\n")
+            f.write(f"\n")
+            f.write(f"  Run 2 (Rank {result['rank2']}): {result['run2']}\n")
+            f.write(f"    Score: {result['score2']:.6e}\n")
+            f.write(f"\n")
+            f.write(f"  Difference: +{result['pct_diff']:.2f}%\n")
+            
+            if result['param_diffs']:
+                f.write(f"\n  Parameter differences:\n")
+                for diff in result['param_diffs']:
+                    f.write(f"    - {diff}\n")
+            else:
+                f.write(f"\n  Parameter differences: Similar or metadata-only\n")
+            
+            f.write("\n")
+    
+    logger.success(f"  ✓ Saved consecutive pair comparisons to {output_file}")
+    console.print(f"\n[green]✓ Pair comparison report saved to:[/green] [cyan]{output_file}[/cyan]\n")
